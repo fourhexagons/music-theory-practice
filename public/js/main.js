@@ -162,6 +162,42 @@ function normalize(raw) {
   return raw.trim().replace(/b/g,"♭").toUpperCase().replace(/\s+/g, " ");
 }
 
+function normalizeChord(str) {
+  return str.trim().replace(/b/g, "♭").replace(/\s+/g, "").toUpperCase();
+}
+
+function chordVariations(root, qual) {
+  const v = [];
+  switch (qual) {
+    case "m": // minor
+      v.push(
+        root + "m", root + "M", root + "-", root + "MIN", root + "MINOR",
+        root + " MIN", root + " MINOR", root + "min", root + "minor", root + " min", root + " minor"
+      );
+      break;
+    case "": // major
+      v.push(
+        root, root + "MAJ", root + "MAJOR", root + " MAJ", root + " MAJOR",
+        root + "maj", root + "major", root + " maj", root + " major"
+      );
+      break;
+    case "dim": // diminished
+      v.push(
+        root + "DIM", root + "dim", root + " DIM", root + " dim", root + "DIMINISHED", root + "diminished", root + " DIMINISHED", root + " diminished", root + "°"
+      );
+      break;
+    case "aug": // augmented
+      v.push(
+        root + "AUG", root + "aug", root + " AUG", root + " aug", root + "AUGMENTED", root + "augmented", root + " AUGMENTED", root + " augmented", root + "+"
+      );
+      break;
+    default:
+      v.push(root + qual.toUpperCase());
+      break;
+  }
+  return v;
+}
+
 // Event handlers
 R.onclick = () => {
   if (confirm("Are you sure you want to restart? Your progress will be saved.")) {
@@ -313,36 +349,10 @@ function checkAnswer() {
       const orig = quizData[at.k].triads[at.d];
       const root = orig.match(/^[A-G][#♭]?/)[0];
       const qual = orig.slice(root.length).toLowerCase();
-      let rc = normalize(raw);
-      const acc = new Set();
-      acc.add(root + qual.toUpperCase());
-      if(qual === "m") {
-        acc.add(root + "M");
-        acc.add(root + "-");
-        acc.add(root + "MIN");
-        acc.add(root + "MINOR");
-        acc.add(root + " MIN");
-        acc.add(root + " MINOR");
-      }
-      if(qual === "") {
-        acc.add(root);
-        acc.add(root + "MAJ");
-        acc.add(root + "MAJOR");
-        acc.add(root + " MAJ");
-        acc.add(root + " MAJOR");
-      }
-      if(qual === "dim") {
-        acc.add(root + "DIM");
-        acc.add(root + "°");
-        acc.add(root + "DIMINISHED");
-        acc.add(root + " DIM");
-        acc.add(root + " DIMINISHED");
-        acc.add(root + "DIM");
-        acc.add(root + "DIMINISHED");
-        acc.add(root + " dim");
-        acc.add(root + " diminished");
-      }
-      if(acc.has(rc)) correct = true;
+      const variations = chordVariations(root, qual);
+      const normAnswer = normalizeChord(raw);
+      const normSet = new Set(variations.map(normalizeChord));
+      if(normSet.has(normAnswer)) correct = true;
       break;
     }
     case "adv7ths": {
