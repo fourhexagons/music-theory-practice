@@ -331,6 +331,10 @@ function checkAnswer() {
         acc.add(root + "DIM");
         acc.add(root + "°");
         acc.add(root + "DIMINISHED");
+        acc.add(root + " DIM");
+        acc.add(root + " DIMINISHED");
+        acc.add(root + "DIM");
+        acc.add(root + "DIMINISHED");
       }
       if(acc.has(rc)) correct = true;
       break;
