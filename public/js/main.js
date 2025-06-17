@@ -159,7 +159,7 @@ function ordinal(n) {
 }
 
 function normalize(raw) {
-  return raw.trim().replace(/b/g,"♭").toUpperCase();
+  return raw.trim().replace(/b/g,"♭").toUpperCase().replace(/\s+/g, " ");
 }
 
 // Event handlers
@@ -313,7 +313,7 @@ function checkAnswer() {
       const orig = quizData[at.k].triads[at.d];
       const root = orig.match(/^[A-G][#♭]?/)[0];
       const qual = orig.slice(root.length).toLowerCase();
-      let rc = normalize(raw).replace(/\s+/g,"");
+      let rc = normalize(raw);
       const acc = new Set();
       acc.add(root + qual.toUpperCase());
       if(qual === "m") {
@@ -321,11 +321,15 @@ function checkAnswer() {
         acc.add(root + "-");
         acc.add(root + "MIN");
         acc.add(root + "MINOR");
+        acc.add(root + " MIN");
+        acc.add(root + " MINOR");
       }
       if(qual === "") {
         acc.add(root);
         acc.add(root + "MAJ");
         acc.add(root + "MAJOR");
+        acc.add(root + " MAJ");
+        acc.add(root + " MAJOR");
       }
       if(qual === "dim") {
         acc.add(root + "DIM");
@@ -335,6 +339,8 @@ function checkAnswer() {
         acc.add(root + " DIMINISHED");
         acc.add(root + "DIM");
         acc.add(root + "DIMINISHED");
+        acc.add(root + " dim");
+        acc.add(root + " diminished");
       }
       if(acc.has(rc)) correct = true;
       break;
