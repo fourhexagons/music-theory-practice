@@ -1,3 +1,4 @@
+console.log('main.js loaded');
 // Quiz Data
 const quizData = {
   C: {
@@ -103,8 +104,22 @@ const englishNums = ["zero","one","two","three","four","five","six"];
 const PROGRESS_KEY = 'musicTheoryProgress';
 
 function loadProgress() {
-  const saved = localStorage.getItem(PROGRESS_KEY);
-  return saved ? JSON.parse(saved) : {
+  const raw = localStorage.getItem('mtp-progress');
+  if (!raw) return null;
+  const parsed = JSON.parse(raw);
+  // Convert unlockedGroups back to Set
+  parsed.unlockedGroups = new Set(parsed.unlockedGroups);
+  return parsed;
+}
+
+function saveProgress(progress) {
+  // Convert Set to Array for storage
+  const toSave = {...progress, unlockedGroups: Array.from(progress.unlockedGroups)};
+  localStorage.setItem('mtp-progress', JSON.stringify(toSave));
+}
+
+function getDefaultProgress() {
+  return {
     completedKeys: new Set(),
     unlockedGroups: new Set([0]), // Start with first group unlocked
     stats: {
@@ -122,10 +137,6 @@ function loadProgress() {
   };
 }
 
-function saveProgress(progress) {
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
-}
-
 // State management
 let state = {
   phase: "accCount",
@@ -134,7 +145,7 @@ let state = {
   chordDegrees: [],
   advTriads: [], advIdx: 0,
   adv7ths: [], sevIdx: 0,
-  progress: loadProgress()
+  progress: loadProgress() || getDefaultProgress()
 };
 
 // DOM Elements
@@ -163,7 +174,11 @@ function normalize(raw) {
 }
 
 function normalizeChord(str) {
-  return str.trim().replace(/b/g, "♭").replace(/\s+/g, "").toUpperCase();
+  return str.trim()
+    // Replace 'b' with '♭' only if it follows a note letter (A-G, #, or ♭)
+    .replace(/([A-G#♭])b/g, '$1♭')
+    .replace(/\s+/g, "")
+    .toUpperCase();
 }
 
 function chordVariations(root, qual) {
@@ -238,6 +253,11 @@ function askQuestion() {
   
   const grp = keyGroups[state.groupIndex],
         key = grp[state.keyIndex];
+  if (typeof key === 'undefined') {
+    advancePhase();
+    if (state.phase !== 'done') askQuestion();
+    return;
+  }
   let q = "";
   
   switch(state.phase) {
@@ -306,6 +326,7 @@ function updateProgress(correct) {
 }
 
 function checkAnswer() {
+  console.log('[DEBUG] checkAnswer called');
   if(state.phase === "done") return;
   
   const raw = A.value.trim();
@@ -330,9 +351,21 @@ function checkAnswer() {
       break;
     }
     case "accNotes": {
-      const notes = quizData[key].notes;
-      const norm = normalize(raw).split(/\s*,\s*/);
-      correct = notes.every(n => norm.includes(n.toUpperCase()));
+      const at = {k:key, d: state.accNotes[0]};
+      const orig = quizData[at.k].accidentals;
+      // Accept answers separated by spaces, commas, or both
+      function normalizeAccList(str) {
+        return str
+          .replace(/,/g, ' ') // replace commas with spaces
+          .split(/\s+/) // split on spaces
+          .map(s => s.trim().toUpperCase())
+          .filter(Boolean)
+          .sort()
+          .join(' ');
+      }
+      const normAnswer = normalizeAccList(raw);
+      const normOrig = normalizeAccList(orig);
+      if(normAnswer === normOrig) correct = true;
       break;
     }
     case "scale": {
@@ -352,6 +385,15 @@ function checkAnswer() {
       const variations = chordVariations(root, qual);
       const normAnswer = normalizeChord(raw);
       const normSet = new Set(variations.map(normalizeChord));
+      // Detailed debug log
+      console.log('[DEBUG] triads/advTriads', {
+        orig,
+        root,
+        qual,
+        variations,
+        normAnswer,
+        normSet: Array.from(normSet)
+      });
       if(normSet.has(normAnswer)) correct = true;
       break;
     }
@@ -405,23 +447,24 @@ function advancePhase() {
       state.chordDegrees.shift();
       if(!state.chordDegrees.length) {
         state.keyIndex++;
-        if(state.keyIndex < grp.length) {
-          state.phase = "accCount";
-        } else if(state.groupIndex < keyGroups.length-1) {
-          state.groupIndex++;
-          state.keyIndex = 0;
-          state.phase = "accCount";
-          // Unlock next group
-          state.progress.unlockedGroups.add(state.groupIndex);
-          saveProgress(state.progress);
+        if(state.keyIndex >= grp.length) {
+          if(state.groupIndex < keyGroups.length-1) {
+            state.groupIndex++;
+            state.keyIndex = 0;
+            state.phase = "accCount";
+            state.progress.unlockedGroups.add(state.groupIndex);
+            saveProgress(state.progress);
+          } else {
+            state.phase = "advTriads";
+            state.advTriads = [];
+            keyGroups.flat().forEach(k => {
+              for(let d = 2; d <= 7; d++) state.advTriads.push({k,d});
+            });
+            shuffle(state.advTriads);
+            state.advIdx = 0;
+          }
         } else {
-          state.phase = "advTriads";
-          state.advTriads = [];
-          keyGroups.flat().forEach(k => {
-            for(let d = 2; d <= 7; d++) state.advTriads.push({k,d});
-          });
-          shuffle(state.advTriads);
-          state.advIdx = 0;
+          state.phase = "accCount";
         }
       }
       break;
@@ -441,3 +484,53 @@ function advancePhase() {
 
 // Initialize
 askQuestion();
+
+// Remove previous skip/jump logic and replace with new skip logic
+(function handleSkipParam() {
+  const params = new URLSearchParams(window.location.search);
+  const skip = params.get('skip');
+  if (skip) {
+    // Format: code:key (e.g., triad:G)
+    const [code, key] = skip.split(':');
+    if (code && key) {
+      // Map code to phase
+      const codeMap = {
+        'acc': 'accCount',
+        'scale': 'scale',
+        'triad': 'triads',
+        'triad+': 'advTriads',
+        '7th': 'sevenths',
+        '7th+': 'adv7ths'
+      };
+      const phase = codeMap[code];
+      if (phase) {
+        state.phase = phase;
+        // Find the group and keyIndex for the requested key
+        for (let g = 0; g < keyGroups.length; g++) {
+          const idx = keyGroups[g].indexOf(key);
+          if (idx !== -1) {
+            state.groupIndex = g;
+            state.keyIndex = idx;
+            break;
+          }
+        }
+        // For triads/advTriads, set up chordDegrees/advIdx
+        if (phase === 'triads') {
+          state.chordDegrees = [0,1,2];
+        }
+        if (phase === 'advTriads') {
+          state.advTriads = [{k:key,d:0},{k:key,d:1},{k:key,d:2}];
+          state.advIdx = 0;
+        }
+        if (phase === 'sevenths') {
+          state.seventhDegrees = [0,1,2];
+        }
+        if (phase === 'adv7ths') {
+          state.adv7ths = [{k:key,d:0},{k:key,d:1},{k:key,d:2}];
+          state.sevIdx = 0;
+        }
+        askQuestion();
+      }
+    }
+  }
+})();
