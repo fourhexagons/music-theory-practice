@@ -146,3 +146,38 @@ button:hover {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+#progress-menu {
+  background: #f7f7f7 !important;
+  min-width: 220px;
+  padding: 1rem 0;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+}
+#progress-menu button {
+  background: #fff !important;
+  color: #222 !important;
+  border: 1px solid #ddd !important;
+  min-height: 2rem;
+  min-width: 4rem;
+  display: block;
+  margin: 0.25rem auto;
+  width: 90%;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: background 0.2s, color 0.2s;
+}
+#progress-menu button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+#progress-menu button.selected {
+  background: #2196f3 !important;
+  color: #fff !important;
+  font-weight: bold;
+}
+#progress-menu button.completed {
+  background: #c8e6c9 !important;
+  color: #333 !important;
+}

@@ -103,21 +103,6 @@ const englishNums = ["zero","one","two","three","four","five","six"];
 // Progress tracking
 const PROGRESS_KEY = 'musicTheoryProgress';
 
-function loadProgress() {
-  const raw = localStorage.getItem('mtp-progress');
-  if (!raw) return null;
-  const parsed = JSON.parse(raw);
-  // Convert unlockedGroups back to Set
-  parsed.unlockedGroups = new Set(parsed.unlockedGroups);
-  return parsed;
-}
-
-function saveProgress(progress) {
-  // Convert Set to Array for storage
-  const toSave = {...progress, unlockedGroups: Array.from(progress.unlockedGroups)};
-  localStorage.setItem('mtp-progress', JSON.stringify(toSave));
-}
-
 function getDefaultProgress() {
   return {
     completedKeys: new Set(),
@@ -137,6 +122,27 @@ function getDefaultProgress() {
   };
 }
 
+function loadProgress() {
+  const raw = localStorage.getItem('mtp-progress');
+  if (!raw) return getDefaultProgress();
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+    // Convert unlockedGroups and completedKeys to arrays if needed
+    let ug = parsed.unlockedGroups;
+    let ck = parsed.completedKeys;
+    if (!Array.isArray(ug)) ug = ug && typeof ug === 'object' ? Object.values(ug) : [0];
+    if (!Array.isArray(ck)) ck = ck && typeof ck === 'object' ? Object.values(ck) : [];
+    parsed.unlockedGroups = new Set(ug);
+    parsed.completedKeys = new Set(ck);
+    return parsed;
+  } catch (e) {
+    // If anything goes wrong, clear progress and use default
+    localStorage.removeItem('mtp-progress');
+    return getDefaultProgress();
+  }
+}
+
 // State management
 let state = {
   phase: "accCount",
@@ -145,7 +151,7 @@ let state = {
   chordDegrees: [],
   advTriads: [], advIdx: 0,
   adv7ths: [], sevIdx: 0,
-  progress: loadProgress() || getDefaultProgress()
+  progress: loadProgress()
 };
 
 // DOM Elements
@@ -173,12 +179,51 @@ function normalize(raw) {
   return raw.trim().replace(/b/g,"♭").toUpperCase().replace(/\s+/g, " ");
 }
 
+// Robust accidental normalization for all answer checking
+function accidentalToUnicode(s) {
+  s = s.trim();
+  // Special case: 'bb' or 'Bb' as a token means B♭
+  if (/^bb$/i.test(s)) return 'B♭';
+  if (/^b$/i.test(s)) return 'B';
+  // Double flat: Abb, Bbb, etc.
+  if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B'; // 𝄫
+  // Double sharp: A##, B##, etc. or Ax, Bx
+  if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A'; // 𝄪
+  // Single flat: Ab, Bb, etc.
+  if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
+  // Single sharp: A#, B#, etc.
+  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
+  // Already Unicode accidental
+  if (/^([A-Ga-g])♭$/.test(s)) return s[0].toUpperCase() + '♭';
+  if (/^([A-Ga-g])♯$/.test(s)) return s[0].toUpperCase() + '♯';
+  if (/^([A-Ga-g])𝄫$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
+  if (/^([A-Ga-g])𝄪$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
+  return s.toUpperCase().normalize('NFC');
+}
+
+function normalizeAccList(strOrArr) {
+  if (Array.isArray(strOrArr)) {
+    return strOrArr
+      .map(s => accidentalToUnicode(s))
+      .filter(Boolean)
+      .sort()
+      .join(' ')
+      .trim();
+  } else {
+    return String(strOrArr)
+      .replace(/,/g, ' ')
+      .split(/\s+/)
+      .map(s => accidentalToUnicode(s))
+      .filter(Boolean)
+      .sort()
+      .join(' ')
+      .trim();
+  }
+}
+
 function normalizeChord(str) {
-  return str.trim()
-    // Replace 'b' with '♭' only if it follows a note letter (A-G, #, or ♭)
-    .replace(/([A-G#♭])b/g, '$1♭')
-    .replace(/\s+/g, "")
-    .toUpperCase();
+  // Normalize each token in the chord string
+  return str.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
 }
 
 function chordVariations(root, qual) {
@@ -265,6 +310,12 @@ function askQuestion() {
       q = `How many accidentals in ${key} major?`;
       break;
     case "accNotes":
+      if (!state.accNotes || state.accNotes.length === 0) {
+        F.textContent = "[Error] Accidentals state not initialized.";
+        state.phase = "accCount";
+        askQuestion();
+        return;
+      }
       q = quizData[key].accidentals === 1
         ? `Name the accidental in ${key} major.`
         : `Name the accidentals in ${key} major.`;
@@ -273,14 +324,32 @@ function askQuestion() {
       q = `Spell the ${key} major scale.`;
       break;
     case "triads":
+      if (!state.chordDegrees || state.chordDegrees.length === 0) {
+        F.textContent = "[Error] Triad degrees not initialized.";
+        state.phase = "scale";
+        askQuestion();
+        return;
+      }
       q = `In ${key} major, what chord is built on the ${ordinal(state.chordDegrees[0])} degree?`;
       break;
     case "advTriads": {
+      if (!state.advTriads || state.advTriads.length === 0 || state.advIdx >= state.advTriads.length) {
+        F.textContent = "[Error] Advanced triads state not initialized.";
+        state.phase = "triads";
+        askQuestion();
+        return;
+      }
       const at = state.advTriads[state.advIdx];
       q = `In ${at.k} major, what chord is built on the ${ordinal(at.d)} degree?`;
       break;
     }
     case "adv7ths": {
+      if (!state.adv7ths || state.adv7ths.length === 0 || state.sevIdx >= state.adv7ths.length) {
+        F.textContent = "[Error] Advanced sevenths state not initialized.";
+        state.phase = "advTriads";
+        askQuestion();
+        return;
+      }
       const sv = state.adv7ths[state.sevIdx];
       q = `Spell the notes in the ${sv.k} major ${ordinal(sv.d)}-degree seventh chord.`;
       break;
@@ -351,41 +420,65 @@ function checkAnswer() {
       break;
     }
     case "accNotes": {
-      const at = {k:key, d: state.accNotes[0]};
-      const orig = quizData[at.k].accidentals;
-      // Accept answers separated by spaces, commas, or both
-      function normalizeAccList(str) {
-        return str
-          .replace(/,/g, ' ') // replace commas with spaces
-          .split(/\s+/) // split on spaces
-          .map(s => s.trim().toUpperCase())
-          .filter(Boolean)
-          .sort()
-          .join(' ');
+      if (!state.accNotes || state.accNotes.length === 0) {
+        F.textContent = "[Error] Accidentals state not initialized.";
+        state.phase = "accCount";
+        askQuestion();
+        return;
       }
+      const at = {k:key, d: state.accNotes[0]};
+      const correctNotes = quizData[at.k].notes || [];
       const normAnswer = normalizeAccList(raw);
-      const normOrig = normalizeAccList(orig);
+      const normOrig = normalizeAccList(correctNotes);
+      console.log('[DEBUG] accNotes', { raw, correctNotes, normAnswer, normOrig });
       if(normAnswer === normOrig) correct = true;
       break;
     }
     case "scale": {
-      const exp = quizData[key].scale.join("").replace(/B/g,"♭").toUpperCase();
-      const cand = normalize(raw).replace(/\s+/g,"");
-      if(cand === exp) correct = true;
+      // Accept both 7-note and 8-note (with repeated root) answers
+      const expArr = quizData[key].scale.map(accidentalToUnicode);
+      const exp = expArr.join("");
+      const candArr = raw.trim().split(/\s+/).map(accidentalToUnicode);
+      const cand = candArr.join("");
+      let correctScale = false;
+      if (cand === exp) correctScale = true;
+      // Accept repeated root at the octave
+      if (
+        candArr.length === expArr.length + 1 &&
+        candArr.slice(0, expArr.length).join("") === exp &&
+        candArr[0] === candArr[candArr.length - 1]
+      ) {
+        correctScale = true;
+      }
+      if (correctScale) correct = true;
       break;
     }
     case "triads":
     case "advTriads": {
-      const at = state.phase === "triads"
-        ? {k:key, d: state.chordDegrees[0]}
-        : state.advTriads[state.advIdx];
+      let at;
+      if (state.phase === "triads") {
+        if (!state.chordDegrees || state.chordDegrees.length === 0) {
+          F.textContent = "[Error] Triad degrees not initialized.";
+          state.phase = "scale";
+          askQuestion();
+          return;
+        }
+        at = {k:key, d: state.chordDegrees[0]};
+      } else {
+        if (!state.advTriads || state.advTriads.length === 0 || state.advIdx >= state.advTriads.length) {
+          F.textContent = "[Error] Advanced triads state not initialized.";
+          state.phase = "triads";
+          askQuestion();
+          return;
+        }
+        at = state.advTriads[state.advIdx];
+      }
       const orig = quizData[at.k].triads[at.d];
       const root = orig.match(/^[A-G][#♭]?/)[0];
       const qual = orig.slice(root.length).toLowerCase();
       const variations = chordVariations(root, qual);
       const normAnswer = normalizeChord(raw);
       const normSet = new Set(variations.map(normalizeChord));
-      // Detailed debug log
       console.log('[DEBUG] triads/advTriads', {
         orig,
         root,
@@ -398,6 +491,12 @@ function checkAnswer() {
       break;
     }
     case "adv7ths": {
+      if (!state.adv7ths || state.adv7ths.length === 0 || state.sevIdx >= state.adv7ths.length) {
+        F.textContent = "[Error] Advanced sevenths state not initialized.";
+        state.phase = "advTriads";
+        askQuestion();
+        return;
+      }
       const sv = state.adv7ths[state.sevIdx];
       const expArr = quizData[sv.k].seventhSpelling[sv.d]
         .map(n => n.replace(/B/g,"♭").toUpperCase());
@@ -486,51 +585,242 @@ function advancePhase() {
 askQuestion();
 
 // Remove previous skip/jump logic and replace with new skip logic
-(function handleSkipParam() {
+function handleSkipParam() {
+  console.log('handleSkipParam running', window.location.search);
   const params = new URLSearchParams(window.location.search);
   const skip = params.get('skip');
   if (skip) {
-    // Format: code:key (e.g., triad:G)
-    const [code, key] = skip.split(':');
-    if (code && key) {
-      // Map code to phase
-      const codeMap = {
-        'acc': 'accCount',
-        'scale': 'scale',
-        'triad': 'triads',
-        'triad+': 'advTriads',
-        '7th': 'sevenths',
-        '7th+': 'adv7ths'
-      };
-      const phase = codeMap[code];
-      if (phase) {
-        state.phase = phase;
-        // Find the group and keyIndex for the requested key
-        for (let g = 0; g < keyGroups.length; g++) {
-          const idx = keyGroups[g].indexOf(key);
-          if (idx !== -1) {
-            state.groupIndex = g;
-            state.keyIndex = idx;
-            break;
+    function normalizeKeyName(key) {
+      return accidentalToUnicode(key.trim()).normalize('NFC');
+    }
+    const phaseMap = {
+      'scale': 'scale',
+      'triad': 'triads',
+      'triad+': 'advTriads',
+      '7th': 'sevenths',
+      '7th+': 'adv7ths'
+    };
+    let key, phase;
+    if (!skip.includes('-')) {
+      // Only key provided, default to accCount
+      key = normalizeKeyName(skip);
+      phase = 'accCount';
+    } else {
+      // Format: KEY-phase
+      const firstDash = skip.indexOf('-');
+      key = normalizeKeyName(skip.slice(0, firstDash));
+      const rawPhase = skip.slice(firstDash + 1);
+      phase = phaseMap[rawPhase];
+    }
+    // Debug: log normalized skip key and phase
+    console.log('[DEBUG] skip logic', { skip, normalizedSkipKey: key, phase });
+    let found = false;
+    outer: for (let g = 0; g < keyGroups.length; g++) {
+      for (let idx = 0; idx < keyGroups[g].length; idx++) {
+        const groupKey = keyGroups[g][idx];
+        const normGroupKey = normalizeKeyName(groupKey);
+        console.log(`[DEBUG] comparing`, { normGroupKey, key });
+        if (normGroupKey === key && phase) {
+          state.groupIndex = g;
+          state.keyIndex = idx;
+          state.phase = phase;
+          found = true;
+          // Data-driven state initialization
+          if (phase === 'accCount' || phase === 'accNotes') {
+            const accCount = quizData[groupKey]?.accidentals || 0;
+            state.accNotes = Array.from({length: accCount}, (_, i) => i);
           }
+          if (phase === 'triads') {
+            state.chordDegrees = [2,3,4,5,6,7].slice(0, DEGREES_PER_KEY);
+          }
+          if (phase === 'advTriads') {
+            state.advTriads = [];
+            for(let d = 2; d <= 7; d++) state.advTriads.push({k:groupKey,d});
+            state.advIdx = 0;
+          }
+          if (phase === 'sevenths') {
+            state.seventhDegrees = [2,3,4,5,6,7].slice(0, DEGREES_PER_KEY);
+          }
+          if (phase === 'adv7ths') {
+            state.adv7ths = [];
+            for(let d = 2; d <= 7; d++) state.adv7ths.push({k:groupKey,d});
+            state.sevIdx = 0;
+          }
+          console.log('[DEBUG] skip match', { groupIndex: g, keyIndex: idx, phase: state.phase });
+          console.log('[DEBUG] state after skip:', JSON.parse(JSON.stringify(state)));
+          askQuestion();
+          renderProgressMenu();
+          break outer;
         }
-        // For triads/advTriads, set up chordDegrees/advIdx
-        if (phase === 'triads') {
-          state.chordDegrees = [0,1,2];
-        }
-        if (phase === 'advTriads') {
-          state.advTriads = [{k:key,d:0},{k:key,d:1},{k:key,d:2}];
-          state.advIdx = 0;
-        }
-        if (phase === 'sevenths') {
-          state.seventhDegrees = [0,1,2];
-        }
-        if (phase === 'adv7ths') {
-          state.adv7ths = [{k:key,d:0},{k:key,d:1},{k:key,d:2}];
-          state.sevIdx = 0;
-        }
-        askQuestion();
       }
     }
+    if (!found) {
+      // Show a clear error in the UI instead of reloading
+      if (typeof F !== 'undefined') {
+        F.style.color = 'red';
+        F.textContent = `Invalid skip parameter or key: "${skip}". Please check your URL.`;
+        // Also show a visible error in the menu area
+        const menu = document.getElementById('progress-menu');
+        if (menu) menu.innerHTML = `<div style="color:red;padding:1rem;">Invalid skip parameter or key: <b>${skip}</b></div>`;
+      } else {
+        alert(`Invalid skip parameter or key: "${skip}". Please check your URL.`);
+      }
+      renderProgressMenu();
+    }
+  } else {
+    // No skip param, render menu for default state
+    renderProgressMenu();
   }
-})();
+}
+
+// --- On load, render UI and run skip logic after DOMContentLoaded ---
+document.addEventListener('DOMContentLoaded', () => {
+  renderProfileSwitcher();
+  handleSkipParam();
+});
+// Also run skip logic whenever the URL changes (popstate event)
+window.addEventListener('popstate', handleSkipParam);
+
+// --- Profile and Progress Menu UI ---
+const PROFILE_KEY = 'mtp-profile';
+const PROFILES = {
+  beginner: 'Beginner',
+  dev: 'Dev/Teacher'
+};
+
+function getProfile() {
+  return localStorage.getItem(PROFILE_KEY) || 'beginner';
+}
+function setProfile(profile) {
+  localStorage.setItem(PROFILE_KEY, profile);
+}
+
+function clearProgress() {
+  localStorage.removeItem(PROGRESS_KEY);
+}
+
+function renderProfileSwitcher() {
+  const el = document.getElementById('profile-switcher');
+  if (!el) return;
+  el.innerHTML = '';
+  const label = document.createElement('label');
+  label.textContent = 'Profile: ';
+  const select = document.createElement('select');
+  for (const key in PROFILES) {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = PROFILES[key];
+    select.appendChild(opt);
+  }
+  select.value = getProfile();
+  select.onchange = () => {
+    setProfile(select.value);
+    if (select.value === 'beginner') {
+      clearProgress();
+      location.reload();
+    } else {
+      // Dev: unlock all
+      const progress = getDefaultProgress();
+      progress.unlockedGroups = new Set(keyGroups.map((_, i) => i));
+      progress.completedKeys = new Set(keyGroups.flat());
+      saveProgress(progress);
+      location.reload();
+    }
+  };
+  label.appendChild(select);
+  el.appendChild(label);
+  // Add Clear Progress button
+  const clearBtn = document.createElement('button');
+  clearBtn.textContent = 'Clear Progress';
+  clearBtn.style.marginLeft = '1rem';
+  clearBtn.onclick = () => {
+    clearProgress();
+    location.reload();
+  };
+  el.appendChild(clearBtn);
+}
+
+function isKeyUnlocked(g, idx) {
+  const profile = getProfile();
+  if (profile === 'dev') return true;
+  const progress = state.progress;
+  return progress.unlockedGroups.has(g) && (!progress.completedKeys || !progress.completedKeys.has(keyGroups[g][idx]));
+}
+function isKeyCompleted(g, idx) {
+  const progress = state.progress;
+  return progress.completedKeys && progress.completedKeys.has(keyGroups[g][idx]);
+}
+
+function renderProgressMenu() {
+  const el = document.getElementById('progress-menu');
+  if (!el) return;
+  el.innerHTML = '';
+  keyGroups.forEach((group, g) => {
+    const groupDiv = document.createElement('div');
+    groupDiv.style.marginBottom = '1rem';
+    group.forEach((key, idx) => {
+      console.log('[DEBUG] menu button key:', key, typeof key);
+      const btn = document.createElement('button');
+      btn.textContent = key;
+      btn.style.display = 'block';
+      btn.style.width = '90%';
+      btn.style.margin = '0.25rem auto';
+      btn.style.padding = '0.5rem';
+      btn.style.borderRadius = '6px';
+      btn.style.border = '1px solid #ddd';
+      btn.style.background = '#fff';
+      btn.style.color = '#222'; // Always visible text for inactive buttons
+      btn.style.cursor = isKeyUnlocked(g, idx) ? 'pointer' : 'not-allowed';
+      btn.disabled = !isKeyUnlocked(g, idx);
+      if (state.groupIndex === g && state.keyIndex === idx) {
+        btn.style.background = '#2196f3';
+        btn.style.color = '#fff';
+        btn.style.fontWeight = 'bold';
+      } else if (isKeyCompleted(g, idx)) {
+        btn.style.background = '#c8e6c9';
+        btn.style.color = '#333';
+      }
+      btn.onclick = () => {
+        if (!btn.disabled) {
+          // Sanitize key value for skip navigation
+          const safeKey = typeof key === 'string' ? key : String(key);
+          window.location.href = `?skip=${encodeURIComponent(safeKey)}`;
+        }
+      };
+      groupDiv.appendChild(btn);
+    });
+    el.appendChild(groupDiv);
+  });
+}
+
+// --- Patch progress logic to unlock next group/key on completion ---
+const origUpdateProgress = updateProgress;
+updateProgress = function(correct) {
+  const prevPhase = state.phase;
+  origUpdateProgress.apply(this, arguments);
+  // If completed a key, mark as completed and unlock next
+  if (correct && (prevPhase === 'triads' || prevPhase === 'advTriads' || prevPhase === 'adv7ths')) {
+    const key = keyGroups[state.groupIndex][state.keyIndex];
+    state.progress.completedKeys.add(key);
+    // Unlock next key/group if not already
+    if (state.keyIndex + 1 < keyGroups[state.groupIndex].length) {
+      state.progress.unlockedGroups.add(state.groupIndex);
+    } else if (state.groupIndex + 1 < keyGroups.length) {
+      state.progress.unlockedGroups.add(state.groupIndex + 1);
+    }
+    saveProgress(state.progress);
+    renderProgressMenu();
+  }
+};
+
+// --- On load, render UI ---
+document.addEventListener('DOMContentLoaded', () => {
+  renderProfileSwitcher();
+  renderProgressMenu();
+});
+// Also re-render menu after each question
+const origAskQuestion = askQuestion;
+askQuestion = function() {
+  origAskQuestion.apply(this, arguments);
+  renderProgressMenu();
+};
