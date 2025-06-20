@@ -1,9 +1,9 @@
-const CACHE_NAME = 'music-theory-v1';
+const CACHE_NAME = 'music-theory-v11';
 const ASSETS = [
   '/',
   '/index.html',
-  '/css/style.css',
-  '/js/main.js',
+  '/css/style.css?v=5',
+  '/js/main.js?v=13',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
@@ -33,31 +33,23 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch event - serve from cache, fall back to network
+// Fetch event - network-first for HTML, cache-first for others
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .then(response => {
-            // Don't cache if not a success response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            // Clone the response
-            const responseToCache = response.clone();
-            
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-              
-            return response;
-          });
+  // For navigation requests (HTML pages), try network first.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        // If network fails, serve from cache
+        return caches.match(event.request);
       })
+    );
+    return;
+  }
+
+  // For other requests (CSS, JS, images), use cache-first strategy.
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 }); 

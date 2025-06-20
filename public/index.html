@@ -4,32 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Theory Practice</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=5">
     <meta name="description" content="Practice music theory concepts including scales, chords, and key signatures">
-    <meta name="theme-color" content="#2196F3">
+    <meta name="theme-color" content="#0066cc">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="icon" href="favicon.ico">
   </head>
   <body>
-    <div id="profile-switcher" style="position: absolute; top: 1rem; right: 1rem;"></div>
-    <div style="display: flex; min-height: 100vh;">
-      <nav id="progress-menu" style="width: 220px; background: #f7f7f7; border-right: 1px solid #eee; padding: 1rem 0; display: flex; flex-direction: column;"></nav>
-      <main style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
-        <h1 class="title">Music Theory Practice</h1>
-        <div id="quiz-container">
-          <form id="quiz-form">
-            <div id="question" class="question"></div>
-            <input id="answer" type="text" autocomplete="off" placeholder="Enter your answer..." />
-            <div id="feedback" class="feedback"></div>
-            <button type="submit" id="check">Check Answer</button>
-            <button type="button" id="reset">Reset Progress</button>
-          </form>
-          <button id="seventhPractice" style="display:none; margin-top:1rem;">Practice All 7th Chords</button>
-        </div>
-      </main>
+    <div id="app-container">
+      <!-- New Learning Path UI will be rendered here -->
     </div>
-    <script src="js/main.js"></script>
+
+    <script src="js/main.js?v=19"></script>
     <script>
       // Register service worker for PWA
       if ('serviceWorker' in navigator) {
