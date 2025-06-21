@@ -106,7 +106,7 @@ h4 {
 
 /* Question text */
 .question-display {
-  font-size: 2.25rem;
+  font-size: 2.5rem; /* Increased from 2.25rem */
   margin-bottom: 2.5rem;
   color: #fff;
   font-weight: 500;
