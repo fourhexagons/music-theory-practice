@@ -278,8 +278,10 @@ function renderNewUI() {
   if (!appContainer || !advancedRoot) return;
 
   appContainer.innerHTML = `
-    <h1 class="main-title">Music Theory Practice</h1>
-    <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+    <header class="app-header">
+      <h1 class="main-title">Music Theory Practice</h1>
+      <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+    </header>
     <div class="main-content">
       <div class="quiz-section">
         <div class="question-display" id="question-display"></div>

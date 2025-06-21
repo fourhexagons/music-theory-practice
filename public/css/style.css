@@ -59,29 +59,38 @@ h4 {
   margin: 0 auto;
 }
 
-/* Header elements - LARGER */
+/* New header container */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  position: relative;
+}
+
+/* Header elements - positioning adjusted */
 .main-title {
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
-  font-size: 1.5rem; /* Increased from 1.25rem */
+  /* position: absolute; */ /* No longer needed */
+  /* top: 2rem; */
+  /* left: 2rem; */
+  font-size: 1.5rem; 
   font-weight: 400;
   color: #fff;
   z-index: 10;
 }
 
 .app-logo {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  height: 2.5rem; /* Increased from 2rem */
+  /* position: absolute; */ /* No longer needed */
+  /* top: 2rem; */
+  /* right: 2rem; */
+  height: 2.5rem; 
   width: auto;
   z-index: 10;
 }
 
 /* Main content */
 .main-content {
-  padding-top: 15vh;
+  padding-top: 10vh; /* Adjusted from 15vh */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -216,10 +225,11 @@ h4 {
 
 /* Responsive Design */
 @media (max-width: 48rem) {
-  #app-container { padding: 1.25rem; }
-  .main-title, .app-logo { top: 1.25rem; }
-  .main-title { left: 1.25rem; }
-  .app-logo { right: 1.25rem; }
+  #app-container { padding: 0; } /* Remove padding from main container */
+  .app-header { padding: 1.25rem; }
+  /* .main-title, .app-logo { top: 1.25rem; } */ /* No longer needed */
+  /* .main-title { left: 1.25rem; } */ /* No longer needed */
+  /* .app-logo { right: 1.25rem; } */ /* No longer needed */
   .question-display { font-size: 2.5rem; }
   
   /* Typography responsive adjustments */
@@ -232,18 +242,25 @@ h4 {
 @media (max-width: 33.75rem) {
   .main-content { padding-top: 2rem; }
   
+  .app-header {
+    flex-direction: column-reverse; /* Stack logo on top */
+    align-items: center;
+    gap: 1.25rem;
+    padding-bottom: 2.5rem;
+  }
+
   .app-logo {
-    position: static;
+    /* position: static; */ /* No longer needed */
     display: block;
-    margin: 0 auto 1.25rem auto;
-    height: 2.25rem; /* Increased from 1.875rem */
+    margin: 0; /* Remove margin */
+    height: 2.25rem;
   }
   
   .main-title {
-    position: static;
+    /* position: static; */ /* No longer needed */
     text-align: center;
-    margin-bottom: 2.5rem;
-    font-size: 1.375rem; /* Increased from 1.125rem */
+    margin-bottom: 0; /* Remove margin */
+    font-size: 1.375rem;
   }
 
   #answer-form, .practice-controls {
