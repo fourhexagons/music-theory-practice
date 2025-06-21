@@ -163,14 +163,14 @@ function normalizeChord(raw) {
 }
 
 function accidentalToUnicode(s) {
-    s = s.trim();
-    if (/^bb$/i.test(s)) return 'B♭';
+  s = s.trim();
+  if (/^bb$/i.test(s)) return 'B♭';
     if (/^b$/i.test(s)) return 'B'; // common mistake
-    if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
-    if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
-    if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
-    if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
-    return s.toUpperCase().normalize('NFC');
+  if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
+  if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
+  if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
+  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
+  return s.toUpperCase().normalize('NFC');
 }
 
 function normalizeAccList(strOrArr) {
@@ -349,7 +349,7 @@ function askNewQuestion() {
     askAdvancedQuestion();
     return;
   }
-
+  
   const questionDisplay = document.getElementById('question-display');
   const answerInput = document.getElementById('answer-input');
   const feedback = document.getElementById('feedback');
@@ -406,7 +406,7 @@ function askNewQuestion() {
       learningState.currentQuestion.degree = degreeSpell;
       text = `Spell the ${ordinal(degreeSpell)} seventh chord in ${key} major.`;
       break;
-  }
+    }
   questionDisplay.textContent = text;
 }
 
@@ -484,7 +484,7 @@ function handleCorrectAnswer() {
       // For keys with accidentals, follow up with "Name the accidentals" question
       learningState.freePractice.chapterId = 'accNotes';
       askNewQuestion();
-    } else {
+  } else {
       // For other questions, ask a new random question
       askNewQuestion();
     }

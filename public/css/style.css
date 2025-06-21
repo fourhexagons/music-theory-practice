@@ -219,7 +219,6 @@ h4 { font-size: 1.25rem; line-height: 1.4; margin-bottom: 0.625rem; }
 @media (max-width: 48rem) {
   #app-container { padding: var(--spacing-lg); }
   .app-header { padding: var(--spacing-lg); }
-  .question-display { font-size: 2rem; }
   
   h1 { font-size: 2rem; }
   h2 { font-size: 1.75rem; }
