@@ -1,0 +1,4 @@
+# Prevent all search engines from indexing the site.
+# This is a temporary measure until the site is ready for public launch.
+User-agent: *
+Disallow: / 

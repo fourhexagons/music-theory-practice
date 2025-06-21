@@ -368,7 +368,9 @@ function renderAppLayout() {
 
   appContainer.innerHTML = `
     <header class="app-header">
-      <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+      <a href="/" style="text-decoration: none;">
+        <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+      </a>
     </header>
     <div class="main-content">
       <div class="quiz-section">
