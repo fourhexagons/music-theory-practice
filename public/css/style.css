@@ -73,18 +73,18 @@ body {
 
 /* Card Styles - Clean and modern */
 .card {
-  background: var(--bg-color);
-  border-radius: var(--border-radius);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-light);
-  transition: var(--transition);
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  border: none;
   width: 100%;
-  border: 1px solid var(--border-color);
+  transition: none;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-medium);
+  transform: none;
+  box-shadow: none;
 }
 
 /* Quiz Section */
@@ -360,7 +360,7 @@ body {
   #key-select, #chapter-select, 
   #practice-btn, #advanced1-btn, #advanced2-btn {
     width: 100%;
-    max-width: 300px;
+    max-width: 560px;
   }
 
   .advanced-practice .practice-controls {
@@ -397,6 +397,42 @@ body {
 
   .navigation-section h3 {
     font-size: 1.2rem;
+  }
+
+  /* Remove top card width restriction */
+  .card.quiz-section {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .answer-container,
+  .practice-controls,
+  .navigation-section {
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  .answer-container,
+  .practice-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .answer-container > input,
+  .answer-container > select,
+  .answer-container > button,
+  .practice-controls > input,
+  .practice-controls > select,
+  .practice-controls > button,
+  .navigation-section > input,
+  .navigation-section > select,
+  .navigation-section > button {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
