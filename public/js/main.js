@@ -297,13 +297,11 @@ function renderNewUI() {
   `;
   
   advancedRoot.innerHTML = `
-    <div class="advanced-practice-container">
-      <div class="advanced-practice">
-        <h3>Advanced Practice</h3>
-        <div class="practice-controls">
-          <button id="advanced1-btn" class="btn">All Keys</button>
-          <button id="advanced2-btn" class="btn">Sevenths</button>
-        </div>
+    <div class="advanced-practice">
+      <h3>Advanced Practice</h3>
+      <div class="practice-controls">
+        <button id="advanced1-btn" class="btn">All Keys</button>
+        <button id="advanced2-btn" class="btn">Sevenths</button>
       </div>
     </div>
   `;

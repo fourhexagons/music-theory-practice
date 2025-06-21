@@ -19,6 +19,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Typographic hierarchy - based on Ableton's rhythm */
@@ -176,11 +178,14 @@ h4 {
   background-color: #3d3d3d;
 }
 
-/* Advanced Practice Section - LIGHTER BACKGROUND, FULL WIDTH */
-.advanced-practice-container {
-  margin-top: 2.5rem;
-  padding: 2.5rem 2rem; /* Re-add horizontal padding */
+/* Advanced Practice Section - Now controlled by root element */
+#advanced-practice-root {
   background-color: #666;
+  padding: 2.5rem 2rem;
+  flex-grow: 1; /* Ensures it fills remaining vertical space */
+  display: flex;
+  align-items: center; /* Vertically center content */
+  justify-content: center;
 }
 
 .advanced-practice {
