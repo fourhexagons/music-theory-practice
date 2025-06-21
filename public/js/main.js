@@ -1,6 +1,23 @@
 console.log('main.js loaded');
 
 // --- 1. Constants and Data ---
+
+const QUESTION_TYPES = {
+  ACCIDENTALS_COUNT: 'accCount',
+  ACCIDENTALS_NAMES: 'accNotes',
+  SCALE_SPELLING: 'scale',
+  TRIADS: 'triads',
+  SEVENTHS: 'sevenths',
+  SEVENTH_SPELLING: 'seventhSpelling'
+};
+
+const MODES = {
+  LINEAR: 'linear',
+  RANDOM: 'random',
+  ADVANCED_ALL: 'advanced',
+  ADVANCED_SEVENTHS: 'advanced2'
+};
+
 const quizData = {
   C: {
     accidentals:0, notes:[],
@@ -95,18 +112,49 @@ const quizData = {
   }
 };
 
-// Custom ordered keys array with C in the center
 const orderedKeys = ['F♯', 'B', 'E', 'A', 'D', 'G', 'C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'];
-
 const allKeys = Object.keys(quizData);
 
-// --- Utility Functions ---
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
+const learningPath = {
+  groups: [
+    { name: 'Introduction', keys: ['C'], mode: MODES.LINEAR },
+    { name: 'Sharps 1', keys: ['G', 'D', 'A'], mode: MODES.LINEAR },
+    { name: 'Sharps 1 Review', keys: ['G', 'D', 'A'], mode: MODES.RANDOM },
+    { name: 'Flats 1', keys: ['F', 'B♭', 'E♭'], mode: MODES.LINEAR },
+    { name: 'Flats 1 Review', keys: ['F', 'B♭', 'E♭'], mode: MODES.RANDOM },
+    { name: 'Sharps 2', keys: ['E', 'B', 'F♯'], mode: MODES.LINEAR },
+    { name: 'Sharps 2 Review', keys: ['E', 'B', 'F♯'], mode: MODES.RANDOM },
+    { name: 'Flats 2', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.LINEAR },
+    { name: 'Flats 2 Review', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.RANDOM },
+    { name: 'All Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F♯'], mode: MODES.RANDOM },
+    { name: 'All Flats', keys: ['C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'], mode: MODES.RANDOM },
+    { name: 'Advanced 1 (All Topics)', keys: allKeys, mode: MODES.ADVANCED_ALL },
+    { name: 'Advanced 2 (Chord Spelling)', keys: allKeys, mode: MODES.ADVANCED_SEVENTHS }
+  ],
+  chapters: [
+    { id: QUESTION_TYPES.ACCIDENTALS_COUNT, name: 'Accidentals Count' },
+    { id: QUESTION_TYPES.ACCIDENTALS_NAMES, name: 'Accidentals Naming' },
+    { id: QUESTION_TYPES.SCALE_SPELLING, name: 'Scale Spelling' },
+    { id: QUESTION_TYPES.TRIADS, name: 'Triads' },
+    { id: QUESTION_TYPES.SEVENTHS, name: 'Sevenths' },
+    { id: QUESTION_TYPES.SEVENTH_SPELLING, name: 'Seventh Spelling' }
+  ]
+};
+
+const learningState = {
+  currentGroup: 0,
+  currentKeyIndex: 0,
+  currentChapterIndex: 0,
+  mode: MODES.LINEAR,
+  currentQuestion: null,
+  correctAnswersInChapter: 0,
+  requiredAnswersPerChapter: 3,
+  usedDegrees: [],
+  lastAnswerIncorrect: false
+};
+
+
+// --- 2. Utility Functions ---
 
 function ordinal(n) {
   const s = ["th", "st", "nd", "rd"], v = n % 100;
@@ -119,11 +167,6 @@ function wordToNumber(word) {
     'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20
   };
   return numberWords[word.toLowerCase()] !== undefined ? numberWords[word.toLowerCase()] : null;
-}
-
-function normalize(raw) {
-  if (!raw) return "";
-  return raw.trim().replace(/b/g, "♭").toUpperCase().replace(/\s+/g, " ");
 }
 
 function normalizeChord(raw) {
@@ -159,6 +202,9 @@ function normalizeChord(raw) {
   normalized = normalized.replace(/HALFDIMINISHED/g, "M7♭5");
   normalized = normalized.replace(/HALFDIM/g, "M7♭5");
   
+  // Allow "˚" as a direct input for diminished
+  // The quizData uses "˚" so this makes matching easier
+  
   return normalized;
 }
 
@@ -178,71 +224,30 @@ function normalizeAccList(strOrArr) {
   return list.map(s => accidentalToUnicode(s)).filter(Boolean).sort().join(' ').trim();
 }
 
-// --- Learning Path Engine ---
-const learningPath = {
-  groups: [
-    { name: 'Introduction', keys: ['C'], mode: 'linear' },
-    { name: 'Sharps 1', keys: ['G', 'D', 'A'], mode: 'linear' },
-    { name: 'Sharps 1 Review', keys: ['G', 'D', 'A'], mode: 'random' },
-    { name: 'Flats 1', keys: ['F', 'B♭', 'E♭'], mode: 'linear' },
-    { name: 'Flats 1 Review', keys: ['F', 'B♭', 'E♭'], mode: 'random' },
-    { name: 'Sharps 2', keys: ['E', 'B', 'F♯'], mode: 'linear' },
-    { name: 'Sharps 2 Review', keys: ['E', 'B', 'F♯'], mode: 'random' },
-    { name: 'Flats 2', keys: ['A♭', 'D♭', 'G♭'], mode: 'linear' },
-    { name: 'Flats 2 Review', keys: ['A♭', 'D♭', 'G♭'], mode: 'random' },
-    { name: 'All Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F♯'], mode: 'random' },
-    { name: 'All Flats', keys: ['C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'], mode: 'random' },
-    { name: 'Advanced 1 (All Topics)', keys: allKeys, mode: 'advanced' },
-    { name: 'Advanced 2 (Chord Spelling)', keys: allKeys, mode: 'advanced2' }
-  ],
-  chapters: [
-    { id: 'accCount', name: 'Accidentals Count' },
-    { id: 'accNotes', name: 'Accidentals Naming' },
-    { id: 'scale', name: 'Scale Spelling' },
-    { id: 'triads', name: 'Triads' }
-  ]
-};
 
-const learningState = {
-  currentGroup: 0,
-  currentKeyIndex: 0,
-  currentChapterIndex: 0,
-  mode: 'linear',
-  currentQuestion: null,
-  correctAnswersInChapter: 0,
-  requiredAnswersPerChapter: 3,
-  usedDegrees: [],
-  freePractice: null,
-  lastAnswerIncorrect: false // Track if last answer was incorrect
-};
+// --- 3. State Management ---
 
 function initLearningState() {
   const saved = localStorage.getItem('learningState');
   if (saved) {
     Object.assign(learningState, JSON.parse(saved));
   }
-  
+
   // Development mode - set to true to always start fresh for testing
-  if (false) { // Development mode - set to true to always start fresh
-    learningState.currentGroup = 0;
-    learningState.currentKeyIndex = 0;
-    learningState.currentChapterIndex = 0;
-    learningState.correctAnswersInChapter = 0;
-    learningState.usedDegrees = []; // Reset used degrees
-    learningState.mode = 'linear';
-    learningState.freePractice = null;
+  if (false) {
+    console.log("DEV MODE: Resetting learning state.");
+    Object.assign(learningState, {
+      currentGroup: 0,
+      currentKeyIndex: 0,
+      currentChapterIndex: 0,
+      correctAnswersInChapter: 0,
+      usedDegrees: [],
+      mode: MODES.LINEAR,
+    });
   }
   
-  // Reset transient states
-  learningState.mode = learningState.mode === 'free-practice' ? 'linear' : learningState.mode;
-  learningState.freePractice = null;
-  
-  // Ensure we start with the correct first question
-  if (learningState.mode === 'linear' && learningState.currentChapterIndex !== 0) {
-    learningState.currentChapterIndex = 0; // Start with 'accCount'
-  }
-  
-  // Ensure usedDegrees is always an array
+  // Reset transient states that shouldn't persist across sessions
+  learningState.lastAnswerIncorrect = false;
   if (!Array.isArray(learningState.usedDegrees)) {
     learningState.usedDegrees = [];
   }
@@ -257,30 +262,29 @@ function getCurrentGroup() {
 }
 
 function getCurrentKey() {
-  if (learningState.mode === 'free-practice') return learningState.freePractice.key;
   const group = getCurrentGroup();
-  if (learningState.mode === 'random' || learningState.mode.startsWith('advanced')) {
+  if (learningState.mode === MODES.RANDOM || learningState.mode.startsWith('advanced')) {
     return group.keys[Math.floor(Math.random() * group.keys.length)];
   }
   return group.keys[learningState.currentKeyIndex];
 }
 
 function getCurrentChapter() {
-  if (learningState.mode === 'free-practice') {
-    return learningPath.chapters.find(c => c.id === learningState.freePractice.chapterId);
-  }
-   if (learningState.mode === 'advanced') {
-     const chapIdx = Math.floor(Math.random() * learningPath.chapters.length);
-     return learningPath.chapters[chapIdx];
+   const { mode, currentChapterIndex } = learningState;
+   if (mode === MODES.ADVANCED_ALL) {
+     const availableChapters = learningPath.chapters.filter(c => c.id !== QUESTION_TYPES.SEVENTH_SPELLING);
+     return availableChapters[Math.floor(Math.random() * availableChapters.length)];
    }
-   if (learningState.mode === 'advanced2') {
-     return learningPath.chapters.find(c => c.id === 'sevenths'); // Or specific advanced chapter
+   if (mode === MODES.ADVANCED_SEVENTHS) {
+     return learningPath.chapters.find(c => c.id === QUESTION_TYPES.SEVENTH_SPELLING);
    }
-  return learningPath.chapters[learningState.currentChapterIndex];
+  return learningPath.chapters[currentChapterIndex];
 }
 
-// --- UI Rendering ---
-function renderNewUI() {
+
+// --- 4. UI Rendering & Event Handling ---
+
+function renderAppLayout() {
   const appContainer = document.getElementById('app-container');
   const advancedRoot = document.getElementById('advanced-practice-root');
   if (!appContainer || !advancedRoot) return;
@@ -307,114 +311,94 @@ function renderNewUI() {
     <div class="advanced-practice">
       <h3>Advanced Practice</h3>
       <div class="practice-controls">
-        <button id="advanced1-btn" class="btn">All Keys</button>
-        <button id="advanced2-btn" class="btn">Sevenths</button>
+        <button id="advanced1-btn" class="btn">All Topics Review</button>
+        <button id="advanced2-btn" class="btn">7th Chord Spelling</button>
       </div>
     </div>
   `;
 
-  attachNewEventListeners();
-  askNewQuestion();
+  attachEventListeners();
 }
 
-function attachNewEventListeners() {
-  document.getElementById('answer-form').addEventListener('submit', handleNewAnswer);
+function attachEventListeners() {
+  document.getElementById('answer-form').addEventListener('submit', handleAnswerSubmit);
   
-  // Add input field click handler to clear after incorrect answer
   const answerInput = document.getElementById('answer-input');
-  if (answerInput) {
-    answerInput.addEventListener('click', function() {
-      if (learningState.lastAnswerIncorrect) {
-        this.value = '';
-        learningState.lastAnswerIncorrect = false;
-      }
-    });
-  }
+  answerInput.addEventListener('click', () => {
+    if (learningState.lastAnswerIncorrect) {
+      answerInput.value = '';
+      learningState.lastAnswerIncorrect = false;
+    }
+  });
   
-  const advanced1Btn = document.getElementById('advanced1-btn');
-  if (advanced1Btn) {
-    advanced1Btn.addEventListener('click', () => startAdvancedPractice('advanced'));
-  }
-
-  const advanced2Btn = document.getElementById('advanced2-btn');
-  if (advanced2Btn) {
-    advanced2Btn.addEventListener('click', () => startAdvancedPractice('advanced2'));
-  }
+  document.getElementById('advanced1-btn').addEventListener('click', () => startAdvancedPractice(MODES.ADVANCED_ALL));
+  document.getElementById('advanced2-btn').addEventListener('click', () => startAdvancedPractice(MODES.ADVANCED_SEVENTHS));
 }
 
-// --- Question and Answer Logic ---
-function askNewQuestion() {
-  // Use advanced question function for advanced modes
-  if (learningState.mode === 'advanced' || learningState.mode === 'advanced2') {
-    askAdvancedQuestion();
-    return;
-  }
-  
+function updateQuestionUI(text) {
   const questionDisplay = document.getElementById('question-display');
   const answerInput = document.getElementById('answer-input');
   const feedback = document.getElementById('feedback');
   
   document.getElementById('answer-form').style.display = 'flex';
+  questionDisplay.textContent = text;
   answerInput.value = '';
   feedback.textContent = '';
   feedback.className = 'feedback';
   answerInput.focus();
-  
-  // Reset incorrect answer flag for new question
-  learningState.lastAnswerIncorrect = false;
+}
 
+
+// --- 5. Question and Answer Logic ---
+
+function askQuestion() {
   const key = getCurrentKey();
   const chapter = getCurrentChapter();
   let text = '';
-  
+  let degree;
+
   learningState.currentQuestion = { key, chapterId: chapter.id };
 
   switch (chapter.id) {
-    case 'accCount':
+    case QUESTION_TYPES.ACCIDENTALS_COUNT:
       text = `How many accidentals are in ${key} major?`;
       break;
-    case 'accNotes':
+    case QUESTION_TYPES.ACCIDENTALS_NAMES:
       text = `Name the accidentals in ${key} major.`;
       break;
-    case 'scale':
+    case QUESTION_TYPES.SCALE_SPELLING:
       text = `Spell the ${key} major scale.`;
       break;
-    case 'triads':
-      // Get available degrees (2-7) that haven't been used yet
+    case QUESTION_TYPES.TRIADS:
+    case QUESTION_TYPES.SEVENTHS:
+    case QUESTION_TYPES.SEVENTH_SPELLING:
       const allDegrees = [2, 3, 4, 5, 6, 7];
-      const availableDegrees = allDegrees.filter(d => !learningState.usedDegrees.includes(d));
+      let availableDegrees = allDegrees.filter(d => !learningState.usedDegrees.includes(d));
       
-      // If all degrees have been used, reset the used degrees array
       if (availableDegrees.length === 0) {
         learningState.usedDegrees = [];
-        availableDegrees.push(...allDegrees);
+        availableDegrees = allDegrees;
       }
       
-      // Pick a random degree from available ones
-      const degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
+      degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
       learningState.usedDegrees.push(degree);
       learningState.currentQuestion.degree = degree;
-      text = `Name the ${ordinal(degree)} triad in ${key} major.`;
+      
+      const chordType = chapter.id === QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
+      const action = chapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
+      text = `${action} the ${ordinal(degree)} ${chordType} in ${key} major.`;
       break;
-    case 'sevenths':
-      const degree7 = Math.floor(Math.random() * 6) + 2;
-      learningState.currentQuestion.degree = degree7;
-      text = `Name the ${ordinal(degree7)} seventh chord in ${key} major.`;
-      break;
-    case 'seventhSpelling':
-      const degreeSpell = Math.floor(Math.random() * 6) + 2;
-      learningState.currentQuestion.degree = degreeSpell;
-      text = `Spell the ${ordinal(degreeSpell)} seventh chord in ${key} major.`;
-      break;
-    }
-  questionDisplay.textContent = text;
+  }
+  
+  updateQuestionUI(text);
+  learningState.lastAnswerIncorrect = false;
 }
 
-function handleNewAnswer(e) {
+function handleAnswerSubmit(e) {
   e.preventDefault();
   const answer = document.getElementById('answer-input').value;
   const feedback = document.getElementById('feedback');
-  const isCorrect = checkNewAnswer(answer);
+  const isCorrect = checkAnswer(answer);
 
   if (isCorrect) {
     feedback.textContent = 'Correct!';
@@ -427,41 +411,41 @@ function handleNewAnswer(e) {
   }
 }
 
-function checkNewAnswer(answer) {
+function checkAnswer(answer) {
   const q = learningState.currentQuestion;
   if (!q) return false;
 
-  const key = q.key;
-  const chapterId = q.chapterId;
+  const { key, chapterId, degree } = q;
   const data = quizData[key];
 
   switch(chapterId) {
-    case 'accCount':
+    case QUESTION_TYPES.ACCIDENTALS_COUNT:
       const normalizedAnswer = answer.trim().toLowerCase();
       if (data.accidentals === 0) {
         return ['0', 'zero', 'none'].includes(normalizedAnswer);
       }
-      // Try to parse as digit first
       const digitAnswer = parseInt(normalizedAnswer, 10);
-      if (digitAnswer === data.accidentals) {
-        return true;
-      }
-      // Try to parse as word
+      if (digitAnswer === data.accidentals) return true;
       const wordAnswer = wordToNumber(normalizedAnswer);
       return wordAnswer === data.accidentals;
-    case 'accNotes':
+
+    case QUESTION_TYPES.ACCIDENTALS_NAMES:
       if (data.accidentals === 0) return answer.trim() === '';
       return normalizeAccList(answer) === normalizeAccList(data.notes);
-    case 'scale':
+
+    case QUESTION_TYPES.SCALE_SPELLING:
       const correctScale = data.scale.map(n => n.toUpperCase()).join('');
       const userScale = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
       return userScale === correctScale;
-    case 'triads':
-      return normalizeChord(answer) === normalizeChord(data.triads[q.degree]);
-    case 'sevenths':
-      return normalizeChord(answer) === normalizeChord(data.sevenths[q.degree]);
-    case 'seventhSpelling':
-      const correctSpelling = data.seventhSpelling[q.degree].map(n => n.toUpperCase()).join('');
+
+    case QUESTION_TYPES.TRIADS:
+      return normalizeChord(answer) === normalizeChord(data.triads[degree]);
+
+    case QUESTION_TYPES.SEVENTHS:
+      return normalizeChord(answer) === normalizeChord(data.sevenths[degree]);
+
+    case QUESTION_TYPES.SEVENTH_SPELLING:
+      const correctSpelling = data.seventhSpelling[degree].map(n => n.toUpperCase()).join('');
       const userSpelling = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
       return userSpelling === correctSpelling;
   }
@@ -469,172 +453,81 @@ function checkNewAnswer(answer) {
 }
 
 function handleCorrectAnswer() {
-  const feedback = document.getElementById('feedback');
-  feedback.textContent = 'Correct!';
-  feedback.className = 'feedback correct';
-
-  if (learningState.mode === 'free-practice') {
-    // Free practice mode - handle accidentals sequence
-    const currentQuestion = learningState.currentQuestion;
-    if (currentQuestion && currentQuestion.chapterId === 'accCount' && quizData[currentQuestion.key].accidentals === 0) {
-      // For keys with 0 accidentals, skip the "Name the accidentals" question
-      // and ask a new random question
-      askNewQuestion();
-    } else if (currentQuestion && currentQuestion.chapterId === 'accCount') {
-      // For keys with accidentals, follow up with "Name the accidentals" question
-      learningState.freePractice.chapterId = 'accNotes';
-      askNewQuestion();
+  if (learningState.mode.startsWith('advanced')) {
+    askQuestion();
   } else {
-      // For other questions, ask a new random question
-      askNewQuestion();
-    }
-  } else if (learningState.mode === 'advanced' || learningState.mode === 'advanced2') {
-    // Advanced practice mode - just ask new random questions
-    askNewQuestion();
-  } else {
-    // Linear learning path mode
     const currentChapter = getCurrentChapter();
-    
-    // Only triad questions require multiple correct answers
-    if (currentChapter.id === 'triads') {
+    const isMultiQuestionChapter = [QUESTION_TYPES.TRIADS, QUESTION_TYPES.SEVENTHS].includes(currentChapter.id);
+
+    if (isMultiQuestionChapter) {
       learningState.correctAnswersInChapter++;
-      
       if (learningState.correctAnswersInChapter >= learningState.requiredAnswersPerChapter) {
-        // Triad chapter completed, advance to next chapter or key
         advanceLearningPath();
       } else {
-        // Ask another triad question
-        askNewQuestion();
+        askQuestion();
       }
     } else {
-      // For non-triad questions (accCount, accNotes, scale), advance immediately
       advanceLearningPath();
     }
   }
-  
   saveLearningState();
 }
+
+
+// --- 6. Learning Path Progression ---
 
 function advanceLearningPath() {
   const group = getCurrentGroup();
   const key = getCurrentKey();
   const chapter = getCurrentChapter();
   
-  // Reset correct answers counter for new chapter
   learningState.correctAnswersInChapter = 0;
-  // Reset used degrees for new chapter
   learningState.usedDegrees = [];
   
-  // Special case: If we just answered "accCount" for a key with 0 accidentals,
-  // skip the "accNotes" question and go directly to "scale"
-  if (chapter.id === 'accCount' && quizData[key].accidentals === 0) {
-    learningState.currentChapterIndex = 2; // Skip to 'scale' (index 2)
+  if (chapter.id === QUESTION_TYPES.ACCIDENTALS_COUNT && quizData[key].accidentals === 0) {
+    learningState.currentChapterIndex += 2; // Skip accNotes
   } else {
     learningState.currentChapterIndex++;
   }
   
+  // Have all chapters in the current key been completed?
   if (learningState.currentChapterIndex >= learningPath.chapters.length) {
-    // All chapters completed for this key, move to next key
     learningState.currentChapterIndex = 0;
     learningState.currentKeyIndex++;
     
+    // Have all keys in the current group been completed?
     if (learningState.currentKeyIndex >= group.keys.length) {
-      // All keys completed in this group
       learningState.currentKeyIndex = 0;
       learningState.currentGroup++;
       
+      // Have all groups been completed?
       if (learningState.currentGroup >= learningPath.groups.length) {
-        // Path complete! Move to advanced practice
-        learningState.currentGroup = learningPath.groups.findIndex(g => g.name === 'Advanced 1 (All Topics)');
-        learningState.mode = 'advanced';
+        // Path complete! Move to advanced practice.
+        startAdvancedPractice(MODES.ADVANCED_ALL);
+        return; // Exit to avoid asking another question here
       } else {
+        // Start the new group
         learningState.mode = getCurrentGroup().mode;
       }
     }
   }
   
-  renderNewUI();
-}
-
-function startFreePractice() {
-  const key = document.getElementById('key-select').value;
-  const chapterId = document.getElementById('chapter-select').value;
-
-  learningState.mode = 'free-practice';
-  learningState.freePractice = {
-    key,
-    chapterId,
-    isAccidentalsSequence: chapterId === 'accCount'
-  };
-  renderNewUI();
+  askQuestion();
 }
 
 function startAdvancedPractice(mode) {
     learningState.mode = mode;
-    const groupName = mode === 'advanced' ? 'Advanced 1 (All Topics)' : 'Advanced 2 (Chord Spelling)';
+    const groupName = mode === MODES.ADVANCED_ALL ? 'Advanced 1 (All Topics)' : 'Advanced 2 (Chord Spelling)';
     learningState.currentGroup = learningPath.groups.findIndex(g => g.name === groupName);
     learningState.currentChapterIndex = 0;
     learningState.correctAnswersInChapter = 0;
-    renderNewUI();
+    askQuestion();
 }
 
-// Add sevenths back to advanced practice questions
-function askAdvancedQuestion() {
-  const questionDisplay = document.getElementById('question-display');
-  const answerInput = document.getElementById('answer-input');
-  const feedback = document.getElementById('feedback');
-  
-  document.getElementById('answer-form').style.display = 'flex';
-  answerInput.value = '';
-  feedback.textContent = '';
-  feedback.className = 'feedback';
-  answerInput.focus();
 
-  const group = getCurrentGroup();
-  const key = group.keys[Math.floor(Math.random() * group.keys.length)];
-  const chapter = learningPath.chapters[Math.floor(Math.random() * learningPath.chapters.length)];
-  let text = '';
-  
-  learningState.currentQuestion = { key, chapterId: chapter.id };
-
-  switch (chapter.id) {
-    case 'accCount':
-      text = `How many accidentals are in ${key} major?`;
-      break;
-    case 'accNotes':
-      text = `Name the accidentals in ${key} major.`;
-      break;
-    case 'scale':
-      text = `Spell the ${key} major scale.`;
-      break;
-    case 'triads':
-      const degree = Math.floor(Math.random() * 6) + 2;
-      learningState.currentQuestion.degree = degree;
-      text = `Name the ${ordinal(degree)} triad in ${key} major.`;
-      break;
-  }
-  
-  // Add sevenths for advanced practice
-  if (learningState.mode === 'advanced' || learningState.mode === 'advanced2') {
-    const shouldAskSeventh = Math.random() < 0.3; // 30% chance for seventh question
-    if (shouldAskSeventh) {
-      const degree = Math.floor(Math.random() * 6) + 2;
-      learningState.currentQuestion.degree = degree;
-      if (learningState.mode === 'advanced2') {
-        text = `Spell the ${ordinal(degree)} seventh chord in ${key} major.`;
-        learningState.currentQuestion.chapterId = 'seventhSpelling';
-      } else {
-        text = `Name the ${ordinal(degree)} seventh chord in ${key} major.`;
-        learningState.currentQuestion.chapterId = 'sevenths';
-      }
-    }
-  }
-  
-  questionDisplay.textContent = text;
-}
-
-// --- Initializer ---
+// --- 7. Initializer ---
 document.addEventListener('DOMContentLoaded', () => {
   initLearningState();
-  renderNewUI();
+  renderAppLayout();
+  askQuestion();
 }); 
