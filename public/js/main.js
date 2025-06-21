@@ -117,19 +117,14 @@ const allKeys = Object.keys(quizData);
 
 const learningPath = {
   groups: [
-    { name: 'Introduction', keys: ['C'], mode: MODES.LINEAR },
-    { name: 'Sharps 1', keys: ['G', 'D', 'A'], mode: MODES.LINEAR },
-    { name: 'Sharps 1 Review', keys: ['G', 'D', 'A'], mode: MODES.RANDOM },
-    { name: 'Flats 1', keys: ['F', 'B♭', 'E♭'], mode: MODES.LINEAR },
-    { name: 'Flats 1 Review', keys: ['F', 'B♭', 'E♭'], mode: MODES.RANDOM },
-    { name: 'Sharps 2', keys: ['E', 'B', 'F♯'], mode: MODES.LINEAR },
-    { name: 'Sharps 2 Review', keys: ['E', 'B', 'F♯'], mode: MODES.RANDOM },
-    { name: 'Flats 2', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.LINEAR },
-    { name: 'Flats 2 Review', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.RANDOM },
-    { name: 'All Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F♯'], mode: MODES.RANDOM },
-    { name: 'All Flats', keys: ['C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'], mode: MODES.RANDOM },
-    { name: 'Advanced 1 (All Topics)', keys: allKeys, mode: MODES.ADVANCED_ALL },
-    { name: 'Advanced 2 (Chord Spelling)', keys: allKeys, mode: MODES.ADVANCED_SEVENTHS }
+    { name: 'Accidentals Count', keys: allKeys, mode: MODES.LINEAR },
+    { name: 'Accidentals Names', keys: allKeys, mode: MODES.LINEAR },
+    { name: 'Scale Spelling', keys: allKeys, mode: MODES.LINEAR },
+    { name: 'Triads', keys: allKeys, mode: MODES.LINEAR },
+    { name: 'Sevenths', keys: allKeys, mode: MODES.LINEAR },
+    { name: 'Seventh Spelling', keys: allKeys, mode: MODES.LINEAR },
+    { name: 'Random', keys: allKeys, mode: MODES.ADVANCED_ALL },
+    { name: 'Seventh Spelling', keys: allKeys, mode: MODES.ADVANCED_SEVENTHS }
   ],
   chapters: [
     { id: QUESTION_TYPES.ACCIDENTALS_COUNT, name: 'Accidentals Count' },
@@ -311,8 +306,8 @@ function renderAppLayout() {
     <div class="advanced-practice">
       <h3>Advanced Practice</h3>
       <div class="practice-controls">
-        <button id="advanced1-btn" class="btn">All Topics Review</button>
-        <button id="advanced2-btn" class="btn">7th Chord Spelling</button>
+        <button id="advanced1-btn" class="btn">Random</button>
+        <button id="advanced2-btn" class="btn">Sevenths</button>
       </div>
     </div>
   `;
@@ -517,7 +512,7 @@ function advanceLearningPath() {
 
 function startAdvancedPractice(mode) {
     learningState.mode = mode;
-    const groupName = mode === MODES.ADVANCED_ALL ? 'Advanced 1 (All Topics)' : 'Advanced 2 (Chord Spelling)';
+    const groupName = mode === MODES.ADVANCED_ALL ? 'Random' : 'Seventh Spelling';
     learningState.currentGroup = learningPath.groups.findIndex(g => g.name === groupName);
     learningState.currentChapterIndex = 0;
     learningState.correctAnswersInChapter = 0;
