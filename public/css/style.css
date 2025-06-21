@@ -1,6 +1,5 @@
 /* 
-  Music Theory Practice - Ableton-inspired Design v6
-  Complete rewrite to ensure proper application.
+  Music Theory Practice - Clean Design
 */
 
 /* Reset and base styles */
@@ -23,7 +22,7 @@ body {
   flex-direction: column;
 }
 
-/* Typographic hierarchy - based on Ableton's rhythm */
+/* Typographic hierarchy */
 h1 {
   font-size: 2.5rem;
   font-weight: 500;
@@ -60,13 +59,13 @@ h4 {
   margin: 0 auto;
 }
 
-/* New header container */
+/* Header container */
 .app-header {
   display: flex;
-  justify-content: center; /* Center logo */
+  justify-content: center;
   align-items: center;
   position: relative;
-  padding-bottom: 2.5rem; /* Add padding for spacing */
+  padding-bottom: 2.5rem;
 }
 
 .app-logo {
@@ -77,7 +76,7 @@ h4 {
 
 /* Main content */
 .main-content {
-  padding-top: 10vh; /* Adjusted from 15vh */
+  padding-top: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,19 +87,19 @@ h4 {
   width: 100%;
   max-width: 50rem;
   text-align: center;
-  padding: 0 1.25rem; /* Add horizontal padding for mobile */
+  padding: 0 1.25rem;
 }
 
 /* Question text */
 .question-display {
-  font-size: 2.35rem; /* Slightly reduced from 2.5rem */
+  font-size: 2.35rem;
   margin-bottom: 2.5rem;
   color: #fff;
   font-weight: 500;
   line-height: 1.2;
 }
 
-/* Form container - WIDER to match question width */
+/* Form container */
 .answer-container {
   display: flex;
   flex-direction: column;
@@ -116,11 +115,11 @@ h4 {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 50rem; /* Match question width */
+  max-width: 50rem;
   margin-bottom: 1.25rem;
 }
 
-/* Input field - WIDER */
+/* Input field */
 #answer-input {
   background-color: #ddd;
   color: #111;
@@ -131,7 +130,7 @@ h4 {
   font-family: inherit;
   font-weight: 400;
   outline: none;
-  width: 25rem; /* Increased from 20rem to match question width better */
+  width: 25rem;
   height: 3.75rem;
 }
 
@@ -140,13 +139,13 @@ h4 {
   opacity: 1;
 }
 
-/* Submit button - WIDER to match input */
+/* Submit button */
 .btn {
   background-color: #444;
   color: #fff;
   border: none;
   border-radius: 0;
-  padding: 1rem 3.5rem; /* Increased from 3rem for more width */
+  padding: 1rem 3.5rem;
   font-size: 1.125rem;
   font-family: inherit;
   font-weight: 500;
@@ -157,35 +156,35 @@ h4 {
   text-align: center;
   height: 3.875rem;
   line-height: 1.875rem;
-  min-width: 14rem; /* Increased from 12rem */
+  min-width: 14rem;
 }
 
 .btn:hover {
   background-color: #3d3d3d;
 }
 
-/* Advanced Practice Section - Now controlled by root element */
+/* Advanced Practice Section */
 #advanced-practice-root {
   background-color: #666;
-  padding: 5rem 2rem; /* Increased top/bottom padding */
-  flex-grow: 1; /* Ensures it fills remaining vertical space */
+  padding: 5rem 2rem;
+  flex-grow: 1;
   display: flex;
-  align-items: flex-start; /* Align to top */
+  align-items: flex-start;
   justify-content: center;
 }
 
 .advanced-practice {
   width: 100%;
-  max-width: 50rem; /* Content width */
-  margin: 0 auto; /* Center content */
+  max-width: 50rem;
+  margin: 0 auto;
   text-align: center;
 }
 
 .advanced-practice h3 {
-  font-size: 1.5rem; /* Increased from 1rem to match h3 hierarchy */
+  font-size: 1.5rem;
   font-weight: 500;
-  color: #fff; /* Changed from #ccc to white */
-  margin-bottom: 1.5rem; /* Increased from 1.25rem */
+  color: #fff;
+  margin-bottom: 1.5rem;
 }
 
 .practice-controls {
@@ -198,14 +197,9 @@ h4 {
   margin: 0 auto;
 }
 
-.practice-controls .btn {
-  /* width: 13.75rem; */ /* Removed to allow dynamic width */
-}
-
 /* Feedback */
 .feedback {
-  margin-top: 1rem;
-  font-size: 0.875rem;
+  font-size: 1.3rem;
   min-height: 1.3125rem;
   font-weight: 400;
   color: #fff;
@@ -220,7 +214,6 @@ h4 {
   .app-header { padding: 1.25rem; }
   .question-display { font-size: 2rem; }
   
-  /* Typography responsive adjustments */
   h1 { font-size: 2rem; }
   h2 { font-size: 1.75rem; }
   h3 { font-size: 1.25rem; }
@@ -231,7 +224,7 @@ h4 {
   .main-content { padding-top: 2rem; }
   
   .app-header {
-    padding: 0 0 2.5rem 0; /* Adjust padding for mobile */
+    padding: 0 0 2.5rem 0;
   }
 
   .app-logo {
@@ -239,44 +232,21 @@ h4 {
   }
   
   .question-display {
-    font-size: 1.5rem; /* Increased from 1.8rem */
+    font-size: 1.5rem;
   }
 
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: 0.625rem;
-    width: 100%; /* Ensure form and controls take full width */
+    width: 100%;
   }
   
   #answer-input, #submit-btn {
-    width: 100%; /* Make input and button full width */
+    width: 100%;
   }
   
-  /* #answer-input { text-align: center; } */ /* Removed to keep text left-aligned */
-  
-  /* Typography responsive adjustments */
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
   h4 { font-size: 1.125rem; }
-}
-
-.quiz-section h2 {
-    font-size: 2.35rem;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-@media (max-width: 768px) {
-    .quiz-section {
-        padding: 0 1rem;
-    }
-
-    .quiz-section h2 {
-        font-size: 1.5rem;
-    }
-
-    #answer-form {
-        flex-direction: column;
-    }
-}
+} 

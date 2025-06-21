@@ -212,7 +212,8 @@ const learningState = {
   correctAnswersInChapter: 0,
   requiredAnswersPerChapter: 3,
   usedDegrees: [],
-  freePractice: null
+  freePractice: null,
+  lastAnswerIncorrect: false // Track if last answer was incorrect
 };
 
 function initLearningState() {
@@ -319,6 +320,17 @@ function renderNewUI() {
 function attachNewEventListeners() {
   document.getElementById('answer-form').addEventListener('submit', handleNewAnswer);
   
+  // Add input field click handler to clear after incorrect answer
+  const answerInput = document.getElementById('answer-input');
+  if (answerInput) {
+    answerInput.addEventListener('click', function() {
+      if (learningState.lastAnswerIncorrect) {
+        this.value = '';
+        learningState.lastAnswerIncorrect = false;
+      }
+    });
+  }
+  
   const advanced1Btn = document.getElementById('advanced1-btn');
   if (advanced1Btn) {
     advanced1Btn.addEventListener('click', () => startAdvancedPractice('advanced'));
@@ -347,6 +359,9 @@ function askNewQuestion() {
   feedback.textContent = '';
   feedback.className = 'feedback';
   answerInput.focus();
+  
+  // Reset incorrect answer flag for new question
+  learningState.lastAnswerIncorrect = false;
 
   const key = getCurrentKey();
   const chapter = getCurrentChapter();
@@ -408,6 +423,7 @@ function handleNewAnswer(e) {
   } else {
     feedback.textContent = 'Incorrect. Try again.';
     feedback.className = 'feedback incorrect';
+    learningState.lastAnswerIncorrect = true;
   }
 }
 
