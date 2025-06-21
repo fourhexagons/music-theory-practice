@@ -93,7 +93,7 @@ h4 {
 
 /* Question text */
 .question-display {
-  font-size: 2.5rem; /* Increased from 2.25rem */
+  font-size: 2.4rem; /* Slightly reduced from 2.5rem */
   margin-bottom: 2.5rem;
   color: #fff;
   font-weight: 500;
@@ -239,7 +239,7 @@ h4 {
   }
   
   .question-display {
-    font-size: 1.8rem; /* Further reduced for narrow viewports */
+    font-size: 2rem; /* Increased from 1.8rem */
   }
 
   #answer-form, .practice-controls {
