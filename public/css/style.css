@@ -243,6 +243,10 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
     min-width: 0;
   }
   
+  .question-display {
+    margin-bottom: var(--spacing-xl);
+  }
+  
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
