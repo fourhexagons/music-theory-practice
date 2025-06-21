@@ -221,12 +221,13 @@ function initLearningState() {
     Object.assign(learningState, JSON.parse(saved));
   }
   
-  // Development mode - uncomment the line below to always start fresh for testing
-  if (true) { // Development mode - always start fresh
+  // Development mode - set to true to always start fresh for testing
+  if (false) { // Development mode - set to true to always start fresh
     learningState.currentGroup = 0;
     learningState.currentKeyIndex = 0;
     learningState.currentChapterIndex = 0;
     learningState.correctAnswersInChapter = 0;
+    learningState.usedDegrees = []; // Reset used degrees
     learningState.mode = 'linear';
     learningState.freePractice = null;
   }
@@ -238,6 +239,11 @@ function initLearningState() {
   // Ensure we start with the correct first question
   if (learningState.mode === 'linear' && learningState.currentChapterIndex !== 0) {
     learningState.currentChapterIndex = 0; // Start with 'accCount'
+  }
+  
+  // Ensure usedDegrees is always an array
+  if (!Array.isArray(learningState.usedDegrees)) {
+    learningState.usedDegrees = [];
   }
 }
 
@@ -491,8 +497,6 @@ function handleCorrectAnswer() {
   }
   
   saveLearningState();
-  renderNewUI(); 
-  attachNewEventListeners();
 }
 
 function advanceLearningPath() {
@@ -533,7 +537,6 @@ function advanceLearningPath() {
     }
   }
   
-  askNewQuestion();
   renderNewUI();
 }
 
