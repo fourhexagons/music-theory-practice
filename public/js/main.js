@@ -168,46 +168,48 @@ function wordToNumber(word) {
 
 function normalizeChord(raw) {
   if (!raw) return "";
-  let normalized = raw.trim().toUpperCase();
-  
-  // Handle minor chord variations
-  normalized = normalized.replace(/\s+/g, ""); // Remove spaces
+  let normalized = raw.trim();
+
+  // Case-insensitive matching for all variations
+  normalized = normalized.toUpperCase();
+
+  // Universal cleanup
+  normalized = normalized.replace(/\s+/g, ""); // Remove all spaces
+
+  // Minor variations
   normalized = normalized.replace(/MINOR/g, "m");
   normalized = normalized.replace(/MIN/g, "m");
-  normalized = normalized.replace(/-/g, "m"); // D- becomes Dm (minor)
-  
-  // Handle major chord variations (though we don't use them in our data)
+  normalized = normalized.replace(/-/g, "m");
+
+  // Major variations (usually just the note name, but handle explicit cases)
   normalized = normalized.replace(/MAJOR/g, "");
   normalized = normalized.replace(/MAJ/g, "");
-  
-  // Handle diminished chord variations - including the "˚" symbol
+
+  // Diminished variations
   normalized = normalized.replace(/DIMINISHED/g, "˚");
-  normalized = normalized.replace(/DIMIN/g, "˚");
   normalized = normalized.replace(/DIM/g, "˚");
   
-  // Handle dominant 7th variations
-  normalized = normalized.replace(/DOMINANT/g, "");
-  normalized = normalized.replace(/DOM/g, "");
-  
-  // Handle major 7th variations
-  normalized = normalized.replace(/MAJ7/g, "MAJ7");
-  normalized = normalized.replace(/MAJOR7/g, "MAJ7");
-  normalized = normalized.replace(/Δ/g, "MAJ7");
-  
-  // Handle minor 7th flat 5 variations (half diminished)
-  // Only accept lowercase 'm' (minor) and lowercase 'b' (flat)
-  normalized = normalized.replace(/m7b5/g, "m7♭5");
-  normalized = normalized.replace(/m7flat5/g, "m7♭5");
+  // Half-diminished (m7b5) variations
+  // Correctly handles 'Bm7b5' -> 'BM7♭5' before it becomes 'B˚7b5'
+  if (normalized.endsWith('m7b5'.toUpperCase())) {
+      const baseNote = normalized.substring(0, normalized.length - 4);
+      return `${baseNote}m7♭5`;
+  }
   normalized = normalized.replace(/HALFDIMINISHED/g, "m7♭5");
   normalized = normalized.replace(/HALFDIM/g, "m7♭5");
-  normalized = normalized.replace(/HALF DIM/g, "m7♭5");
-  normalized = normalized.replace(/HALF DIMINISHED/g, "m7♭5");
-  normalized = normalized.replace(/HALF-DIM/g, "m7♭5");
-  normalized = normalized.replace(/HALF-DIMINISHED/g, "m7♭5");
+  normalized = normalized.replace(/Ø/g, "m7♭5"); // Common symbol for half-diminished
   
-  // Allow "˚" as a direct input for diminished
-  // The quizData uses "˚" so this makes matching easier
-  
+  // Major 7th variations
+  normalized = normalized.replace(/MAJ7/g, "maj7"); // Keep 'maj7' distinct
+  normalized = normalized.replace(/Δ/g, "maj7");
+
+  // All other 'm' instances should now be for minor chords.
+  // Final check for diminished symbol
+  if (normalized.includes('˚') || normalized.includes('°')) {
+      normalized = normalized.replace(/M7♭5/g, "m7♭5"); // Fix for Bm7b5 etc.
+      normalized = normalized.replace('M', 'm'); // A half-dim is a minor chord
+  }
+
   return normalized;
 }
 
@@ -442,10 +444,10 @@ function checkAnswer(answer) {
       return userScale === correctScale;
 
     case QUESTION_TYPES.TRIADS:
-      return normalizeChord(answer) === normalizeChord(data.triads[degree]);
+      return normalizeChord(answer).toUpperCase() === normalizeChord(data.triads[degree]).toUpperCase();
 
     case QUESTION_TYPES.SEVENTHS:
-      return normalizeChord(answer) === normalizeChord(data.sevenths[degree]);
+      return normalizeChord(answer).toUpperCase() === normalizeChord(data.sevenths[degree]).toUpperCase();
 
     case QUESTION_TYPES.SEVENTH_SPELLING:
       const correctSpelling = data.seventhSpelling[degree].map(n => n.toUpperCase()).join('');
