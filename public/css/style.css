@@ -105,8 +105,8 @@ h4 {
 
 /* Question text */
 .question-display {
-  font-size: 2.5rem;
-  margin-bottom: 4rem;
+  font-size: 2.25rem;
+  margin-bottom: 2.5rem;
   color: #fff;
   font-weight: 500;
   line-height: 1.2;
@@ -230,7 +230,7 @@ h4 {
   /* .main-title, .app-logo { top: 1.25rem; } */ /* No longer needed */
   /* .main-title { left: 1.25rem; } */ /* No longer needed */
   /* .app-logo { right: 1.25rem; } */ /* No longer needed */
-  .question-display { font-size: 2.5rem; }
+  .question-display { font-size: 2rem; }
   
   /* Typography responsive adjustments */
   h1 { font-size: 2rem; }
