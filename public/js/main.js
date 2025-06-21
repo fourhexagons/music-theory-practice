@@ -1,5 +1,8 @@
 console.log('main.js loaded');
 
+// Version for beta testing
+const APP_VERSION = 'v1.3.0-beta';
+
 // --- 1. Constants and Data ---
 
 const QUESTION_TYPES = {
@@ -371,6 +374,7 @@ function renderAppLayout() {
       <a href="/" style="text-decoration: none;">
         <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
       </a>
+      <div style="position: absolute; top: 10px; right: 10px; font-size: 0.7em; opacity: 0.6; color: #e0e0e0;">${APP_VERSION}</div>
     </header>
     <div class="main-content">
       <div class="quiz-section">
@@ -635,4 +639,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Update cache-busting version
-const CACHE_VERSION = 72; 
+const CACHE_VERSION = 72;
+
+// --- 6. Error Handling and Beta Testing ---
+
+// Global error handler for beta testing
+window.addEventListener('error', function(e) {
+  console.error('App Error:', e.error);
+  console.error('Version:', APP_VERSION);
+  console.error('URL:', window.location.href);
+  console.error('User Agent:', navigator.userAgent);
+});
+
+// Log app initialization for debugging
+console.log('Music Theory Practice App initialized');
+console.log('Version:', APP_VERSION);
+console.log('URL:', window.location.href); 

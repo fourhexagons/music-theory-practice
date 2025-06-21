@@ -1,6 +1,65 @@
 # Music Theory Practice App
 
-A web-based music theory practice application that helps you learn chords, scales, and music theory through interactive exercises.
+A web-based music theory practice application focused on chord and accidental normalization, currently in **beta testing**.
+
+## 🎼 Live Demo
+
+- **Landing Page**: [https://learning.lightbath.com](https://learning.lightbath.com)
+- **Practice App**: [https://learning.lightbath.com/practice](https://learning.lightbath.com/practice)
+
+## 🧪 Beta Testing
+
+This app is currently in **beta testing** with students. Features include:
+
+- ✅ Chord normalization with case-sensitive pattern matching
+- ✅ Accidental normalization for double accidentals and mixed notation
+- ✅ Comprehensive test framework with keyboard shortcuts (Ctrl+Shift+Q)
+- ✅ Mobile-responsive design
+- ✅ Path-based architecture for future expansion
+
+## 🎯 Current Version
+
+**v1.3.0-beta** - Pre-release for student feedback
+
+## 🚀 Quick Start
+
+1. Visit [https://learning.lightbath.com/practice](https://learning.lightbath.com/practice)
+2. Start practicing music theory concepts
+3. Use Ctrl+Shift+Q (Mac: Cmd+Shift+Q) to run tests
+4. Report any issues with version number displayed in top-right corner
+
+## 📚 Documentation
+
+See the [docs/](docs/) folder for detailed documentation:
+- [Development Guide](docs/DEVELOPMENT.md)
+- [Testing Guide](docs/TESTING.md)
+- [Release Format](docs/RELEASE_FORMAT.md)
+
+## 🏗️ Architecture
+
+- **Landing Page**: `learning.lightbath.com` - Future course marketing and student dashboard
+- **Practice App**: `learning.lightbath.com/practice` - Music theory practice tools
+- **Future**: `learning.lightbath.com/dashboard` - Individual student dashboards
+
+## 🔧 Development
+
+```bash
+# Clone the repository
+git clone https://github.com/fourhexagons/music-theory-practice.git
+
+# Start local development server
+python3 -m http.server 8000
+
+# Visit http://localhost:8000/practice
+```
+
+## 📝 Beta Feedback
+
+For beta testing feedback, please include:
+- Version number (displayed in app)
+- Browser and device information
+- Steps to reproduce any issues
+- Screenshots if helpful
 
 ## 🎵 What You Can Practice
 
