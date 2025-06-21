@@ -123,7 +123,7 @@ const learningPath = {
     { name: 'Triads', keys: allKeys, mode: MODES.LINEAR },
     { name: 'Sevenths', keys: allKeys, mode: MODES.LINEAR },
     { name: 'Seventh Spelling', keys: allKeys, mode: MODES.LINEAR },
-    { name: 'Random', keys: allKeys, mode: MODES.ADVANCED_ALL },
+    { name: 'Randomize', keys: allKeys, mode: MODES.ADVANCED_ALL },
     { name: 'Seventh Spelling', keys: allKeys, mode: MODES.ADVANCED_SEVENTHS }
   ],
   chapters: [
@@ -306,7 +306,7 @@ function renderAppLayout() {
     <div class="advanced-practice">
       <h3>Advanced Practice</h3>
       <div class="practice-controls">
-        <button id="advanced1-btn" class="btn">Random</button>
+        <button id="advanced1-btn" class="btn">Randomize</button>
         <button id="advanced2-btn" class="btn">Sevenths</button>
       </div>
     </div>
@@ -512,7 +512,7 @@ function advanceLearningPath() {
 
 function startAdvancedPractice(mode) {
     learningState.mode = mode;
-    const groupName = mode === MODES.ADVANCED_ALL ? 'Random' : 'Seventh Spelling';
+    const groupName = mode === MODES.ADVANCED_ALL ? 'Randomize' : 'Seventh Spelling';
     learningState.currentGroup = learningPath.groups.findIndex(g => g.name === groupName);
     learningState.currentChapterIndex = 0;
     learningState.correctAnswersInChapter = 0;
