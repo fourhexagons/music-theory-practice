@@ -2,6 +2,30 @@
   Music Theory Practice
 */
 
+/* CSS Custom Properties */
+:root {
+  --bg-primary: #555;
+  --bg-secondary: #666;
+  --text-primary: #fff;
+  --text-secondary: #111;
+  --input-bg: #ddd;
+  --input-placeholder: #555;
+  --button-bg: #444;
+  --button-hover: #3d3d3d;
+  --feedback-correct: #89ff89;
+  --feedback-incorrect: #ff8989;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.625rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.25rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 2.5rem;
+  --spacing-4xl: 5rem;
+  --max-width-container: 75rem;
+  --max-width-content: 50rem;
+}
+
 /* Reset and base styles */
 * {
   margin: 0;
@@ -11,8 +35,8 @@
 
 body {
   font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #555;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -23,49 +47,31 @@ body {
 }
 
 /* Typographic hierarchy */
-h1 {
-  font-size: 2.5rem;
+h1, h2, h3, h4 {
   font-weight: 500;
   line-height: 1.2;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-md);
 }
 
-h2 {
-  font-size: 2rem;
-  font-weight: 500;
-  line-height: 1.3;
-  margin-bottom: 0.875rem;
-}
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; line-height: 1.3; margin-bottom: 0.875rem; }
+h3 { font-size: 1.5rem; line-height: 1.4; margin-bottom: 0.75rem; }
+h4 { font-size: 1.25rem; line-height: 1.4; margin-bottom: 0.625rem; }
 
-h3 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  line-height: 1.4;
-  margin-bottom: 0.75rem;
-}
-
-h4 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1.4;
-  margin-bottom: 0.625rem;
-}
-
-/* App container */
+/* Layout containers */
 #app-container {
   position: relative;
-  padding: 2rem;
-  max-width: 75rem;
+  padding: var(--spacing-2xl);
+  max-width: var(--max-width-container);
   margin: 0 auto;
 }
 
-/* Header container */
 .app-header {
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  padding-bottom: 2.5rem;
+  padding-bottom: var(--spacing-3xl);
 }
 
 .app-logo {
@@ -74,7 +80,6 @@ h4 {
   z-index: 10;
 }
 
-/* Main content */
 .main-content {
   padding-top: 10vh;
   display: flex;
@@ -85,47 +90,46 @@ h4 {
 
 .quiz-section {
   width: 100%;
-  max-width: 50rem;
+  max-width: var(--max-width-content);
   text-align: center;
-  padding: 0 1.25rem;
+  padding: 0 var(--spacing-lg);
 }
 
-/* Question text */
+/* Question display */
 .question-display {
   font-size: 2.35rem;
-  margin-bottom: 2.5rem;
-  color: #fff;
+  margin-bottom: var(--spacing-3xl);
+  color: var(--text-primary);
   font-weight: 500;
   line-height: 1.2;
 }
 
-/* Form container */
+/* Form elements */
 .answer-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-xs);
   width: 100%;
-  max-width: 50rem;
+  max-width: var(--max-width-content);
 }
 
 #answer-form {
   display: flex;
-  gap: 0.625rem;
+  gap: var(--spacing-sm);
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 50rem;
-  margin-bottom: 1.25rem;
+  max-width: var(--max-width-content);
+  margin-bottom: var(--spacing-lg);
 }
 
-/* Input field */
 #answer-input {
-  background-color: #ddd;
-  color: #111;
+  background-color: var(--input-bg);
+  color: var(--text-secondary);
   border: none;
   border-radius: 0;
-  padding: 1rem 1.25rem;
+  padding: var(--spacing-md) var(--spacing-lg);
   font-size: 1.125rem;
   font-family: inherit;
   font-weight: 400;
@@ -135,17 +139,17 @@ h4 {
 }
 
 #answer-input::placeholder {
-  color: #555;
+  color: var(--input-placeholder);
   opacity: 1;
 }
 
-/* Submit button */
+/* Buttons */
 .btn {
-  background-color: #444;
-  color: #fff;
+  background-color: var(--button-bg);
+  color: var(--text-primary);
   border: none;
   border-radius: 0;
-  padding: 1rem 3.5rem;
+  padding: var(--spacing-md) 3.5rem;
   font-size: 1.125rem;
   font-family: inherit;
   font-weight: 500;
@@ -160,13 +164,13 @@ h4 {
 }
 
 .btn:hover {
-  background-color: #3d3d3d;
+  background-color: var(--button-hover);
 }
 
 /* Advanced Practice Section */
 #advanced-practice-root {
-  background-color: #666;
-  padding: 5rem 2rem;
+  background-color: var(--bg-secondary);
+  padding: var(--spacing-4xl) var(--spacing-2xl);
   flex-grow: 1;
   display: flex;
   align-items: flex-start;
@@ -175,7 +179,7 @@ h4 {
 
 .advanced-practice {
   width: 100%;
-  max-width: 50rem;
+  max-width: var(--max-width-content);
   margin: 0 auto;
   text-align: center;
 }
@@ -183,17 +187,17 @@ h4 {
 .advanced-practice h3 {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #fff;
-  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
 }
 
 .practice-controls {
   display: flex;
-  gap: 0.625rem;
+  gap: var(--spacing-sm);
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 50rem;
+  max-width: var(--max-width-content);
   margin: 0 auto;
 }
 
@@ -202,19 +206,19 @@ h4 {
   font-size: 1.3rem;
   min-height: 1.3125rem;
   font-weight: 400;
-  color: #fff;
+  color: var(--text-primary);
 }
 
-.feedback.correct { color: #89ff89; }
+.feedback.correct { color: var(--feedback-correct); }
 .feedback.incorrect { 
-  color: #ff8989; 
-  margin-bottom: 0.5rem;
+  color: var(--feedback-incorrect); 
+  margin-bottom: var(--spacing-xs);
 }
 
 /* Responsive Design */
 @media (max-width: 48rem) {
-  #app-container { padding: 1.25rem; }
-  .app-header { padding: 1.25rem; }
+  #app-container { padding: var(--spacing-lg); }
+  .app-header { padding: var(--spacing-lg); }
   .question-display { font-size: 2rem; }
   
   h1 { font-size: 2rem; }
@@ -224,10 +228,10 @@ h4 {
 }
 
 @media (max-width: 33.75rem) {
-  .main-content { padding-top: 2rem; }
+  .main-content { padding-top: var(--spacing-2xl); }
   
   .app-header {
-    padding: 0 0 2.5rem 0;
+    padding: 0 0 var(--spacing-3xl) 0;
   }
 
   .app-logo {
@@ -240,7 +244,7 @@ h4 {
 
   #answer-form, .practice-controls {
     flex-direction: column;
-    gap: 0.625rem;
+    gap: var(--spacing-sm);
     width: 100%;
   }
   
