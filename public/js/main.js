@@ -190,6 +190,7 @@ function normalizeChord(raw) {
   // Handle major 7th variations
   normalized = normalized.replace(/MAJ7/g, "MAJ7");
   normalized = normalized.replace(/MAJOR7/g, "MAJ7");
+  normalized = normalized.replace(/Δ/g, "MAJ7");
   
   // Handle minor 7th flat 5 variations (half diminished)
   // Only accept lowercase 'm' (minor) and lowercase 'b' (flat)
