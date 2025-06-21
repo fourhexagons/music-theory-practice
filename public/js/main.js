@@ -191,11 +191,16 @@ function normalizeChord(raw) {
   normalized = normalized.replace(/MAJ7/g, "MAJ7");
   normalized = normalized.replace(/MAJOR7/g, "MAJ7");
   
-  // Handle minor 7th flat 5 variations
-  normalized = normalized.replace(/M7B5/g, "M7♭5");
-  normalized = normalized.replace(/M7FLAT5/g, "M7♭5");
-  normalized = normalized.replace(/HALFDIMINISHED/g, "M7♭5");
-  normalized = normalized.replace(/HALFDIM/g, "M7♭5");
+  // Handle minor 7th flat 5 variations (half diminished)
+  // Only accept lowercase 'm' (minor) and lowercase 'b' (flat)
+  normalized = normalized.replace(/m7b5/g, "m7♭5");
+  normalized = normalized.replace(/m7flat5/g, "m7♭5");
+  normalized = normalized.replace(/HALFDIMINISHED/g, "m7♭5");
+  normalized = normalized.replace(/HALFDIM/g, "m7♭5");
+  normalized = normalized.replace(/HALF DIM/g, "m7♭5");
+  normalized = normalized.replace(/HALF DIMINISHED/g, "m7♭5");
+  normalized = normalized.replace(/HALF-DIM/g, "m7♭5");
+  normalized = normalized.replace(/HALF-DIMINISHED/g, "m7♭5");
   
   // Allow "˚" as a direct input for diminished
   // The quizData uses "˚" so this makes matching easier
