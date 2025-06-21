@@ -170,9 +170,9 @@ function normalizeChord(raw) {
   
   // Handle minor chord variations
   normalized = normalized.replace(/\s+/g, ""); // Remove spaces
-  normalized = normalized.replace(/MINOR/g, "M");
-  normalized = normalized.replace(/MIN/g, "M");
-  normalized = normalized.replace(/-/g, "M"); // D- becomes DM
+  normalized = normalized.replace(/MINOR/g, "m");
+  normalized = normalized.replace(/MIN/g, "m");
+  normalized = normalized.replace(/-/g, "m"); // D- becomes Dm (minor)
   
   // Handle major chord variations (though we don't use them in our data)
   normalized = normalized.replace(/MAJOR/g, "");
