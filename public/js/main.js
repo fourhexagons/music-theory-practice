@@ -374,7 +374,6 @@ function renderAppLayout() {
       <a href="/" style="text-decoration: none;">
         <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
       </a>
-      <div style="position: absolute; top: 10px; right: 10px; font-size: 0.7em; opacity: 0.6; color: #e0e0e0;">${APP_VERSION}</div>
     </header>
     <div class="main-content">
       <div class="quiz-section">
@@ -399,6 +398,12 @@ function renderAppLayout() {
       </div>
     </div>
   `;
+
+  // Find the global footer and inject the version number
+  const footer = document.querySelector('.app-footer');
+  if (footer) {
+    footer.textContent = APP_VERSION;
+  }
 
   attachEventListeners();
 }
