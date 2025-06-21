@@ -93,7 +93,7 @@ h4 {
 
 /* Question text */
 .question-display {
-  font-size: 2.4rem; /* Slightly reduced from 2.5rem */
+  font-size: 2.35rem; /* Slightly reduced from 2.5rem */
   margin-bottom: 2.5rem;
   color: #fff;
   font-weight: 500;
@@ -239,7 +239,7 @@ h4 {
   }
   
   .question-display {
-    font-size: 2rem; /* Increased from 1.8rem */
+    font-size: 1.5rem; /* Increased from 1.8rem */
   }
 
   #answer-form, .practice-controls {
@@ -259,4 +259,24 @@ h4 {
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
   h4 { font-size: 1.125rem; }
+}
+
+.quiz-section h2 {
+    font-size: 2.35rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+@media (max-width: 768px) {
+    .quiz-section {
+        padding: 0 1rem;
+    }
+
+    .quiz-section h2 {
+        font-size: 1.5rem;
+    }
+
+    #answer-form {
+        flex-direction: column;
+    }
 }
