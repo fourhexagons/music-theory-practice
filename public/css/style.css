@@ -84,7 +84,7 @@ h4 {
   /* position: absolute; */ /* No longer needed */
   /* top: 2rem; */
   /* right: 2rem; */
-  height: 2.5rem; 
+  height: 5rem; /* Increased 2x from 2.5rem */
   width: auto;
   z-index: 10;
 }
@@ -257,7 +257,7 @@ h4 {
     /* position: static; */ /* No longer needed */
     display: block;
     margin: 0; /* Remove margin */
-    height: 2.25rem;
+    height: 4.5rem; /* Increased 2x from 2.25rem */
   }
   
   .main-title {
