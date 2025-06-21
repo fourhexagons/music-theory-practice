@@ -63,28 +63,14 @@ h4 {
 /* New header container */
 .app-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center logo */
   align-items: center;
-  /* padding: 2rem; */ /* Removed, handled by #app-container */
   position: relative;
-}
-
-/* Header elements - positioning adjusted */
-.main-title {
-  /* position: absolute; */ /* No longer needed */
-  /* top: 2rem; */
-  /* left: 2rem; */
-  font-size: 1.5rem; 
-  font-weight: 400;
-  color: #fff;
-  z-index: 10;
+  padding-bottom: 2.5rem; /* Add padding for spacing */
 }
 
 .app-logo {
-  /* position: absolute; */ /* No longer needed */
-  /* top: 2rem; */
-  /* right: 2rem; */
-  height: 5rem; /* Increased 2x from 2.5rem */
+  height: 5rem;
   width: auto;
   z-index: 10;
 }
@@ -230,11 +216,8 @@ h4 {
 
 /* Responsive Design */
 @media (max-width: 48rem) {
-  #app-container { padding: 0; } /* Remove padding from main container */
+  #app-container { padding: 1.25rem; }
   .app-header { padding: 1.25rem; }
-  /* .main-title, .app-logo { top: 1.25rem; } */ /* No longer needed */
-  /* .main-title { left: 1.25rem; } */ /* No longer needed */
-  /* .app-logo { right: 1.25rem; } */ /* No longer needed */
   .question-display { font-size: 2rem; }
   
   /* Typography responsive adjustments */
@@ -248,23 +231,13 @@ h4 {
   .main-content { padding-top: 2rem; }
   
   .app-header {
-    flex-direction: column-reverse; /* Stack logo on top */
-    align-items: center;
-    gap: 1.25rem;
-    padding-bottom: 2.5rem;
+    padding: 0 0 2.5rem 0; /* Adjust padding for mobile */
   }
 
   .app-logo {
-    /* position: static; */ /* No longer needed */
-    display: block;
-    margin: 0; /* Remove margin */
-    height: 4.5rem; /* Increased 2x from 2.25rem */
+    height: 4.5rem;
   }
   
-  .main-title {
-    display: none; /* Hide title on narrow viewports */
-  }
-
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: 0.625rem;

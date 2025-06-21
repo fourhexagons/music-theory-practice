@@ -279,7 +279,6 @@ function renderNewUI() {
 
   appContainer.innerHTML = `
     <header class="app-header">
-      <h1 class="main-title">Music Theory Practice</h1>
       <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
     </header>
     <div class="main-content">
