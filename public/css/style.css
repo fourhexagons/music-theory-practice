@@ -248,7 +248,7 @@ h4 {
     width: 100%; /* Make input and button full width */
   }
   
-  #answer-input { text-align: center; }
+  /* #answer-input { text-align: center; } */ /* Removed to keep text left-aligned */
   
   /* Typography responsive adjustments */
   h1 { font-size: 1.75rem; }
