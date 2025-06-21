@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chord Normalization Tests</title>
+</head>
+<body>
+    <h1>Chord Normalization Tests</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Copy the normalizeChord function and test cases here
+        function normalizeChord(raw) {
+          if (!raw) return "";
+          let normalized = raw.trim();
+          
+          // Handle minor chord variations (before uppercase conversion)
+          normalized = normalized.replace(/\s+/g, ""); // Remove spaces
+          normalized = normalized.replace(/MINOR/g, "m");
+          normalized = normalized.replace(/MIN/g, "m");
+          normalized = normalized.replace(/-/g, "m"); // D- becomes Dm (minor)
+          
+          // Handle major chord variations (though we don't use them in our data)
+          normalized = normalized.replace(/MAJOR/g, "");
+          normalized = normalized.replace(/MAJ/g, "");
+          
+          // Handle diminished chord variations - including the "˚" symbol
+          normalized = normalized.replace(/DIMINISHED/g, "˚");
+          normalized = normalized.replace(/DIMIN/g, "˚");
+          normalized = normalized.replace(/DIM/g, "˚");
+          
+          // Handle dominant 7th variations
+          normalized = normalized.replace(/DOMINANT/g, "");
+          normalized = normalized.replace(/DOM/g, "");
+          
+          // Handle major 7th variations
+          normalized = normalized.replace(/MAJ7/g, "maj7");
+          normalized = normalized.replace(/MAJOR7/g, "maj7");
+          normalized = normalized.replace(/Δ/g, "maj7");
+          normalized = normalized.replace(/Δ7/g, "maj7");
+          
+          // Handle minor 7th flat 5 variations (half diminished)
+          normalized = normalized.replace(/m7b5/g, "m7♭5");
+          normalized = normalized.replace(/m7flat5/g, "m7♭5");
+          normalized = normalized.replace(/HALFDIMINISHED/g, "m7♭5");
+          normalized = normalized.replace(/HALFDIM/g, "m7♭5");
+          normalized = normalized.replace(/HALF DIM/g, "m7♭5");
+          normalized = normalized.replace(/HALF DIMINISHED/g, "m7♭5");
+          normalized = normalized.replace(/HALF-DIM/g, "m7♭5");
+          normalized = normalized.replace(/HALF-DIMINISHED/g, "m7♭5");
+          
+          // Handle half diminished symbols
+          normalized = normalized.replace(/ø/g, "m7♭5");
+          normalized = normalized.replace(/ø7/g, "m7♭5");
+          
+          // Handle flat symbols before uppercase conversion
+          normalized = normalized.replace(/Bb/g, "B♭");
+          normalized = normalized.replace(/Eb/g, "E♭");
+          normalized = normalized.replace(/Ab/g, "A♭");
+          normalized = normalized.replace(/Db/g, "D♭");
+          normalized = normalized.replace(/Gb/g, "G♭");
+          normalized = normalized.replace(/Cb/g, "C♭");
+          
+          // Handle sharp symbols before uppercase conversion
+          normalized = normalized.replace(/F#/g, "F♯");
+          normalized = normalized.replace(/C#/g, "C♯");
+          normalized = normalized.replace(/G#/g, "G♯");
+          normalized = normalized.replace(/D#/g, "D♯");
+          normalized = normalized.replace(/A#/g, "A♯");
+          normalized = normalized.replace(/E#/g, "E♯");
+          normalized = normalized.replace(/B#/g, "B♯");
+          
+          // Now convert to uppercase for final processing, but preserve minor notation
+          // First, temporarily replace 'm' with a unique marker
+          normalized = normalized.replace(/m/g, "MINOR_MARKER");
+          normalized = normalized.toUpperCase();
+          // Then restore the minor marker as lowercase 'm'
+          normalized = normalized.replace(/MINOR_MARKER/g, "m");
+          
+          return normalized;
+        }
+
+        const testCases = [
+          // Major 7th chords
+          { input: 'Cmaj7', expected: 'Cmaj7', description: 'Major 7th - maj7' },
+          { input: 'CM7', expected: 'Cmaj7', description: 'Major 7th - M7' },
+          { input: 'CΔ', expected: 'Cmaj7', description: 'Major 7th - Δ' },
+          { input: 'CΔ7', expected: 'Cmaj7', description: 'Major 7th - Δ7' },
+          { input: 'CMAJ7', expected: 'Cmaj7', description: 'Major 7th - MAJ7' },
+          { input: 'CMAJOR7', expected: 'Cmaj7', description: 'Major 7th - MAJOR7' },
+          
+          // Minor chords
+          { input: 'Cm', expected: 'Cm', description: 'Minor - m' },
+          { input: 'C-', expected: 'Cm', description: 'Minor - dash' },
+          { input: 'Cmin', expected: 'Cm', description: 'Minor - min' },
+          { input: 'Cminor', expected: 'Cm', description: 'Minor - minor' },
+          
+          // Diminished chords
+          { input: 'C˚', expected: 'C˚', description: 'Diminished - ˚' },
+          { input: 'Cdim', expected: 'C˚', description: 'Diminished - dim' },
+          { input: 'Cdimin', expected: 'C˚', description: 'Diminished - dimin' },
+          { input: 'Cdiminished', expected: 'C˚', description: 'Diminished - diminished' },
+          
+          // Dominant 7th chords
+          { input: 'C7', expected: 'C7', description: 'Dominant 7th - 7' },
+          { input: 'Cdom', expected: 'C7', description: 'Dominant 7th - dom' },
+          { input: 'Cdominant', expected: 'C7', description: 'Dominant 7th - dominant' },
+          
+          // Minor 7th chords
+          { input: 'Cm7', expected: 'Cm7', description: 'Minor 7th - m7' },
+          { input: 'C-7', expected: 'Cm7', description: 'Minor 7th - dash7' },
+          { input: 'Cmin7', expected: 'Cm7', description: 'Minor 7th - min7' },
+          { input: 'Cminor7', expected: 'Cm7', description: 'Minor 7th - minor7' },
+          
+          // Half diminished chords
+          { input: 'Cm7b5', expected: 'Cm7♭5', description: 'Half diminished - m7b5' },
+          { input: 'Cm7♭5', expected: 'Cm7♭5', description: 'Half diminished - m7♭5' },
+          { input: 'Cø', expected: 'Cm7♭5', description: 'Half diminished - ø' },
+          { input: 'Cø7', expected: 'Cm7♭5', description: 'Half diminished - ø7' },
+          
+          // With flats
+          { input: 'Bb', expected: 'B♭', description: 'Flat - Bb' },
+          { input: 'B♭', expected: 'B♭', description: 'Flat - B♭' },
+          { input: 'Bbm', expected: 'B♭m', description: 'Flat minor - Bbm' },
+          { input: 'B♭m', expected: 'B♭m', description: 'Flat minor - B♭m' },
+          { input: 'Bbm7', expected: 'B♭m7', description: 'Flat minor 7th - Bbm7' },
+          { input: 'B♭m7', expected: 'B♭m7', description: 'Flat minor 7th - B♭m7' },
+          { input: 'Bbmaj7', expected: 'B♭maj7', description: 'Flat major 7th - Bbmaj7' },
+          { input: 'B♭maj7', expected: 'B♭maj7', description: 'Flat major 7th - B♭maj7' },
+          { input: 'BbΔ', expected: 'B♭maj7', description: 'Flat major 7th - BbΔ' },
+          { input: 'B♭Δ', expected: 'B♭maj7', description: 'Flat major 7th - B♭Δ' },
+          { input: 'Bb7', expected: 'B♭7', description: 'Flat dominant 7th - Bb7' },
+          { input: 'B♭7', expected: 'B♭7', description: 'Flat dominant 7th - B♭7' },
+          { input: 'Bbdim', expected: 'B♭˚', description: 'Flat diminished - Bbdim' },
+          { input: 'B♭dim', expected: 'B♭˚', description: 'Flat diminished - B♭dim' },
+          
+          // With sharps
+          { input: 'F#', expected: 'F♯', description: 'Sharp - F#' },
+          { input: 'F♯', expected: 'F♯', description: 'Sharp - F♯' },
+          { input: 'F#m', expected: 'F♯m', description: 'Sharp minor - F#m' },
+          { input: 'F♯m', expected: 'F♯m', description: 'Sharp minor - F♯m' },
+          { input: 'F#m7', expected: 'F♯m7', description: 'Sharp minor 7th - F#m7' },
+          { input: 'F♯m7', expected: 'F♯m7', description: 'Sharp minor 7th - F♯m7' },
+          { input: 'F#maj7', expected: 'F♯maj7', description: 'Sharp major 7th - F#maj7' },
+          { input: 'F♯maj7', expected: 'F♯maj7', description: 'Sharp major 7th - F♯maj7' },
+          { input: 'F#Δ', expected: 'F♯maj7', description: 'Sharp major 7th - F#Δ' },
+          { input: 'F♯Δ', expected: 'F♯maj7', description: 'Sharp major 7th - F♯Δ' },
+          { input: 'F#7', expected: 'F♯7', description: 'Sharp dominant 7th - F#7' },
+          { input: 'F♯7', expected: 'F♯7', description: 'Sharp dominant 7th - F♯7' },
+          { input: 'F#dim', expected: 'F♯˚', description: 'Sharp diminished - F#dim' },
+          { input: 'F♯dim', expected: 'F♯˚', description: 'Sharp diminished - F♯dim' },
+          
+          // Edge cases
+          { input: 'b', expected: 'B', description: 'Standalone b = note B' },
+          { input: 'B', expected: 'B', description: 'Note B' },
+          { input: 'C', expected: 'C', description: 'Note C' },
+          { input: 'D', expected: 'D', description: 'Note D' },
+          { input: 'E', expected: 'E', description: 'Note E' },
+          { input: 'F', expected: 'F', description: 'Note F' },
+          { input: 'G', expected: 'G', description: 'Note G' },
+          { input: 'A', expected: 'A', description: 'Note A' },
+        ];
+        
+        let passed = 0;
+        let failed = 0;
+        let results = [];
+        
+        testCases.forEach(testCase => {
+          const result = normalizeChord(testCase.input);
+          if (result === testCase.expected) {
+            passed++;
+            results.push(`✅ ${testCase.description}: "${testCase.input}" → "${result}"`);
+          } else {
+            failed++;
+            results.push(`❌ ${testCase.description}: "${testCase.input}" → "${result}" (expected "${testCase.expected}")`);
+          }
+        });
+        
+        document.getElementById('results').innerHTML = `
+          <h2>Test Results: ${passed} passed, ${failed} failed</h2>
+          <pre>${results.join('\n')}</pre>
+        `;
+    </script>
+</body>
+</html> 

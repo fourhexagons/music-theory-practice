@@ -145,7 +145,13 @@ const learningState = {
   correctAnswersInChapter: 0,
   requiredAnswersPerChapter: 3,
   usedDegrees: [],
-  lastAnswerIncorrect: false
+  lastAnswerIncorrect: false,
+  // New state for accidentals pairing
+  accidentalsPairState: {
+    inProgress: false,
+    currentKey: null,
+    countAnswered: false
+  }
 };
 
 
@@ -166,58 +172,97 @@ function wordToNumber(word) {
 
 function normalizeChord(raw) {
   if (!raw) return "";
-  let normalized = raw.trim().toUpperCase();
-  
-  // Handle minor chord variations
-  normalized = normalized.replace(/\s+/g, ""); // Remove spaces
-  normalized = normalized.replace(/MINOR/g, "m");
-  normalized = normalized.replace(/MIN/g, "m");
-  normalized = normalized.replace(/-/g, "m"); // D- becomes Dm (minor)
-  
-  // Handle major chord variations (though we don't use them in our data)
-  normalized = normalized.replace(/MAJOR/g, "");
-  normalized = normalized.replace(/MAJ/g, "");
-  
-  // Handle diminished chord variations - including the "˚" symbol
-  normalized = normalized.replace(/DIMINISHED/g, "˚");
-  normalized = normalized.replace(/DIMIN/g, "˚");
-  normalized = normalized.replace(/DIM/g, "˚");
-  
-  // Handle dominant 7th variations
-  normalized = normalized.replace(/DOMINANT/g, "");
-  normalized = normalized.replace(/DOM/g, "");
-  
-  // Handle major 7th variations
-  normalized = normalized.replace(/MAJ7/g, "MAJ7");
-  normalized = normalized.replace(/MAJOR7/g, "MAJ7");
-  normalized = normalized.replace(/Δ/g, "MAJ7");
-  
-  // Handle minor 7th flat 5 variations (half diminished)
-  // Only accept lowercase 'm' (minor) and lowercase 'b' (flat)
-  normalized = normalized.replace(/m7b5/g, "m7♭5");
-  normalized = normalized.replace(/m7flat5/g, "m7♭5");
-  normalized = normalized.replace(/HALFDIMINISHED/g, "m7♭5");
-  normalized = normalized.replace(/HALFDIM/g, "m7♭5");
-  normalized = normalized.replace(/HALF DIM/g, "m7♭5");
-  normalized = normalized.replace(/HALF DIMINISHED/g, "m7♭5");
-  normalized = normalized.replace(/HALF-DIM/g, "m7♭5");
-  normalized = normalized.replace(/HALF-DIMINISHED/g, "m7♭5");
-  
-  // Allow "˚" as a direct input for diminished
-  // The quizData uses "˚" so this makes matching easier
-  
-  return normalized;
+  let normalized = raw.trim().replace(/\s+/g, "");
+
+  // Special case: single letter (note only)
+  if (/^[A-Ga-g]$/.test(normalized)) return normalized.toUpperCase();
+  if (/^[bB]$/.test(normalized)) return "B";
+
+  // Extract root (with accidental)
+  const rootMatch = normalized.match(/^([A-Ga-g](?:b|#|♭|♯)?)/);
+  if (!rootMatch) return normalized;
+  let root = rootMatch[1];
+  // Normalize accidental
+  root = root.replace('b', '♭').replace('#', '♯').replace('♭', '♭').replace('♯', '♯').toUpperCase();
+  let quality = normalized.slice(rootMatch[1].length);
+
+  // Prioritized mapping of chord qualities (case-sensitive matching for conflicting patterns)
+  const qualityMap = [
+    // Half diminished
+    { patterns: ['m7b5', 'm7♭5', 'm7flat5', 'ø7', 'ø', 'halfdiminished', 'half-diminished', 'half dim', 'half dimished', 'half-dim', 'half-dimished'], result: 'm7♭5', caseSensitive: false },
+    // Minor 7th (case-sensitive to avoid conflicts with M7)
+    { patterns: ['m7', 'min7', 'minor7', '-7'], result: 'm7', caseSensitive: true },
+    // Major 7th (case-insensitive for variations, but M7 is case-sensitive)
+    { patterns: ['maj7', 'major7', 'Δ7', 'Δ', '∆', '∆7', 'MAJ7', 'MAJOR7'], result: 'maj7', caseSensitive: false },
+    // Major 7th with M7 (case-sensitive to distinguish from m7)
+    { patterns: ['M7'], result: 'maj7', caseSensitive: true },
+    // Minor (case-sensitive to avoid conflicts)
+    { patterns: ['m', 'min', 'minor', '-'], result: 'm', caseSensitive: true },
+    // Diminished
+    { patterns: ['diminished', 'dimin', 'dim', '˚'], result: '˚', caseSensitive: false },
+    // Dominant 7th
+    { patterns: ['7', 'dom7', 'dominant7', 'dom', 'dominant'], result: '7', caseSensitive: false },
+    // Major triad (rare, must come after maj7)
+    { patterns: ['maj', 'M'], result: '', caseSensitive: true },
+    // Empty quality (triad)
+    { patterns: [''], result: '', caseSensitive: true },
+  ];
+
+  for (const mapping of qualityMap) {
+    const matchFound = mapping.patterns.some(pattern => {
+      if (mapping.caseSensitive) {
+        return quality === pattern;
+      } else {
+        return quality.toLowerCase() === pattern.toLowerCase();
+      }
+    });
+    
+    if (matchFound) {
+      quality = mapping.result;
+      break;
+    }
+  }
+
+  // If quality is empty, just return root
+  if (!quality) return root;
+
+  return root + quality;
 }
 
 function accidentalToUnicode(s) {
   s = s.trim();
-  if (/^bb$/i.test(s)) return 'B♭';
-    if (/^b$/i.test(s)) return 'B'; // common mistake
-  if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
-  if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
-  if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
-  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
-  return s.toUpperCase().normalize('NFC');
+  
+  // Handle single notes first (A-G, a-g)
+  if (/^[A-Ga-g]$/.test(s)) return s.toUpperCase();
+  
+  // Handle standalone 'b' as note B
+  if (/^b$/i.test(s)) return 'B';
+  
+  // Handle single flats (b, Bb, etc.)
+  if (/^([A-Ga-g])b$/i.test(s)) return s[0].toUpperCase() + '♭';
+  
+  // Handle single sharps (#, F#, etc.)
+  if (/^([A-Ga-g])#$/i.test(s)) return s[0].toUpperCase() + '♯';
+  
+  // Handle double flats (bb, Bbb, etc.)
+  if (/^bb$/i.test(s)) return 'B♭♭';
+  if (/^([A-Ga-g])bb$/i.test(s)) return s[0].toUpperCase() + '♭♭';
+  
+  // Handle double sharps (##, x, F##, Cx, etc.)
+  if (/^([A-Ga-g])(##|x)$/i.test(s)) return s[0].toUpperCase() + '♯♯';
+  
+  // Handle mixed notation (Bb♭, F#♯, C♯#, E♭b, etc.)
+  if (/^([A-Ga-g])b♭$/i.test(s)) return s[0].toUpperCase() + '♭♭';
+  if (/^([A-Ga-g])#♯$/i.test(s)) return s[0].toUpperCase() + '♯♯';
+  if (/^([A-Ga-g])♯#$/i.test(s)) return s[0].toUpperCase() + '♯♯';
+  if (/^([A-Ga-g])♭b$/i.test(s)) return s[0].toUpperCase() + '♭♭';
+  
+  // Handle invalid notes with accidentals (X#, Yb, etc.)
+  if (/^([A-Za-z])#$/i.test(s)) return s[0].toUpperCase() + '♯';
+  if (/^([A-Za-z])b$/i.test(s)) return s[0].toUpperCase() + '♭';
+  
+  // Default: return uppercase version
+  return s.toUpperCase();
 }
 
 function normalizeAccList(strOrArr) {
@@ -264,6 +309,9 @@ function getCurrentGroup() {
 
 function getCurrentKey() {
   const group = getCurrentGroup();
+  if (learningState.accidentalsPairState && learningState.accidentalsPairState.inProgress) {
+    return learningState.accidentalsPairState.currentKey;
+  }
   if (learningState.mode === MODES.RANDOM || learningState.mode.startsWith('advanced')) {
     return group.keys[Math.floor(Math.random() * group.keys.length)];
   }
@@ -271,15 +319,43 @@ function getCurrentKey() {
 }
 
 function getCurrentChapter() {
-   const { mode, currentChapterIndex } = learningState;
+   const { mode, currentChapterIndex, accidentalsPairState } = learningState;
+   
+   // Handle accidentals pairing logic
+   if (accidentalsPairState.inProgress) {
+     if (!accidentalsPairState.countAnswered) {
+       // First part: accidentals count
+       return learningPath.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_COUNT);
+     } else {
+       // Second part: accidentals naming (only if the key has accidentals)
+       const key = accidentalsPairState.currentKey;
+       if (quizData[key] && quizData[key].accidentals > 0) {
+         return learningPath.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
+       } else {
+         // Key has no accidentals, skip naming and end the pair
+         accidentalsPairState.inProgress = false;
+         accidentalsPairState.countAnswered = false;
+         accidentalsPairState.currentKey = null;
+       }
+     }
+   }
+   
    if (mode === MODES.ADVANCED_ALL) {
-     const availableChapters = learningPath.chapters.filter(c => c.id !== QUESTION_TYPES.SEVENTH_SPELLING);
+     const availableChapters = learningPath.chapters.filter(c => c.id !== QUESTION_TYPES.SEVENTH_SPELLING && c.id !== QUESTION_TYPES.ACCIDENTALS_NAMES);
      return availableChapters[Math.floor(Math.random() * availableChapters.length)];
    }
    if (mode === MODES.ADVANCED_SEVENTHS) {
      return learningPath.chapters.find(c => c.id === QUESTION_TYPES.SEVENTH_SPELLING);
    }
-  return learningPath.chapters[currentChapterIndex];
+   
+   // For linear mode, ensure accidentals naming is never selected standalone
+   const currentChapter = learningPath.chapters[currentChapterIndex];
+   if (currentChapter.id === QUESTION_TYPES.ACCIDENTALS_NAMES) {
+     // Skip accidentals naming if we're not in a pair
+     return learningPath.chapters[currentChapterIndex + 1] || learningPath.chapters[0];
+   }
+   
+  return currentChapter;
 }
 
 
@@ -363,6 +439,10 @@ function askQuestion() {
   switch (chapter.id) {
     case QUESTION_TYPES.ACCIDENTALS_COUNT:
       text = `How many accidentals are in ${key} major?`;
+      // Set up accidentals pairing state
+      learningState.accidentalsPairState.inProgress = true;
+      learningState.accidentalsPairState.currentKey = key;
+      learningState.accidentalsPairState.countAnswered = false;
       break;
     case QUESTION_TYPES.ACCIDENTALS_NAMES:
       text = `Name the accidentals in ${key} major.`;
@@ -389,7 +469,7 @@ function askQuestion() {
       const action = chapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
       text = `${action} the ${ordinal(degree)} ${chordType} in ${key} major.`;
       break;
-  }
+    }
   
   updateQuestionUI(text);
   learningState.lastAnswerIncorrect = false;
@@ -435,9 +515,10 @@ function checkAnswer(answer) {
       return normalizeAccList(answer) === normalizeAccList(data.notes);
 
     case QUESTION_TYPES.SCALE_SPELLING:
-      const correctScale = data.scale.map(n => n.toUpperCase()).join('');
-      const userScale = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
-      return userScale === correctScale;
+      // Normalize both user input and correct answer to Unicode accidentals
+      const correctScaleUnicode = data.scale.map(accidentalToUnicode).join('').toUpperCase();
+      const userScaleUnicode = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
+      return userScaleUnicode === correctScaleUnicode;
 
     case QUESTION_TYPES.TRIADS:
       return normalizeChord(answer) === normalizeChord(data.triads[degree]);
@@ -454,6 +535,24 @@ function checkAnswer(answer) {
 }
 
 function handleCorrectAnswer() {
+  const { accidentalsPairState } = learningState;
+  
+  // Handle accidentals pairing progression
+  if (accidentalsPairState.inProgress) {
+    if (!accidentalsPairState.countAnswered) {
+      // Just answered the count question, now move to naming
+      accidentalsPairState.countAnswered = true;
+      askQuestion();
+      saveLearningState();
+      return;
+    } else {
+      // Just answered the naming question, end the pair
+      accidentalsPairState.inProgress = false;
+      accidentalsPairState.countAnswered = false;
+      accidentalsPairState.currentKey = null;
+    }
+  }
+  
   if (learningState.mode.startsWith('advanced')) {
     askQuestion();
   } else {
@@ -512,7 +611,7 @@ function advanceLearningPath() {
       }
     }
   }
-  
+
   askQuestion();
 }
 
@@ -530,5 +629,8 @@ function startAdvancedPractice(mode) {
 document.addEventListener('DOMContentLoaded', () => {
   initLearningState();
   renderAppLayout();
-  askQuestion();
-}); 
+    askQuestion();
+});
+
+// Update cache-busting version
+const CACHE_VERSION = 72; 
