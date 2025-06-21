@@ -273,50 +273,55 @@ function getCurrentChapter() {
 
 // --- UI Rendering ---
 function renderNewUI() {
-  const container = document.getElementById('app-container');
-  if (!container) return;
+  const appContainer = document.getElementById('app-container');
+  const advancedRoot = document.getElementById('advanced-practice-root');
+  if (!appContainer || !advancedRoot) return;
 
-  container.innerHTML = `
-    <div class="app-header"><h1>Music Theory Practice</h1></div>
+  appContainer.innerHTML = `
+    <h1 class="main-title">Music Theory Practice</h1>
+    <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
     <div class="main-content">
-      <div class="card quiz-section">
+      <div class="quiz-section">
         <div class="question-display" id="question-display"></div>
         <div class="answer-container">
           <form id="answer-form">
             <input type="text" id="answer-input" placeholder="Your answer..." autocomplete="off">
-            <button type="submit" id="submit-btn">Submit</button>
+            <button type="submit" id="submit-btn" class="btn">Submit</button>
           </form>
           <div class="feedback" id="feedback"></div>
         </div>
       </div>
-      <div class="card navigation-section">
-        <h3>Free Practice</h3>
+    </div>
+  `;
+  
+  advancedRoot.innerHTML = `
+    <div class="advanced-practice-container">
+      <div class="advanced-practice">
+        <h3>Advanced Practice</h3>
         <div class="practice-controls">
-          <select id="key-select">${orderedKeys.map(k => `<option value="${k}"${k === 'C' ? ' selected' : ''}>${k}</option>`).join('')}</select>
-          <select id="chapter-select">
-            ${learningPath.chapters
-              .filter(c => c.id !== 'accNotes')
-              .map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-          </select>
-          <button id="practice-btn">Start</button>
-        </div>
-         <h3>Advanced Practice</h3>
-         <div class="practice-controls">
-            <button id="advanced1-btn">All Topics</button>
-            <button id="advanced2-btn">Chord Spelling</button>
+          <button id="advanced1-btn" class="btn">All Keys</button>
+          <button id="advanced2-btn" class="btn">Sevenths</button>
         </div>
       </div>
     </div>
   `;
+
   attachNewEventListeners();
   askNewQuestion();
 }
 
 function attachNewEventListeners() {
   document.getElementById('answer-form').addEventListener('submit', handleNewAnswer);
-  document.getElementById('practice-btn').addEventListener('click', startFreePractice);
-  document.getElementById('advanced1-btn').addEventListener('click', () => startAdvancedPractice('advanced'));
-  document.getElementById('advanced2-btn').addEventListener('click', () => startAdvancedPractice('advanced2'));
+  
+  const advanced1Btn = document.getElementById('advanced1-btn');
+  if (advanced1Btn) {
+    advanced1Btn.addEventListener('click', () => startAdvancedPractice('advanced'));
+  }
+
+  const advanced2Btn = document.getElementById('advanced2-btn');
+  if (advanced2Btn) {
+    advanced2Btn.addEventListener('click', () => startAdvancedPractice('advanced2'));
+  }
 }
 
 // --- Question and Answer Logic ---
@@ -371,11 +376,15 @@ function askNewQuestion() {
       text = `Name the ${ordinal(degree)} triad in ${key} major.`;
       break;
     case 'sevenths':
-      return normalizeChord(answer) === normalizeChord(data.sevenths[q.degree]);
+      const degree7 = Math.floor(Math.random() * 6) + 2;
+      learningState.currentQuestion.degree = degree7;
+      text = `Name the ${ordinal(degree7)} seventh chord in ${key} major.`;
+      break;
     case 'seventhSpelling':
-      const correctSpelling = data.seventhSpelling[q.degree].map(n => n.toUpperCase()).join('');
-      const userSpelling = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
-      return userSpelling === correctSpelling;
+      const degreeSpell = Math.floor(Math.random() * 6) + 2;
+      learningState.currentQuestion.degree = degreeSpell;
+      text = `Spell the ${ordinal(degreeSpell)} seventh chord in ${key} major.`;
+      break;
   }
   questionDisplay.textContent = text;
 }
