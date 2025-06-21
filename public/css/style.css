@@ -55,7 +55,6 @@ h4 {
 /* App container */
 #app-container {
   position: relative;
-  /* min-height: 100vh; */ /* Removed to fix vertical spacing issue */
   padding: 2rem;
   max-width: 75rem;
   margin: 0 auto;
@@ -66,7 +65,7 @@ h4 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem;
+  /* padding: 2rem; */ /* Removed, handled by #app-container */
   position: relative;
 }
 
