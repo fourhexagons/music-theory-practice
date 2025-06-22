@@ -386,7 +386,9 @@ function renderAppLayout() {
   const appContainer = document.getElementById('app-container');
   appContainer.innerHTML = `
     <header class="app-header">
-      <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+      <a href="/" class="logo-link">
+        <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+      </a>
     </header>
     <div class="main-content">
       <div class="quiz-section">
