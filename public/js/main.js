@@ -1,7 +1,5 @@
 console.log('main.js loaded');
 
-const APP_VERSION = 'v1.0.0';
-
 // --- 1. Constants and Data ---
 
 const QUESTION_TYPES = {
@@ -114,7 +112,6 @@ const quizData = {
   }
 };
 
-const orderedKeys = ['F♯', 'B', 'E', 'A', 'D', 'G', 'C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'];
 const allKeys = Object.keys(quizData);
 
 const CHAPTERS = {
@@ -304,7 +301,6 @@ function normalizeAccList(strOrArr) {
 function initLearningState() {
   // For this complex progression, we always start fresh.
   // Can re-introduce localStorage later, but would need a robust way to handle path changes.
-  console.log("Initializing fresh learning state for the new progression.");
 }
 
 function getCurrentLevel() {
@@ -394,14 +390,12 @@ function attachEventListeners() {
   
   if (form) {
     form.addEventListener('submit', handleAnswerSubmit);
-    console.log('Form submit listener attached');
   } else {
     console.error('Form not found');
   }
   
   if (submitBtn) {
     submitBtn.addEventListener('click', handleAnswerSubmit);
-    console.log('Submit button click listener attached');
   } else {
     console.error('Submit button not found');
   }
@@ -414,7 +408,6 @@ function attachEventListeners() {
         learningState.lastAnswerIncorrect = false;
       }
     });
-    console.log('Answer input click listener attached');
   } else {
     console.error('Answer input not found');
   }
@@ -644,17 +637,8 @@ function checkAnswer(answer) {
   return false;
 }
 
-function handleCorrectAnswer() {
-  // This function is now OBSOLETE. The logic is moved into handleAnswerSubmit.
-  // Kept here to avoid breaking any old references, but it does nothing.
-}
-
 
 // --- 6. Learning Path Progression ---
-
-function advanceLearningPath() {
-  // This function is now OBSOLETE. The new function is advanceProgression().
-}
 
 function startAdvancedPractice(mode) {
   // Set advanced mode flags
