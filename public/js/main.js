@@ -219,7 +219,9 @@ function normalizeChord(raw) {
   // Half-diminished text variations
   if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM') || 
       upperNormalized.includes('HALF DIM') || upperNormalized.includes('HALF-DIMINISHED') ||
-      upperNormalized.includes('HALF-DIM')) {
+      upperNormalized.includes('HALF-DIM') || upperNormalized.includes('-HALFDIMINISHED') ||
+      upperNormalized.includes('-HALFDIM') || normalized.includes('halfdiminished') ||
+      normalized.includes('halfdim')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}m7♭5`;
   }
@@ -233,7 +235,8 @@ function normalizeChord(raw) {
   // Minor 7th variations (handle BEFORE major 7th to avoid conflicts)
   // Check for lowercase 'm7' pattern first (before uppercase conversion)
   if (normalized.endsWith('m7') || upperNormalized.includes('MIN7') || upperNormalized.includes('MINOR7') || 
-      upperNormalized.includes('-7')) {
+      upperNormalized.includes('-7') || upperNormalized.includes('-MIN7') || upperNormalized.includes('-MINOR7') ||
+      normalized.includes('minor7') || normalized.includes('min7')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}m7`;
   }
@@ -241,13 +244,17 @@ function normalizeChord(raw) {
   // Major 7th variations (handle after minor 7th)
   if (upperNormalized.includes('MAJ7') || 
       (upperNormalized.includes('M7') && !normalized.endsWith('m7')) || 
-      upperNormalized.includes('Δ') || upperNormalized.includes('∆')) {
+      upperNormalized.includes('Δ') || upperNormalized.includes('∆') ||
+      upperNormalized.includes('MAJOR7') || upperNormalized.includes('MAJ7') ||
+      normalized.includes('major7') || normalized.includes('maj7')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}maj7`;
   }
 
   // Diminished variations
-  if (upperNormalized.includes('DIMINISHED') || upperNormalized.includes('DIM')) {
+  if (upperNormalized.includes('DIMINISHED') || upperNormalized.includes('DIM') ||
+      upperNormalized.includes('-DIMINISHED') || upperNormalized.includes('-DIM') ||
+      normalized.includes('diminished') || normalized.includes('dim')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}˚`;
   }
