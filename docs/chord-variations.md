@@ -12,11 +12,12 @@ This document provides a comprehensive reference for all chord input variations 
 |------------|----------------|------------------|
 | Major Triad | C | C, C major, C maj, C MAJOR, C MAJ |
 | Minor Triad | Cm | Cm, C minor, C min, C-, C MINOR, C MIN |
-| Dominant 7th | C7 | C7 |
+| Dominant 7th | C7 | C7, C dominant, C dom, C DOMINANT, C DOM |
 | Major 7th | Cmaj7 | Cmaj7, C maj7, C major7, CM7, C∆, CΔ, C∆7, CΔ7, C MAJ7, C MAJOR7 |
 | Minor 7th | Cm7 | Cm7, C min7, C minor7, C-7, Cminor7, C MIN7, C MINOR7 |
-| Half-Diminished 7th | Cm7♭5 | Cm7b5, C halfdiminished, C halfdim, CØ, Chalfdiminished, C HALFDIMINISHED, C HALFDIM |
+| Half-Diminished 7th | Cm7♭5 | Cm7b5, C m7flat5, C halfdiminished, C halfdim, CØ, Chalfdiminished, C HALFDIMINISHED, C HALFDIM |
 | Diminished Triad | C˚ | Cdim, C diminished, C dim, Cdiminished, C DIMINISHED, C DIM |
+| Note Spellings | C | C# E G# B, C# E G#, etc. (returns root note) |
 
 ## Detailed Reference
 
@@ -30,7 +31,7 @@ This document provides a comprehensive reference for all chord input variations 
 
 ### Dominant 7th
 **Standard Output:** C7
-**Accepted Inputs:** C7
+**Accepted Inputs:** C7, C dominant, C dom, C DOMINANT, C DOM
 
 ### Major 7th
 **Standard Output:** Cmaj7
@@ -42,11 +43,16 @@ This document provides a comprehensive reference for all chord input variations 
 
 ### Half-Diminished 7th
 **Standard Output:** Cm7♭5
-**Accepted Inputs:** Cm7b5, C halfdiminished, C halfdim, CØ, Chalfdiminished, C HALFDIMINISHED, C HALFDIM
+**Accepted Inputs:** Cm7b5, C m7flat5, C halfdiminished, C halfdim, CØ, Chalfdiminished, C HALFDIMINISHED, C HALFDIM
 
 ### Diminished Triad
 **Standard Output:** C˚
 **Accepted Inputs:** Cdim, C diminished, C dim, Cdiminished, C DIMINISHED, C DIM
+
+### Note Spellings
+**Standard Output:** C (root note)
+**Accepted Inputs:** Space-separated note spellings like "C# E G# B", "C# E G#", etc.
+**Note:** When users input note spellings (e.g., "C# E G# B" for a C# minor 7th), the system extracts and returns the root note (C#).
 
 ## Implementation Details
 
