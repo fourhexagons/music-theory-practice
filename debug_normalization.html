@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Chord Normalization</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { margin: 10px 0; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; }
+        .result { margin: 5px 0; padding: 5px; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <h1>Debug Chord Normalization</h1>
+    <div id="debug"></div>
+
+    <script src="public/js/main.js"></script>
+    <script>
+        const debugDiv = document.getElementById('debug');
+        
+        function debugNormalizeChord(input) {
+            const div = document.createElement('div');
+            div.className = 'debug';
+            
+            // Simulate the normalizeChord function step by step
+            let normalized = input.trim();
+            div.innerHTML += `<div class="result"><strong>Input:</strong> "${input}"</div>`;
+            div.innerHTML += `<div class="result"><strong>After trim:</strong> "${normalized}"</div>`;
+            
+            // Check note spelling
+            const noteSpellingMatch = normalized.match(/^([A-Ga-g][#♯b♭]?)\s+([A-Ga-g][#♯b♭]?)\s+([A-Ga-g][#♯b♭]?)(?:\s+([A-Ga-g][#♯b♭]?))?$/);
+            if (noteSpellingMatch) {
+                div.innerHTML += `<div class="result"><strong>Note spelling detected:</strong> ${noteSpellingMatch[1]}</div>`;
+                return div;
+            }
+            
+            // Remove spaces
+            normalized = normalized.replace(/\s+/g, "");
+            div.innerHTML += `<div class="result"><strong>After space removal:</strong> "${normalized}"</div>`;
+            
+            // Validate note letter
+            if (!/^[A-Ga-g]/.test(normalized)) {
+                div.innerHTML += `<div class="result"><strong>Invalid note letter:</strong> returning ""</div>`;
+                return div;
+            }
+            
+            // Parse note and chord part
+            const noteMatch = normalized.match(/^([A-Ga-g])([#♯b♭]*)(.*)$/);
+            if (!noteMatch) {
+                div.innerHTML += `<div class="result"><strong>No note match:</strong> returning ""</div>`;
+                return div;
+            }
+            
+            const [, baseNote, accidentals, rest] = noteMatch;
+            const normalizedNote = accidentalToUnicode(baseNote + accidentals);
+            let chordPart = rest;
+            
+            div.innerHTML += `<div class="result"><strong>Base note:</strong> "${baseNote}"</div>`;
+            div.innerHTML += `<div class="result"><strong>Accidentals:</strong> "${accidentals}"</div>`;
+            div.innerHTML += `<div class="result"><strong>Rest:</strong> "${rest}"</div>`;
+            div.innerHTML += `<div class="result"><strong>Normalized note:</strong> "${normalizedNote}"</div>`;
+            div.innerHTML += `<div class="result"><strong>Chord part:</strong> "${chordPart}"</div>`;
+            
+            // Test multi-token rules
+            const multiTokenRules = [
+                { pattern: /^(major|maj|M)7$/i, replacement: 'maj7' },
+                { pattern: /^(major|maj|M)aj7$/i, replacement: 'maj7' },
+                { pattern: /^(minor|min|m)7$/i, replacement: 'm7' },
+                { pattern: /^(minor|min|m)in7$/i, replacement: 'm7' },
+                { pattern: /^(dominant|dom)7$/i, replacement: '7' },
+                { pattern: /^(dominant|dom)inant7$/i, replacement: '7' },
+                { pattern: /^(half|halfdim|halfdiminished)7$/i, replacement: 'm7♭5' },
+                { pattern: /^(half|halfdim|halfdiminished)dim7$/i, replacement: 'm7♭5' },
+                { pattern: /^(dim|diminished|o|°|˚)7$/i, replacement: '˚7' },
+                { pattern: /^(dim|diminished|o|°|˚)inished7$/i, replacement: '˚7' },
+                { pattern: /^(aug|augmented|\+)7$/i, replacement: '+7' },
+                { pattern: /^(aug|augmented|\+)mented7$/i, replacement: '+7' },
+            ];
+            
+            div.innerHTML += `<div class="result"><strong>Testing multi-token rules:</strong></div>`;
+            let matched = false;
+            for (let i = 0; i < multiTokenRules.length; i++) {
+                const rule = multiTokenRules[i];
+                const testResult = rule.pattern.test(chordPart);
+                div.innerHTML += `<div class="result">Rule ${i}: ${rule.pattern} → ${testResult ? 'MATCH' : 'no match'}</div>`;
+                if (testResult) {
+                    chordPart = rule.replacement;
+                    matched = true;
+                    div.innerHTML += `<div class="result"><strong>Multi-token match:</strong> "${rule.replacement}"</div>`;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                div.innerHTML += `<div class="result"><strong>No multi-token match, testing single-token rules...</strong></div>`;
+            }
+            
+            const finalResult = normalizeChord(input);
+            div.innerHTML += `<div class="result"><strong>Final result:</strong> "${finalResult}"</div>`;
+            
+            return div;
+        }
+        
+        // Test the problematic cases
+        const testCases = ["CM7", "C major 7", "C dominant 7", "Cdom7", "C half dim", "C halfdim"];
+        
+        testCases.forEach(testCase => {
+            debugDiv.appendChild(debugNormalizeChord(testCase));
+        });
+    </script>
+</body>
+</html> 

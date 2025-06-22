@@ -73,6 +73,16 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   padding-bottom: var(--spacing-3xl);
 }
 
+.app-logo-link {
+  display: block;
+  line-height: 0;
+  transition: opacity 0.2s ease;
+}
+
+.app-logo-link:hover {
+  opacity: 0.9;
+}
+
 .app-logo {
   height: 5rem;
   width: auto;
@@ -253,4 +263,22 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
   h4 { font-size: 1.125rem; }
+}
+
+/* Landing page */
+.landing-section {
+  text-align: center;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: var(--spacing-2xl) 0;
+}
+
+.landing-section h1 {
+  margin-bottom: var(--spacing-lg);
+}
+
+.landing-section p {
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-2xl);
+  opacity: 0.9;
 } 

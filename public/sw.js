@@ -1,7 +1,9 @@
-const CACHE_NAME = 'music-theory-v11';
+const CACHE_NAME = 'music-theory-v12';
 const ASSETS = [
   '/',
   '/index.html',
+  '/practice.html',
+  '/404.html',
   '/css/style.css?v=5',
   '/js/main.js?v=13',
   '/manifest.json',
@@ -33,23 +35,25 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch event - network-first for HTML, cache-first for others
+// Fetch event - handle network and cache strategies
 self.addEventListener('fetch', event => {
-  // For navigation requests (HTML pages), try network first.
-  if (event.request.mode === 'navigate') {
+  const { request } = event;
+
+  // For navigation requests, use a "network-first, falling back to offline page" strategy.
+  if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        // If network fails, serve from cache
-        return caches.match(event.request);
+      fetch(request).catch(() => {
+        // If the network request fails, serve the offline fallback page from the cache.
+        return caches.match('/404.html');
       })
     );
-    return;
+  } else {
+    // For all other assets (CSS, JS, images), use a "cache-first" strategy.
+    event.respondWith(
+      caches.match(request).then(response => {
+        // Return from cache if available, otherwise fetch from network.
+        return response || fetch(request);
+      })
+    );
   }
-
-  // For other requests (CSS, JS, images), use cache-first strategy.
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
 }); 

@@ -1,15 +1,5 @@
 {
   "projects": {
     "default": "music-theory-practice-01"
-  },
-  "targets": {
-    "music-theory-practice-01": {
-      "hosting": {
-        "music-theory": [
-          "learning-lightbath-music-theory"
-        ]
-      }
-    }
-  },
-  "etags": {}
+  }
 }

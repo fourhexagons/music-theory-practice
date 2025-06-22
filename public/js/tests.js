@@ -45,6 +45,11 @@ const TEST_CATEGORIES = {
     description: 'Tests chord symbol normalization and variations',
     run: runChordNormalizationTests
   },
+  chordNormalizationEdgeCases: {
+    name: '🎵 Chord Normalization Edge Cases',
+    description: 'Tests specific edge cases in chord normalization',
+    run: runChordNormalizationEdgeCases
+  },
   accidentalNormalization: {
     name: '🎼 Accidental Normalization',
     description: 'Tests note/accidental conversion to Unicode',
@@ -334,81 +339,102 @@ function runAllTests() {
   return { results, totalPassed, totalFailed, totalTests };
 }
 
+// Helper function to copy results to clipboard
+function copyResultsToClipboard(results) {
+  const json = JSON.stringify(results, null, 2);
+  navigator.clipboard.writeText(json).then(() => {
+    const button = document.getElementById('copy-json-button');
+    if (button) {
+      button.textContent = 'Copied!';
+      setTimeout(() => {
+        button.textContent = 'Copy JSON';
+      }, 2000);
+    }
+  }).catch(err => {
+    console.error('Failed to copy results:', err);
+  });
+}
+
 // Display test results
 function displayTestResults(results, totalPassed, totalFailed, totalTests) {
-  const successRate = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
-  
-  // Generate HTML report
-  let html = `
-    <!DOCTYPE html>
+  const percentage = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
+  const overallStatus = totalFailed === 0 ? 'All tests passed!' : `${totalFailed} test(s) failed.`;
+  const headerColor = totalFailed === 0 ? 'background-color: #4CAF50;' : 'background-color: #F44336;';
+
+  let resultsHtml = `
     <html>
-    <head>
-      <title>Music Theory Test Results</title>
-      <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; text-align: center; margin-bottom: 30px; }
-        .summary { background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center; }
-        .summary.failed { background: #ffe8e8; }
-        .category { margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
-        .category-header { background: #f8f9fa; padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; }
-        .category-header.passed { background: #d4edda; color: #155724; }
-        .category-header.failed { background: #f8d7da; color: #721c24; }
-        .category-content { padding: 20px; }
-        .test-result { margin: 5px 0; padding: 8px; border-radius: 4px; }
-        .test-result.passed { background: #d1ecf1; color: #0c5460; }
-        .test-result.failed { background: #f8d7da; color: #721c24; }
-        .failure-list { background: #fff3cd; padding: 15px; border-radius: 4px; margin-top: 10px; }
-        .failure-item { margin: 5px 0; padding: 5px; background: #ffeaa7; border-radius: 3px; }
-        .timestamp { text-align: center; color: #666; margin-top: 20px; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>🎵 Music Theory Test Results</h1>
-        
-        <div class="summary ${totalFailed > 0 ? 'failed' : ''}">
-          <h2>${totalFailed > 0 ? '❌' : '✅'} Overall Results</h2>
-          <p><strong>${totalPassed}</strong> passed, <strong>${totalFailed}</strong> failed out of <strong>${totalTests}</strong> total tests</p>
-          <p>Success Rate: <strong>${successRate}%</strong></p>
+      <head>
+        <title>Test Results</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; }
+          .header { padding: 20px; color: white; text-align: center; }
+          .header h1, .header p { margin: 0; }
+          .container { padding: 20px; }
+          .category { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px; }
+          .category-header { background-color: #f2f2f2; padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd; }
+          .category-header.passed { background-color: #e8f5e9; }
+          .category-header.failed { background-color: #ffebee; }
+          .test-list { list-style: none; padding: 0; margin: 0; }
+          .test-list li { padding: 8px 12px; border-bottom: 1px solid #eee; }
+          .test-list li:last-child { border-bottom: none; }
+          .failure { color: #D32F2F; }
+          .summary { font-weight: bold; }
+          .copy-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          }
+          .copy-button:hover { background-color: #0056b3; }
+        </style>
+      </head>
+      <body>
+        <div class="header" style="${headerColor}">
+          <h1>${overallStatus}</h1>
+          <p>${totalPassed}/${totalTests} passed (${percentage}%)</p>
         </div>
+        <button id="copy-json-button" class="copy-button">Copy JSON</button>
+        <div class="container">
   `;
 
-  // Add each category
-  Object.entries(results).forEach(([category, result]) => {
+  for (const category in results) {
     const categoryInfo = TEST_CATEGORIES[category];
-    const isPassed = result.failed === 0;
+    const isPassed = results[category].failed === 0;
     const emoji = isPassed ? '✅' : '❌';
     
-    html += `
+    resultsHtml += `
       <div class="category">
         <div class="category-header ${isPassed ? 'passed' : 'failed'}">
-          ${emoji} ${categoryInfo.name} (${result.passed}/${result.total} passed)
+          ${emoji} ${categoryInfo.name} (${results[category].passed}/${results[category].total} passed)
         </div>
         <div class="category-content">
           <p><em>${categoryInfo.description}</em></p>
           <div class="test-result ${isPassed ? 'passed' : 'failed'}">
-            <strong>${result.passed}</strong> passed, <strong>${result.failed}</strong> failed
+            <strong>${results[category].passed}</strong> passed, <strong>${results[category].failed}</strong> failed
           </div>
     `;
 
-    if (result.failed > 0) {
-      html += '<div class="failure-list"><strong>Failed Tests:</strong>';
-      result.failures.forEach(failure => {
-        html += `<div class="failure-item">❌ ${failure}</div>`;
+    if (results[category].failed > 0) {
+      resultsHtml += '<div class="failure-list"><strong>Failed Tests:</strong>';
+      results[category].failures.forEach(failure => {
+        resultsHtml += `<div class="failure-item">❌ ${failure}</div>`;
       });
-      html += '</div>';
+      resultsHtml += '</div>';
     }
 
-    html += '</div></div>';
-  });
+    resultsHtml += '</div></div>';
+  }
 
-  html += `
-        <div class="timestamp">
-          Tests run at ${new Date().toLocaleString()}
+  resultsHtml += `
         </div>
-      </div>
-    </body>
+      </body>
     </html>
   `;
 
@@ -416,19 +442,25 @@ function displayTestResults(results, totalPassed, totalFailed, totalTests) {
   if (TEST_CONFIG.openInNewTab) {
     const newWindow = window.open('', '_blank');
     if (newWindow) {
-      newWindow.document.write(html);
+      newWindow.document.write(resultsHtml);
       newWindow.document.close();
     } else {
       // Fallback: show results in current page if popup is blocked
-      showResultsOverlay(html);
+      showResultsOverlay(resultsHtml);
     }
   } else {
-    showResultsOverlay(html);
+    showResultsOverlay(resultsHtml);
+  }
+
+  // Attach event listener to the copy button
+  const copyButton = document.getElementById('copy-json-button');
+  if (copyButton) {
+    copyButton.addEventListener('click', () => copyResultsToClipboard(results));
   }
 
   // Console summary
   console.log(`\n🧪 Test Summary: ${totalPassed} passed, ${totalFailed} failed out of ${totalTests} total tests`);
-  console.log(`Success Rate: ${successRate}%`);
+  console.log(`Success Rate: ${percentage}%`);
   
   if (totalFailed > 0) {
     console.log('\n❌ Some tests failed! Check the detailed report.');
