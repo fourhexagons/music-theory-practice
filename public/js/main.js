@@ -608,7 +608,8 @@ function startAdvancedPractice(mode) {
     } else {
       // Pick a random chapter, but exclude accidentals naming if we haven't asked count first
       const availableChapters = ALL_CHAPTERS.filter(chapter => 
-        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES
+        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
+        chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
       );
       randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
     }
