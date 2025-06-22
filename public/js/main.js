@@ -271,6 +271,7 @@ function renderAppLayout() {
         <div class="practice-controls">
           <button id="advanced1-btn" class="btn">Randomize</button>
           <button id="advanced2-btn" class="btn">Sevenths</button>
+          <button id="learning-path-test-btn" class="btn">Test Learning Path</button>
         </div>
       </div>
     `;
@@ -310,12 +311,22 @@ function attachEventListeners() {
   // Restore advanced practice button listeners
   const advanced1Btn = document.getElementById('advanced1-btn');
   const advanced2Btn = document.getElementById('advanced2-btn');
+  const learningPathTestBtn = document.getElementById('learning-path-test-btn');
   
   if (advanced1Btn) {
     advanced1Btn.addEventListener('click', () => startAdvancedPractice('random_all'));
   }
   if (advanced2Btn) {
     advanced2Btn.addEventListener('click', () => startAdvancedPractice('sevenths_only'));
+  }
+  if (learningPathTestBtn) {
+    learningPathTestBtn.addEventListener('click', () => {
+      if (typeof window.runLearningPathTest === 'function') {
+        window.runLearningPathTest();
+      } else {
+        console.error('Learning path test function not available');
+      }
+    });
   }
 }
 
