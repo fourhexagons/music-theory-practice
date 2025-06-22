@@ -4,29 +4,29 @@
 
 This document provides a comprehensive reference for all chord input variations supported by the Music Theory Practice app. The normalization system accepts multiple input formats and converts them to standardized output formats for consistent validation.
 
-**Note:** All inputs are case-insensitive. The examples below show the standard format (note name capitalized, quality lowercase), but users can input in any case.
+**Implementation Note:** The system uses dual pattern matching - both lowercase and uppercase variations are supported for maximum user flexibility.
 
 ## Quick Reference
 
 | Chord Type | Standard Output | Input Variations |
 |------------|----------------|------------------|
-| Major Triad | C | C, C major, C maj |
-| Minor Triad | Cm | Cm, C minor, C min, C- |
+| Major Triad | C | C, C major, C maj, C MAJOR, C MAJ |
+| Minor Triad | Cm | Cm, C minor, C min, C-, C MINOR, C MIN |
 | Dominant 7th | C7 | C7 |
-| Major 7th | Cmaj7 | Cmaj7, C maj7, C major7, CM7, C∆, CΔ, C∆7, CΔ7 |
-| Minor 7th | Cm7 | Cm7, C min7, C minor7, C-7, Cminor7 |
-| Half-Diminished 7th | Cm7♭5 | Cm7b5, C halfdiminished, C halfdim, CØ, Chalfdiminished |
-| Diminished Triad | C˚ | Cdim, C diminished, C dim, Cdiminished |
+| Major 7th | Cmaj7 | Cmaj7, C maj7, C major7, CM7, C∆, CΔ, C∆7, CΔ7, C MAJ7, C MAJOR7 |
+| Minor 7th | Cm7 | Cm7, C min7, C minor7, C-7, Cminor7, C MIN7, C MINOR7 |
+| Half-Diminished 7th | Cm7♭5 | Cm7b5, C halfdiminished, C halfdim, CØ, Chalfdiminished, C HALFDIMINISHED, C HALFDIM |
+| Diminished Triad | C˚ | Cdim, C diminished, C dim, Cdiminished, C DIMINISHED, C DIM |
 
 ## Detailed Reference
 
 ### Major Triad
 **Standard Output:** C
-**Accepted Inputs:** C, C major, C maj
+**Accepted Inputs:** C, C major, C maj, C MAJOR, C MAJ
 
 ### Minor Triad  
 **Standard Output:** Cm
-**Accepted Inputs:** Cm, C minor, C min, C-
+**Accepted Inputs:** Cm, C minor, C min, C-, C MINOR, C MIN
 
 ### Dominant 7th
 **Standard Output:** C7
@@ -34,21 +34,35 @@ This document provides a comprehensive reference for all chord input variations 
 
 ### Major 7th
 **Standard Output:** Cmaj7
-**Accepted Inputs:** Cmaj7, C maj7, C major7, CM7, C∆, CΔ, C∆7, CΔ7
+**Accepted Inputs:** Cmaj7, C maj7, C major7, CM7, C∆, CΔ, C∆7, CΔ7, C MAJ7, C MAJOR7
 
 ### Minor 7th
 **Standard Output:** Cm7
-**Accepted Inputs:** Cm7, C min7, C minor7, C-7, Cminor7
+**Accepted Inputs:** Cm7, C min7, C minor7, C-7, Cminor7, C MIN7, C MINOR7
 
 ### Half-Diminished 7th
 **Standard Output:** Cm7♭5
-**Accepted Inputs:** Cm7b5, C halfdiminished, C halfdim, CØ, Chalfdiminished
+**Accepted Inputs:** Cm7b5, C halfdiminished, C halfdim, CØ, Chalfdiminished, C HALFDIMINISHED, C HALFDIM
 
 ### Diminished Triad
 **Standard Output:** C˚
-**Accepted Inputs:** Cdim, C diminished, C dim, Cdiminished
+**Accepted Inputs:** Cdim, C diminished, C dim, Cdiminished, C DIMINISHED, C DIM
 
-## Input Processing Rules
+## Implementation Details
+
+### Pattern Matching Strategy
+The system uses dual matching for maximum flexibility:
+
+1. **Lowercase matching:** For no-space variations (cmajor7, cminor7)
+2. **Uppercase matching:** For spaced variations (C MAJOR7, C MINOR7)
+
+### Priority Order
+1. Minor 7th detection (before major 7th to avoid conflicts)
+2. Major 7th detection
+3. Half-diminished detection
+4. Diminished detection
+5. Minor detection
+6. Major detection
 
 ### Case Insensitivity
 All text-based inputs are case-insensitive:
@@ -77,21 +91,6 @@ All text-based inputs are case-insensitive:
 
 **Correct:** C- = C minor, C-7 = C minor 7th
 **Incorrect:** C-halfdim, C-dim (these are NOT supported)
-
-## Implementation Notes
-
-### Pattern Matching Strategy
-The system uses dual matching:
-1. **Lowercase matching:** For no-space variations (cmajor7, cminor7)
-2. **Uppercase matching:** For spaced variations (C MAJOR7, C MINOR7)
-
-### Priority Order
-1. Minor 7th detection (before major 7th to avoid conflicts)
-2. Major 7th detection
-3. Half-diminished detection
-4. Diminished detection
-5. Minor detection
-6. Major detection
 
 ## Testing
 
