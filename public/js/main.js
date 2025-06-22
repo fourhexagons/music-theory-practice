@@ -595,20 +595,20 @@ function startAdvancedPractice(mode) {
   if (mode === 'random_all') {
     // For random practice, we'll use a simple approach
     // Pick a random key and random chapter
-    const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
+    let randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
     let randomChapter;
     
     // Check if we're waiting to ask accidentals naming
-    if (learningState.waitingForAccidentalsNaming && learningState.lastAccidentalsKey === randomKey) {
-      // We must ask accidentals naming for this key
+    if (learningState.waitingForAccidentalsNaming) {
+      // We must ask accidentals naming for the key that was asked about
+      randomKey = learningState.lastAccidentalsKey;
       randomChapter = CHAPTERS.ACCIDENTALS_NAMES;
       learningState.waitingForAccidentalsNaming = false;
       learningState.lastAccidentalsKey = null;
     } else {
       // Pick a random chapter, but exclude accidentals naming if we haven't asked count first
       const availableChapters = ALL_CHAPTERS.filter(chapter => 
-        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES || 
-        !learningState.waitingForAccidentalsNaming
+        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES
       );
       randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
     }
