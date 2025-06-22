@@ -458,9 +458,9 @@ function askQuestion() {
   const level = getCurrentLevel();
   if (level.mode === MODES.COMPLETE) {
       updateQuestionUI('');
-      return;
+    return;
   }
-
+  
   let key, chapter;
   
   // Determine the key for the question
@@ -572,7 +572,7 @@ function handleAnswerSubmit(e) {
             // Check if we've completed all keys in this level
             if (learningState.currentKeyIndex >= level.keys.length) {
               advanceLevel();
-            } else {
+  } else {
               // Reset to first chapter for the new key
               learningState.currentChapterIndex = 0;
             }
@@ -718,5 +718,5 @@ function startAdvancedPractice(mode) {
 document.addEventListener('DOMContentLoaded', () => {
   initLearningState();
   renderAppLayout();
-  askQuestion();
+    askQuestion();
 }); 
