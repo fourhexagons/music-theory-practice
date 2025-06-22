@@ -155,6 +155,8 @@ const learningState = {
   isAdvancedMode: false,
   advancedModeType: null,
   correctChordAnswersForCurrentKey: 0,
+  waitingForAccidentalsNaming: false,
+  lastAccidentalsKey: null,
 };
 
 
@@ -594,7 +596,22 @@ function startAdvancedPractice(mode) {
     // For random practice, we'll use a simple approach
     // Pick a random key and random chapter
     const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
-    const randomChapter = ALL_CHAPTERS[Math.floor(Math.random() * ALL_CHAPTERS.length)];
+    let randomChapter;
+    
+    // Check if we're waiting to ask accidentals naming
+    if (learningState.waitingForAccidentalsNaming && learningState.lastAccidentalsKey === randomKey) {
+      // We must ask accidentals naming for this key
+      randomChapter = CHAPTERS.ACCIDENTALS_NAMES;
+      learningState.waitingForAccidentalsNaming = false;
+      learningState.lastAccidentalsKey = null;
+    } else {
+      // Pick a random chapter, but exclude accidentals naming if we haven't asked count first
+      const availableChapters = ALL_CHAPTERS.filter(chapter => 
+        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES || 
+        !learningState.waitingForAccidentalsNaming
+      );
+      randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
+    }
     
     learningState.currentQuestion = { key: randomKey, chapterId: randomChapter.id };
     
@@ -604,6 +621,9 @@ function startAdvancedPractice(mode) {
     switch (randomChapter.id) {
       case QUESTION_TYPES.ACCIDENTALS_COUNT:
         text = `How many accidentals are in ${randomKey} major?`;
+        // Mark that we need to ask accidentals naming next for this key
+        learningState.waitingForAccidentalsNaming = true;
+        learningState.lastAccidentalsKey = randomKey;
         break;
       case QUESTION_TYPES.ACCIDENTALS_NAMES:
         text = `Name the accidentals in ${randomKey} major.`;
@@ -626,10 +646,9 @@ function startAdvancedPractice(mode) {
     updateQuestionUI(text);
     
   } else if (mode === 'sevenths_only') {
-    // For sevenths practice, focus on seventh chords
+    // For sevenths practice, focus ONLY on seventh chord spelling
     const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
-    const seventhsChapters = [CHAPTERS.SEVENTHS, CHAPTERS.SEVENTH_SPELLING];
-    const randomChapter = seventhsChapters[Math.floor(Math.random() * seventhsChapters.length)];
+    const randomChapter = CHAPTERS.SEVENTH_SPELLING; // Only spelling, not naming
     
     learningState.currentQuestion = { key: randomKey, chapterId: randomChapter.id };
     
@@ -637,7 +656,7 @@ function startAdvancedPractice(mode) {
     learningState.currentQuestion.degree = degree;
     
     const chordType = 'seventh chord';
-    const action = randomChapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
+    const action = 'Spell';
     const text = `${action} the ${ordinal(degree)} ${chordType} in ${randomKey} major.`;
     
     updateQuestionUI(text);
