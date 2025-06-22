@@ -602,13 +602,17 @@
                 'Major Triads': [
                     { input: 'C', expected: 'C', description: 'Basic major' },
                     { input: 'C major', expected: 'C', description: 'Major with text' },
-                    { input: 'C maj', expected: 'C', description: 'Maj abbreviation' }
+                    { input: 'C maj', expected: 'C', description: 'Maj abbreviation' },
+                    { input: 'C MAJOR', expected: 'C', description: 'Uppercase major' },
+                    { input: 'C MAJ', expected: 'C', description: 'Uppercase maj' }
                 ],
                 'Minor Triads': [
                     { input: 'Cm', expected: 'Cm', description: 'Basic minor' },
                     { input: 'C minor', expected: 'Cm', description: 'Minor with text' },
                     { input: 'C min', expected: 'Cm', description: 'Min abbreviation' },
-                    { input: 'C-', expected: 'Cm', description: 'Dash notation' }
+                    { input: 'C-', expected: 'Cm', description: 'Dash notation' },
+                    { input: 'C MINOR', expected: 'Cm', description: 'Uppercase minor' },
+                    { input: 'C MIN', expected: 'Cm', description: 'Uppercase min' }
                 ],
                 'Dominant 7th': [
                     { input: 'C7', expected: 'C7', description: 'Basic dominant 7th' }
@@ -621,27 +625,35 @@
                     { input: 'C∆', expected: 'Cmaj7', description: 'Delta symbol (U+2206)' },
                     { input: 'CΔ', expected: 'Cmaj7', description: 'Delta symbol (U+0394)' },
                     { input: 'C∆7', expected: 'Cmaj7', description: 'Delta with 7' },
-                    { input: 'CΔ7', expected: 'Cmaj7', description: 'Delta with 7' }
+                    { input: 'CΔ7', expected: 'Cmaj7', description: 'Delta with 7' },
+                    { input: 'C MAJ7', expected: 'Cmaj7', description: 'Uppercase MAJ7' },
+                    { input: 'C MAJOR7', expected: 'Cmaj7', description: 'Uppercase MAJOR7' }
                 ],
                 'Minor 7th': [
                     { input: 'Cm7', expected: 'Cm7', description: 'Basic minor 7th' },
                     { input: 'C min7', expected: 'Cm7', description: 'min7 with space' },
                     { input: 'C minor7', expected: 'Cm7', description: 'minor7 with space' },
                     { input: 'C-7', expected: 'Cm7', description: 'Dash with 7' },
-                    { input: 'Cminor7', expected: 'Cm7', description: 'minor7 (no space)' }
+                    { input: 'Cminor7', expected: 'Cm7', description: 'minor7 (no space)' },
+                    { input: 'C MIN7', expected: 'Cm7', description: 'Uppercase MIN7' },
+                    { input: 'C MINOR7', expected: 'Cm7', description: 'Uppercase MINOR7' }
                 ],
                 'Half-Diminished 7th': [
                     { input: 'Cm7b5', expected: 'Cm7♭5', description: 'Basic half-diminished' },
                     { input: 'C halfdiminished', expected: 'Cm7♭5', description: 'halfdiminished with space' },
                     { input: 'C halfdim', expected: 'Cm7♭5', description: 'halfdim with space' },
                     { input: 'CØ', expected: 'Cm7♭5', description: 'Ø symbol' },
-                    { input: 'Chalfdiminished', expected: 'Cm7♭5', description: 'halfdiminished (no space)' }
+                    { input: 'Chalfdiminished', expected: 'Cm7♭5', description: 'halfdiminished (no space)' },
+                    { input: 'C HALFDIMINISHED', expected: 'Cm7♭5', description: 'Uppercase HALFDIMINISHED' },
+                    { input: 'C HALFDIM', expected: 'Cm7♭5', description: 'Uppercase HALFDIM' }
                 ],
                 'Diminished Triads': [
                     { input: 'Cdim', expected: 'C˚', description: 'Basic diminished' },
                     { input: 'C diminished', expected: 'C˚', description: 'diminished with space' },
                     { input: 'C dim', expected: 'C˚', description: 'dim with space' },
-                    { input: 'Cdiminished', expected: 'C˚', description: 'diminished (no space)' }
+                    { input: 'Cdiminished', expected: 'C˚', description: 'diminished (no space)' },
+                    { input: 'C DIMINISHED', expected: 'C˚', description: 'Uppercase DIMINISHED' },
+                    { input: 'C DIM', expected: 'C˚', description: 'Uppercase DIM' }
                 ],
                 'With Accidentals': [
                     { input: 'Db', expected: 'D♭', description: 'Flat with b' },
