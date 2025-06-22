@@ -199,74 +199,132 @@ function normalizeChord(raw) {
   const normalizedNote = accidentalToUnicode(baseNote + accidentals);
   let chordPart = rest;
 
-  // Apply multi-token rules FIRST (before single-token rules)
-  const multiTokenRules = [
-    { pattern: /^(major|maj|M)[\s\-]?7$/i, replacement: 'maj7' },
-    { pattern: /^(minor|min|m)[\s\-]?7$/i, replacement: 'm7' },
-    { pattern: /^(dominant|dom)[\s\-]?7$/i, replacement: '7' },
-    { pattern: /^(half[\s\-]?dim|halfdiminished|ø)[\s\-]?7$/i, replacement: 'm7♭5' },
-    { pattern: /^(dim|diminished|o|°|˚)[\s\-]?7$/i, replacement: '˚7' },
-    { pattern: /^(aug|augmented|\+)[\s\-]?7$/i, replacement: '+7' },
-  ];
-
-  let matched = false;
-  for (const rule of multiTokenRules) {
-    if (rule.pattern.test(chordPart)) {
-      chordPart = rule.replacement;
-      matched = true;
-      break;
-    }
-  }
-
-  // If no multi-token match, apply single-token rules
-  if (!matched) {
-    const singleTokenRules = [
-      // Half-diminished (m7b5, half dim, etc.)
-      { pattern: /^(halfdiminished|half\-?dim|ø|m7b5|min7b5|minor7b5|m7flat5|min7flat5|minor7flat5|m7♭5|min7♭5|minor7♭5|half\-?diminished|half\s*dim|half\s*diminished|half\s*dim7|half\-?dim7|half\s*diminished7|half\-?diminished7|flat5|b5)$/i, replacement: 'm7♭5' },
-      // Major 7th (maj7, M7, major7, etc.)
-      { pattern: /^(major7|maj7|ma7|M7|Δ|∆)$/i, replacement: 'maj7' },
-      // Minor 7th (min7, m7, minor7, etc.)
-      { pattern: /^(minor7|min7|m7)$/i, replacement: 'm7' },
-      // Dominant 7th (dominant7, dom7, dominant, dom)
-      { pattern: /^(dominant7|dom7|dominant|dom)$/i, replacement: '7' },
-      // Diminished (dim, diminished, o, °)
-      { pattern: /^(diminished|dim|o|°|˚)$/i, replacement: '˚' },
-      // Minor (min, m, -)
-      { pattern: /^(minor|min|m|\-)$/i, replacement: 'm' },
-      // Major (major, maj)
-      { pattern: /^(major|maj)$/i, replacement: '' },
-      // Augmented (aug, +)
-      { pattern: /^(augmented|aug|\+)$/i, replacement: '+' },
-      // 7th (7)
-      { pattern: /^7$/, replacement: '7' },
-    ];
-
-    for (const rule of singleTokenRules) {
-      if (rule.pattern.test(chordPart)) {
-        chordPart = rule.replacement;
-        matched = true;
-        break;
-      }
-    }
-  }
-
-  // If no match, check for simple cases
-  if (!matched) {
-    // If the rest is empty, just return the note
-    if (!chordPart) return normalizedNote;
-    // If the rest is 'm', return minor
-    if (chordPart === 'm') return normalizedNote + 'm';
-    // If the rest is '7', return dominant 7
-    if (chordPart === '7') return normalizedNote + '7';
-    // If the rest is '+', return augmented
-    if (chordPart === '+') return normalizedNote + '+';
-    // If the rest is '˚', return diminished
-    if (chordPart === '˚') return normalizedNote + '˚';
-    // Otherwise, return normalizedNote + chordPart (as fallback)
+  // Tokenize the chord part (split on spaces, hyphens, and other delimiters)
+  const tokens = chordPart.split(/[\s\-]+/).filter(Boolean);
+  
+  // Join tokens with a delimiter for matching, preserving case for M7 vs m7 distinction
+  const tokenKey = tokens.join('-');
+  
+  // Comprehensive mapping table for all chord type variations
+  const chordTypeMap = {
+    // Major 7th variations (uppercase M)
+    'M7': 'MAJ7',
+    'MAJ7': 'MAJ7',
+    'MAJOR7': 'MAJ7',
+    'MA7': 'MAJ7',
+    'M-7': 'MAJ7',
+    'MAJ-7': 'MAJ7',
+    'MAJOR-7': 'MAJ7',
+    'MA-7': 'MAJ7',
+    
+    // Minor 7th variations (lowercase m)
+    'm7': 'M7',
+    'min7': 'M7',
+    'minor7': 'M7',
+    'm-7': 'M7',
+    'min-7': 'M7',
+    'minor-7': 'M7',
+    
+    // Dominant 7th variations
+    'dom7': '7',
+    'dominant7': '7',
+    'dom': '7',
+    'dominant': '7',
+    '7': '7',
+    'dom-7': '7',
+    'dominant-7': '7',
+    
+    // Half-diminished variations
+    'halfdim7': 'M7♭5',
+    'halfdiminished7': 'M7♭5',
+    'half7': 'M7♭5',
+    'halfdim': 'M7♭5',
+    'halfdiminished': 'M7♭5',
+    'half': 'M7♭5',
+    'half-dim': 'M7♭5',
+    'half-diminished': 'M7♭5',
+    'half-dim7': 'M7♭5',
+    'half-diminished7': 'M7♭5',
+    'm7b5': 'M7♭5',
+    'min7b5': 'M7♭5',
+    'minor7b5': 'M7♭5',
+    'm7flat5': 'M7♭5',
+    'min7flat5': 'M7♭5',
+    'minor7flat5': 'M7♭5',
+    'm7♭5': 'M7♭5',
+    'min7♭5': 'M7♭5',
+    'minor7♭5': 'M7♭5',
+    'flat5': 'M7♭5',
+    'b5': 'M7♭5',
+    'ø': 'M7♭5',
+    'ø7': 'M7♭5',
+    
+    // Diminished variations
+    'dim7': '˚7',
+    'diminished7': '˚7',
+    'o7': '˚7',
+    '°7': '˚7',
+    '˚7': '˚7',
+    'dim': '˚',
+    'diminished': '˚',
+    'o': '˚',
+    '°': '˚',
+    '˚': '˚',
+    
+    // Augmented variations
+    'aug7': '+7',
+    'augmented7': '+7',
+    '+7': '+7',
+    'aug': '+',
+    'augmented': '+',
+    '+': '+',
+    
+    // Minor variations
+    'min': 'M',
+    'minor': 'M',
+    'm': 'M',
+    '-': 'M',
+    
+    // Major variations
+    'major': '',
+    'maj': '',
+    
+    // Empty chord (just the note)
+    '': ''
+  };
+  
+  // Try to match the token key
+  if (chordTypeMap.hasOwnProperty(tokenKey)) {
+    chordPart = chordTypeMap[tokenKey];
     return normalizedNote + chordPart;
   }
-
-  // Return normalized chord
+  
+  // Fallback: try lowercase version for case-insensitive matching
+  const lowerTokenKey = tokenKey.toLowerCase();
+  if (chordTypeMap.hasOwnProperty(lowerTokenKey)) {
+    chordPart = chordTypeMap[lowerTokenKey];
+    return normalizedNote + chordPart;
+  }
+  
+  // Additional fallback: try individual token matching for multi-token inputs
+  if (tokens.length > 1) {
+    const individualTokens = tokens.map(t => t.toLowerCase());
+    const individualKey = individualTokens.join('-');
+    if (chordTypeMap.hasOwnProperty(individualKey)) {
+      chordPart = chordTypeMap[individualKey];
+      return normalizedNote + chordPart;
+    }
+  }
+  
+  // If no match, check for simple cases
+  if (!chordPart) return normalizedNote;
+  if (chordPart === 'M') return normalizedNote + 'M';
+  if (chordPart === 'm') return normalizedNote + 'M';
+  if (chordPart === '7') return normalizedNote + '7';
+  if (chordPart === '+') return normalizedNote + '+';
+  if (chordPart === '˚') return normalizedNote + '˚';
+  
+  // Fallback: return normalized note + original chord part
   return normalizedNote + chordPart;
 }
 
@@ -554,7 +612,7 @@ function handleAnswerSubmit(e) {
             // Check if we've completed all keys in this level
             if (learningState.currentKeyIndex >= level.keys.length) {
               advanceLevel();
-  } else {
+            } else {
               // Reset to first chapter for the new key
               learningState.currentChapterIndex = 0;
             }
