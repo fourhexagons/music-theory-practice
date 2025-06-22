@@ -12,7 +12,6 @@
   --input-placeholder: #555;
   --button-bg: #444;
   --button-hover: #3d3d3d;
-  --feedback-correct: #89ff89;
   --feedback-incorrect: #ff8989;
   --spacing-xs: 0.5rem;
   --spacing-sm: 0.625rem;
@@ -92,6 +91,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   width: 100%;
   max-width: var(--max-width-content);
   text-align: center;
+  margin-bottom: var(--spacing-4xl);
 }
 
 /* Question display */
@@ -126,11 +126,10 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 #answer-input {
   background-color: var(--input-bg);
   color: var(--text-secondary);
-  border: 1px solid transparent;
+  border: none;
   border-radius: 0;
   padding: var(--spacing-md) var(--spacing-lg);
   font-size: 1.125rem;
-  line-height: 1.4;
   font-family: inherit;
   font-weight: 400;
   outline: none;
@@ -146,11 +145,10 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 .btn {
   background-color: var(--button-bg);
   color: var(--text-primary);
-  border: 1px solid var(--button-bg);
+  border: none;
   border-radius: 0;
   padding: var(--spacing-md) 3.5rem;
   font-size: 1.125rem;
-  line-height: 1.4;
   font-family: inherit;
   font-weight: 500;
   cursor: pointer;
@@ -163,22 +161,16 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 
 .btn:hover {
   background-color: var(--button-hover);
-  border-color: var(--button-hover);
 }
 
 /* Advanced Practice Section */
 #advanced-practice-root {
+  background-color: var(--bg-secondary);
   padding: var(--spacing-4xl) var(--spacing-2xl);
+  flex-grow: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-}
-
-.bottom-wrapper {
-  background-color: var(--bg-secondary);
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 .advanced-practice {
@@ -205,64 +197,60 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   margin: 0 auto;
 }
 
-/* Footer */
-.app-footer {
-  margin-top: auto;
-  padding: var(--spacing-md);
-  text-align: center;
-  font-size: 0.7em;
-  color: var(--text-primary);
-  opacity: 0.6;
-}
-
 /* Feedback */
 .feedback {
-  font-size: 1.3rem;
-  min-height: 1.3125rem;
-  font-weight: 400;
-  color: var(--text-primary);
+  min-height: 1.5em;
+  margin-top: 0.5em;
+  color: #d32f2f; /* error color, can be overridden for success */
+  transition: color 0.2s;
+  display: block;
 }
 
-.feedback.correct { color: var(--feedback-correct); }
 .feedback.incorrect { 
   color: var(--feedback-incorrect); 
   margin-bottom: var(--spacing-xs);
 }
 
 /* Responsive Design */
+@media (max-width: 48rem) {
+  #app-container { padding: var(--spacing-lg); }
+  .app-header { padding: var(--spacing-lg); }
+}
+
 @media (max-width: 42.5rem) {
-  .main-content {
-    padding-top: var(--spacing-2xl);
-  }
+  .main-content { padding-top: var(--spacing-2xl); }
+  
   .app-header {
     padding: 0 0 var(--spacing-3xl) 0;
   }
+
   .app-logo {
     height: 4.5rem;
   }
+  
   .question-display {
     font-size: 1.5rem;
     margin-bottom: var(--spacing-xl);
   }
+
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: var(--spacing-sm);
     width: 100%;
-    max-width: 25rem;
-    margin-left: auto;
-    margin-right: auto;
   }
-  #answer-input, #submit-btn, .practice-controls .btn {
+  
+  #answer-input, #submit-btn {
     width: 100%;
+    min-width: 0;
   }
+  
+  .practice-controls .btn {
+    width: 25rem;
+    min-width: 0;
+  }
+  
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
   h4 { font-size: 1.125rem; }
-}
-
-@media (max-width: 32.5rem) {
-  .question-display {
-    margin-bottom: var(--spacing-xl);
-  }
 } 

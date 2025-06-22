@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chord Input Normalization Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .chord-type-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .chord-type-section h3 {
+            color: #666;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .test-grid:nth-child(even) {
+            background-color: #f0f0f0;
+        }
+        .test-header {
+            font-weight: bold;
+            background-color: #e3e3e3;
+            padding: 8px;
+            border-radius: 3px;
+        }
+        .input {
+            font-family: monospace;
+            background-color: #fff3cd;
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #ffeaa7;
+        }
+        .expected {
+            font-family: monospace;
+            background-color: #d1ecf1;
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #bee5eb;
+        }
+        .actual {
+            font-family: monospace;
+            background-color: #d4edda;
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #c3e6cb;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+            text-align: center;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .summary {
+            background-color: #e2e3e5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .summary h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-box {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .export-section {
+            background-color: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .export-section h3 {
+            margin-top: 0;
+            color: #155724;
+        }
+        .export-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .export-button:hover {
+            background-color: #218838;
+        }
+        .export-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .export-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .export-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .export-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chord Input Normalization Tests</h1>
+        
+        <div class="note">
+            <strong>Test Purpose:</strong> This test validates that all chord input variations are correctly normalized and accepted by the system. 
+            Each test case shows the input, expected normalized output, actual normalized output, and whether the test passed.
+        </div>
+
+        <div class="export-section">
+            <h3>Export Test Results</h3>
+            <button id="export-json" class="export-button">Copy JSON to Clipboard</button>
+            <button id="export-csv" class="export-button">Copy CSV to Clipboard</button>
+            <button id="export-summary" class="export-button">Copy Summary to Clipboard</button>
+            <div id="export-status" class="export-status"></div>
+        </div>
+
+        <div id="test-results"></div>
+        <div id="summary" class="summary" style="display: none;">
+            <h3>Test Summary</h3>
+            <div id="stats" class="stats"></div>
+        </div>
+    </div>
+
+    <script>
+        // Import the normalizeChord function from main.js
+        function normalizeChord(raw) {
+            if (!raw) return "";
+            let normalized = raw.trim();
+
+            // Check if this is a note spelling (space-separated notes like "C# E G# B")
+            const noteSpellingMatch = normalized.match(/^([A-Ga-g][#♯b♭]?)\s+([A-Ga-g][#♯b♭]?)\s+([A-Ga-g][#♯b♭]?)(?:\s+([A-Ga-g][#♯b♭]?))?$/);
+            if (noteSpellingMatch) {
+                // This is a note spelling, return the root note
+                const rootNote = accidentalToUnicode(noteSpellingMatch[1]);
+                return rootNote;
+            }
+
+            // Universal cleanup - remove spaces first
+            normalized = normalized.replace(/\s+/g, ""); // Remove all spaces
+
+            // First, validate that the input starts with a valid note letter (A-G)
+            if (!/^[A-Ga-g]/.test(normalized)) {
+                return ""; // Reject invalid chords that don't start with A-G
+            }
+
+            // First, normalize the note names (handle accidentals) BEFORE case conversion
+            // Extract the base note (first character) and any accidentals
+            const noteMatch = normalized.match(/^([A-Ga-g])([#♯b♭]*)(.*)$/);
+            if (noteMatch) {
+                const [, baseNote, accidentals, rest] = noteMatch;
+                const normalizedNote = accidentalToUnicode(baseNote + accidentals);
+                normalized = normalizedNote + rest;
+            } else {
+                // If we can't match a valid note pattern, reject it
+                return "";
+            }
+
+            // Now do case-insensitive matching for the rest, but preserve the structure
+            // Normalize to NFC to ensure Unicode symbols (like delta) are matched consistently
+            normalized = normalized.normalize('NFC');
+            const upperNormalized = normalized.toUpperCase();
+
+            // Helper function to extract base note with accidentals
+            function getBaseNoteWithAccidentals(str) {
+                // Match a note letter followed by any number of accidentals (♯, ♭, 𝄪, 𝄫, #, b)
+                const match = str.match(/^([A-G][#b♯♭𝄪𝄫]*)/);
+                return match ? match[1] : str.substring(0, 1);
+            }
+
+            // Handle chord types in order of specificity
+            
+            // Half-diminished (m7b5) variations - handle before other patterns
+            if (normalized.endsWith('m7b5') || upperNormalized.endsWith('M7B5')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}m7♭5`;
+            }
+            
+            // Half-diminished text variations (including "flat5")
+            if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM') || 
+                upperNormalized.includes('HALF DIM') || upperNormalized.includes('HALF-DIMINISHED') ||
+                upperNormalized.includes('HALF-DIM') || upperNormalized.includes('-HALFDIMINISHED') ||
+                upperNormalized.includes('-HALFDIM') || normalized.includes('halfdiminished') ||
+                normalized.includes('halfdim') || upperNormalized.includes('FLAT5') ||
+                normalized.includes('flat5')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}m7♭5`;
+            }
+            
+            // Half-diminished symbol (including Ø7)
+            if (upperNormalized.includes('Ø')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}m7♭5`;
+            }
+
+            // Dominant 7th variations (handle before other 7th patterns)
+            if (upperNormalized.includes('DOMINANT') || upperNormalized.includes('DOM')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}7`;
+            }
+
+            // Minor 7th variations (handle BEFORE major 7th to avoid conflicts)
+            // Check for lowercase 'm7' pattern first (before uppercase conversion)
+            if (normalized.endsWith('m7') || upperNormalized.includes('MIN7') || upperNormalized.includes('MINOR7') || 
+                upperNormalized.includes('-7') || upperNormalized.includes('-MIN7') || upperNormalized.includes('-MINOR7') ||
+                normalized.includes('minor7') || normalized.includes('min7')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}m7`;
+            }
+
+            // Major 7th variations (handle after minor 7th)
+            if (upperNormalized.includes('MAJ7') || 
+                (upperNormalized.includes('M7') && !normalized.endsWith('m7')) || 
+                upperNormalized.includes('Δ') || upperNormalized.includes('∆') ||
+                upperNormalized.includes('MAJOR7') || upperNormalized.includes('MAJ7') ||
+                normalized.includes('major7') || normalized.includes('maj7')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}maj7`;
+            }
+
+            // Diminished variations
+            if (upperNormalized.includes('DIMINISHED') || upperNormalized.includes('DIM') ||
+                upperNormalized.includes('-DIMINISHED') || upperNormalized.includes('-DIM') ||
+                normalized.includes('diminished') || normalized.includes('dim')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}˚`;
+            }
+
+            // Minor variations (handle before major)
+            if (upperNormalized.includes('MINOR') || upperNormalized.includes('MIN') || 
+                upperNormalized.includes('-')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}m`;
+            }
+
+            // Major variations (explicit)
+            if (upperNormalized.includes('MAJOR') || upperNormalized.includes('MAJ')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return baseNote;
+            }
+
+            // Handle simple chord symbols
+            if (upperNormalized.endsWith('7')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}7`;
+            }
+
+            // Handle minor chord with 'm' (lowercase m)
+            if (normalized.endsWith('m')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}m`;
+            }
+
+            // If no specific pattern matches, return the normalized note
+            return normalized;
+        }
+
+        function accidentalToUnicode(s) {
+            s = s.trim();
+            if (/^bb$/i.test(s)) return 'B♭';
+            if (/^b$/i.test(s)) return 'B'; // common mistake
+            if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
+            if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
+            if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
+            if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
+            return s.toUpperCase().normalize('NFC');
+        }
+
+        // Test data - comprehensive chord input variations
+        const testCases = {
+            'Major Triad': [
+                { input: 'C', expected: 'C' },
+                { input: 'C major', expected: 'C' },
+                { input: 'C maj', expected: 'C' },
+                { input: 'C MAJOR', expected: 'C' },
+                { input: 'C MAJ', expected: 'C' },
+                { input: 'C#', expected: 'C♯' },
+                { input: 'C# major', expected: 'C♯' },
+                { input: 'Db', expected: 'D♭' },
+                { input: 'Db major', expected: 'D♭' }
+            ],
+            'Minor Triad': [
+                { input: 'Cm', expected: 'Cm' },
+                { input: 'C minor', expected: 'Cm' },
+                { input: 'C min', expected: 'Cm' },
+                { input: 'C-', expected: 'Cm' },
+                { input: 'C MINOR', expected: 'Cm' },
+                { input: 'C MIN', expected: 'Cm' },
+                { input: 'C#m', expected: 'C♯m' },
+                { input: 'C# minor', expected: 'C♯m' },
+                { input: 'C#-', expected: 'C♯m' },
+                { input: 'Dbm', expected: 'D♭m' },
+                { input: 'Db minor', expected: 'D♭m' }
+            ],
+            'Dominant 7th': [
+                { input: 'C7', expected: 'C7' },
+                { input: 'C 7', expected: 'C7' },
+                { input: 'C#7', expected: 'C♯7' },
+                { input: 'Db7', expected: 'D♭7' },
+                { input: 'C dominant', expected: 'C7' },
+                { input: 'C dom', expected: 'C7' },
+                { input: 'C DOMINANT', expected: 'C7' },
+                { input: 'C DOM', expected: 'C7' },
+                { input: 'C dominant7', expected: 'C7' },
+                { input: 'C dom7', expected: 'C7' },
+                { input: 'C DOMINANT7', expected: 'C7' },
+                { input: 'C DOM7', expected: 'C7' },
+                { input: 'C dominant 7', expected: 'C7' },
+                { input: 'C dom 7', expected: 'C7' },
+                { input: 'C DOMINANT 7', expected: 'C7' },
+                { input: 'C DOM 7', expected: 'C7' }
+            ],
+            'Major 7th': [
+                { input: 'Cmaj7', expected: 'Cmaj7' },
+                { input: 'C maj7', expected: 'Cmaj7' },
+                { input: 'C major7', expected: 'Cmaj7' },
+                { input: 'CM7', expected: 'Cmaj7' },
+                { input: 'C M7', expected: 'Cmaj7' },
+                { input: 'CΔ', expected: 'Cmaj7' },
+                { input: 'C∆', expected: 'Cmaj7' },
+                { input: 'CΔ7', expected: 'Cmaj7' },
+                { input: 'C∆7', expected: 'Cmaj7' },
+                { input: 'C MAJ7', expected: 'Cmaj7' },
+                { input: 'C MAJOR7', expected: 'Cmaj7' },
+                { input: 'C#maj7', expected: 'C♯maj7' },
+                { input: 'C#M7', expected: 'C♯maj7' },
+                { input: 'C#Δ', expected: 'C♯maj7' },
+                { input: 'Dbmaj7', expected: 'D♭maj7' },
+                { input: 'DbM7', expected: 'D♭maj7' }
+            ],
+            'Minor 7th': [
+                { input: 'Cm7', expected: 'Cm7' },
+                { input: 'C m7', expected: 'Cm7' },
+                { input: 'C min7', expected: 'Cm7' },
+                { input: 'C minor7', expected: 'Cm7' },
+                { input: 'C-7', expected: 'Cm7' },
+                { input: 'C MIN7', expected: 'Cm7' },
+                { input: 'C MINOR7', expected: 'Cm7' },
+                { input: 'C#m7', expected: 'C♯m7' },
+                { input: 'C# min7', expected: 'C♯m7' },
+                { input: 'C#-7', expected: 'C♯m7' },
+                { input: 'Dbm7', expected: 'D♭m7' },
+                { input: 'Db min7', expected: 'D♭m7' }
+            ],
+            'Half-Diminished 7th': [
+                { input: 'Cm7b5', expected: 'Cm7♭5' },
+                { input: 'C m7b5', expected: 'Cm7♭5' },
+                { input: 'Cm7flat5', expected: 'Cm7♭5' },
+                { input: 'C halfdiminished', expected: 'Cm7♭5' },
+                { input: 'C halfdim', expected: 'Cm7♭5' },
+                { input: 'C HALFDIMINISHED', expected: 'Cm7♭5' },
+                { input: 'C HALFDIM', expected: 'Cm7♭5' },
+                { input: 'CØ', expected: 'Cm7♭5' },
+                { input: 'Cø', expected: 'Cm7♭5' },
+                { input: 'CØ7', expected: 'Cm7♭5' },
+                { input: 'C#m7b5', expected: 'C♯m7♭5' },
+                { input: 'C# halfdiminished', expected: 'C♯m7♭5' },
+                { input: 'C#Ø', expected: 'C♯m7♭5' },
+                { input: 'Dbm7b5', expected: 'D♭m7♭5' },
+                { input: 'Db halfdiminished', expected: 'D♭m7♭5' }
+            ],
+            'Diminished Triad': [
+                { input: 'Cdim', expected: 'C˚' },
+                { input: 'C dim', expected: 'C˚' },
+                { input: 'C diminished', expected: 'C˚' },
+                { input: 'Cdimin', expected: 'C˚' },
+                { input: 'C DIM', expected: 'C˚' },
+                { input: 'C DIMINISHED', expected: 'C˚' },
+                { input: 'C#dim', expected: 'C♯˚' },
+                { input: 'C# diminished', expected: 'C♯˚' },
+                { input: 'Dbdim', expected: 'D♭˚' },
+                { input: 'Db diminished', expected: 'D♭˚' }
+            ],
+            'User Specific Cases': [
+                { input: 'C#m7', expected: 'C♯m7' },
+                { input: 'C#-7', expected: 'C♯m7' },
+                { input: 'C# minor7', expected: 'C♯m7' },
+                { input: 'C# MINOR7', expected: 'C♯m7' },
+                { input: 'C# E G# B', expected: 'C♯' }, // Note: This is a spelling, not a chord name
+                { input: 'C# E G#', expected: 'C♯' }    // Note: This is a triad spelling, not a chord name
+            ]
+        };
+
+        let globalTestData = null; // Store test data globally for export
+
+        function runChordInputTests() {
+            const results = [];
+            let totalTests = 0;
+            let passedTests = 0;
+            let failedTests = 0;
+
+            Object.entries(testCases).forEach(([chordType, tests]) => {
+                const chordTypeResults = [];
+
+                tests.forEach(test => {
+                    const actual = normalizeChord(test.input);
+                    const passed = actual === test.expected;
+                    
+                    const testResult = {
+                        chordType: chordType,
+                        input: test.input,
+                        expected: test.expected,
+                        actual: actual,
+                        passed: passed
+                    };
+
+                    chordTypeResults.push(testResult);
+                    totalTests++;
+                    if (passed) {
+                        passedTests++;
+                    } else {
+                        failedTests++;
+                    }
+                });
+
+                results.push({
+                    chordType: chordType,
+                    results: chordTypeResults
+                });
+            });
+
+            const testData = {
+                results: results,
+                stats: {
+                    total: totalTests,
+                    passed: passedTests,
+                    failed: failedTests
+                },
+                timestamp: new Date().toISOString(),
+                testType: 'Chord Input Normalization'
+            };
+
+            globalTestData = testData; // Store for export
+            return testData;
+        }
+
+        function displayResults(testData) {
+            const container = document.getElementById('test-results');
+            const summary = document.getElementById('summary');
+            const stats = document.getElementById('stats');
+
+            // Display summary
+            summary.style.display = 'block';
+            stats.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-number">${testData.stats.total}</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" style="color: #28a745;">${testData.stats.passed}</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" style="color: #dc3545;">${testData.stats.failed}</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" style="color: #007bff;">${((testData.stats.passed / testData.stats.total) * 100).toFixed(1)}%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            `;
+
+            // Display detailed results
+            testData.results.forEach(chordTypeResult => {
+                const chordTypeSection = document.createElement('div');
+                chordTypeSection.className = 'chord-type-section';
+                
+                const chordTypeHeader = document.createElement('h3');
+                chordTypeHeader.textContent = chordTypeResult.chordType;
+                chordTypeSection.appendChild(chordTypeHeader);
+
+                // Create header row
+                const headerRow = document.createElement('div');
+                headerRow.className = 'test-grid';
+                headerRow.innerHTML = `
+                    <div class="test-header">Input</div>
+                    <div class="test-header">Expected</div>
+                    <div class="test-header">Actual</div>
+                    <div class="test-header">Status</div>
+                    <div class="test-header">Notes</div>
+                `;
+                chordTypeSection.appendChild(headerRow);
+
+                chordTypeResult.results.forEach(test => {
+                    const testRow = document.createElement('div');
+                    testRow.className = 'test-grid';
+                    
+                    const statusClass = test.passed ? 'pass' : 'fail';
+                    const statusText = test.passed ? 'PASS' : 'FAIL';
+                    
+                    // Determine notes based on the test
+                    let notes = '';
+                    if (!test.passed) {
+                        notes = `Expected "${test.expected}" but got "${test.actual}"`;
+                    } else if (test.input.includes(' ')) {
+                        notes = 'Spelling input (not chord name)';
+                    } else {
+                        notes = '✓ Normalized correctly';
+                    }
+                    
+                    testRow.innerHTML = `
+                        <div class="input">${test.input}</div>
+                        <div class="expected">${test.expected}</div>
+                        <div class="actual">${test.actual}</div>
+                        <div class="status ${statusClass}">${statusText}</div>
+                        <div style="font-size: 12px; color: #666;">${notes}</div>
+                    `;
+                    
+                    chordTypeSection.appendChild(testRow);
+                });
+
+                container.appendChild(chordTypeSection);
+            });
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const testResults = runChordInputTests();
+            displayResults(testResults);
+            setupExportButtons();
+        });
+
+        // Export functionality
+        function setupExportButtons() {
+            document.getElementById('export-json').addEventListener('click', exportJSON);
+            document.getElementById('export-csv').addEventListener('click', exportCSV);
+            document.getElementById('export-summary').addEventListener('click', exportSummary);
+        }
+
+        function showExportStatus(message, isSuccess = true) {
+            const statusDiv = document.getElementById('export-status');
+            statusDiv.textContent = message;
+            statusDiv.className = `export-status ${isSuccess ? 'export-success' : 'export-error'}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+                return false;
+            }
+        }
+
+        function exportJSON() {
+            if (!globalTestData) {
+                showExportStatus('No test data available', false);
+                return;
+            }
+
+            const jsonData = JSON.stringify(globalTestData, null, 2);
+            copyToClipboard(jsonData).then(success => {
+                if (success) {
+                    showExportStatus('JSON data copied to clipboard!');
+                } else {
+                    showExportStatus('Failed to copy to clipboard. Check console for details.', false);
+                }
+            });
+        }
+
+        function exportCSV() {
+            if (!globalTestData) {
+                showExportStatus('No test data available', false);
+                return;
+            }
+
+            let csv = 'Chord Type,Input,Expected,Actual,Passed\n';
+            
+            globalTestData.results.forEach(chordTypeResult => {
+                chordTypeResult.results.forEach(test => {
+                    csv += `"${test.chordType}","${test.input}","${test.expected}","${test.actual}","${test.passed}"\n`;
+                });
+            });
+
+            copyToClipboard(csv).then(success => {
+                if (success) {
+                    showExportStatus('CSV data copied to clipboard!');
+                } else {
+                    showExportStatus('Failed to copy to clipboard. Check console for details.', false);
+                }
+            });
+        }
+
+        function exportSummary() {
+            if (!globalTestData) {
+                showExportStatus('No test data available', false);
+                return;
+            }
+
+            const stats = globalTestData.stats;
+            const successRate = ((stats.passed / stats.total) * 100).toFixed(1);
+            
+            let summary = `Chord Input Normalization Test Results\n`;
+            summary += `=====================================\n\n`;
+            summary += `Test Date: ${new Date(globalTestData.timestamp).toLocaleString()}\n`;
+            summary += `Total Tests: ${stats.total}\n`;
+            summary += `Passed: ${stats.passed}\n`;
+            summary += `Failed: ${stats.failed}\n`;
+            summary += `Success Rate: ${successRate}%\n\n`;
+
+            // Add failed tests details
+            const failedTests = [];
+            globalTestData.results.forEach(chordTypeResult => {
+                chordTypeResult.results.forEach(test => {
+                    if (!test.passed) {
+                        failedTests.push({
+                            chordType: test.chordType,
+                            input: test.input,
+                            expected: test.expected,
+                            actual: test.actual
+                        });
+                    }
+                });
+            });
+
+            if (failedTests.length > 0) {
+                summary += `Failed Tests:\n`;
+                summary += `=============\n`;
+                failedTests.forEach(test => {
+                    summary += `• ${test.chordType}: "${test.input}" → Expected: "${test.expected}", Got: "${test.actual}"\n`;
+                });
+            } else {
+                summary += `All tests passed! 🎉\n`;
+            }
+
+            copyToClipboard(summary).then(success => {
+                if (success) {
+                    showExportStatus('Summary copied to clipboard!');
+                } else {
+                    showExportStatus('Failed to copy to clipboard. Check console for details.', false);
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
