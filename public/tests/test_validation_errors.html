@@ -14,9 +14,23 @@
         .summary { font-weight: bold; margin: 10px 0; }
         button { margin: 5px; padding: 8px 16px; }
         pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .back-link:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
+    <a href="index.html" class="back-link">← Back to Test Suite</a>
     <h1>Music Theory App - Validation Error Tests</h1>
     <p>This test suite checks for symbol mismatches, validation errors, and edge cases.</p>
     
@@ -31,7 +45,7 @@
     <span id="copy-status" style="margin-left:10px;color:green;"></span>
     <div id="results"></div>
 
-    <script src="public/js/main.js?v=32"></script>
+    <script src="../js/main.js?v=32"></script>
     <script>
         // quizData, normalizeChord, and accidentalToUnicode are now loaded from main.js
 
