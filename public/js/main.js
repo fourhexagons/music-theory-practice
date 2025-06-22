@@ -242,7 +242,9 @@ function normalizeChord(raw) {
   }
 
   // Dominant 7th variations (handle before other 7th patterns)
-  if (upperNormalized.includes('DOMINANT') || upperNormalized.includes('DOM')) {
+  if (upperNormalized.includes('DOMINANT') || upperNormalized.includes('DOM') ||
+      upperNormalized.includes('DOMINANT7') || upperNormalized.includes('DOM7') ||
+      upperNormalized.includes('DOMINANT 7') || upperNormalized.includes('DOM 7')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}7`;
   }
