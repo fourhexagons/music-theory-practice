@@ -185,10 +185,24 @@ function normalizeChord(raw) {
   // Universal cleanup
   normalized = normalized.replace(/\s+/g, ""); // Remove all spaces
 
+  // First, normalize the note names (handle accidentals)
+  // Extract the base note (first character) and any accidentals
+  const noteMatch = normalized.match(/^([A-G])([#♯b♭]*)(.*)$/);
+  if (noteMatch) {
+    const [, baseNote, accidentals, rest] = noteMatch;
+    const normalizedNote = accidentalToUnicode(baseNote + accidentals);
+    normalized = normalizedNote + rest;
+  }
+
   // Minor variations
   normalized = normalized.replace(/MINOR/g, "m");
   normalized = normalized.replace(/MIN/g, "m");
   normalized = normalized.replace(/-/g, "m");
+
+  // Minor 7th variations (handle before general minor replacement)
+  normalized = normalized.replace(/MIN7/g, "m7");
+  normalized = normalized.replace(/MINOR7/g, "m7");
+  normalized = normalized.replace(/-7/g, "m7");
 
   // Major variations (usually just the note name, but handle explicit cases)
   normalized = normalized.replace(/MAJOR/g, "");
@@ -210,7 +224,9 @@ function normalizeChord(raw) {
   
   // Major 7th variations
   normalized = normalized.replace(/MAJ7/g, "maj7"); // Keep 'maj7' distinct
+  normalized = normalized.replace(/M7/g, "maj7"); // Common jazz notation
   normalized = normalized.replace(/Δ/g, "maj7");
+  normalized = normalized.replace(/∆/g, "maj7"); // Jazz delta symbol
 
   // All other 'm' instances should now be for minor chords.
   // Final check for diminished symbol
@@ -471,7 +487,19 @@ function handleAnswerSubmit(e) {
     feedback.className = 'feedback';
     
     if (learningState.isAdvancedMode) {
-      startAdvancedPractice(learningState.advancedModeType);
+      // Handle A/B pair logic for accidentals questions
+      if (learningState.currentQuestion && 
+          learningState.currentQuestion.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT &&
+          quizData[learningState.currentQuestion.key].accidentals > 0) {
+        // We just answered accidentals count correctly, now ask naming for the same key
+        const key = learningState.currentQuestion.key;
+        learningState.currentQuestion = { key: key, chapterId: QUESTION_TYPES.ACCIDENTALS_NAMES };
+        const text = `Name the accidentals in ${key} major.`;
+        updateQuestionUI(text);
+      } else {
+        // Normal case - start a new random question
+        startAdvancedPractice(learningState.advancedModeType);
+      }
     } else {
       const level = getCurrentLevel();
       
@@ -598,21 +626,12 @@ function startAdvancedPractice(mode) {
     let randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
     let randomChapter;
     
-    // Check if we're waiting to ask accidentals naming
-    if (learningState.waitingForAccidentalsNaming) {
-      // We must ask accidentals naming for the key that was asked about
-      randomKey = learningState.lastAccidentalsKey;
-      randomChapter = CHAPTERS.ACCIDENTALS_NAMES;
-      learningState.waitingForAccidentalsNaming = false;
-      learningState.lastAccidentalsKey = null;
-    } else {
-      // Pick a random chapter, but exclude accidentals naming if we haven't asked count first
-      const availableChapters = ALL_CHAPTERS.filter(chapter => 
-        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
-        chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
-      );
-      randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
-    }
+    // Pick a random chapter, but exclude accidentals naming and seventh spelling
+    const availableChapters = ALL_CHAPTERS.filter(chapter => 
+      chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
+      chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
+    );
+    randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
     
     learningState.currentQuestion = { key: randomKey, chapterId: randomChapter.id };
     
@@ -622,24 +641,17 @@ function startAdvancedPractice(mode) {
     switch (randomChapter.id) {
       case QUESTION_TYPES.ACCIDENTALS_COUNT:
         text = `How many accidentals are in ${randomKey} major?`;
-        // Mark that we need to ask accidentals naming next for this key
-        learningState.waitingForAccidentalsNaming = true;
-        learningState.lastAccidentalsKey = randomKey;
-        break;
-      case QUESTION_TYPES.ACCIDENTALS_NAMES:
-        text = `Name the accidentals in ${randomKey} major.`;
         break;
       case QUESTION_TYPES.SCALE_SPELLING:
         text = `Spell the ${randomKey} major scale.`;
         break;
       case QUESTION_TYPES.TRIADS:
       case QUESTION_TYPES.SEVENTHS:
-      case QUESTION_TYPES.SEVENTH_SPELLING:
         degree = [2, 3, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
         learningState.currentQuestion.degree = degree;
         
         const chordType = randomChapter.id === QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
-        const action = randomChapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
+        const action = 'Name';
         text = `${action} the ${ordinal(degree)} ${chordType} in ${randomKey} major.`;
         break;
     }
