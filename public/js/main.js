@@ -179,62 +179,106 @@ function normalizeChord(raw) {
   if (!raw) return "";
   let normalized = raw.trim();
 
-  // Case-insensitive matching for all variations
-  normalized = normalized.toUpperCase();
-
-  // Universal cleanup
+  // Universal cleanup - remove spaces first
   normalized = normalized.replace(/\s+/g, ""); // Remove all spaces
 
-  // First, normalize the note names (handle accidentals)
+  // First, validate that the input starts with a valid note letter (A-G)
+  if (!/^[A-Ga-g]/.test(normalized)) {
+    return ""; // Reject invalid chords that don't start with A-G
+  }
+
+  // First, normalize the note names (handle accidentals) BEFORE case conversion
   // Extract the base note (first character) and any accidentals
-  const noteMatch = normalized.match(/^([A-G])([#♯b♭]*)(.*)$/);
+  const noteMatch = normalized.match(/^([A-Ga-g])([#♯b♭]*)(.*)$/);
   if (noteMatch) {
     const [, baseNote, accidentals, rest] = noteMatch;
     const normalizedNote = accidentalToUnicode(baseNote + accidentals);
     normalized = normalizedNote + rest;
+  } else {
+    // If we can't match a valid note pattern, reject it
+    return "";
   }
 
-  // Minor variations
-  normalized = normalized.replace(/MINOR/g, "m");
-  normalized = normalized.replace(/MIN/g, "m");
-  normalized = normalized.replace(/-/g, "m");
+  // Now do case-insensitive matching for the rest, but preserve the structure
+  // Normalize to NFC to ensure Unicode symbols (like delta) are matched consistently
+  normalized = normalized.normalize('NFC');
+  const upperNormalized = normalized.toUpperCase();
 
-  // Minor 7th variations (handle before general minor replacement)
-  normalized = normalized.replace(/MIN7/g, "m7");
-  normalized = normalized.replace(/MINOR7/g, "m7");
-  normalized = normalized.replace(/-7/g, "m7");
+  // Helper function to extract base note with accidentals
+  function getBaseNoteWithAccidentals(str) {
+    // Match a note letter followed by any number of accidentals (♯, ♭, 𝄪, 𝄫, #, b)
+    const match = str.match(/^([A-G][#b♯♭𝄪𝄫]*)/);
+    return match ? match[1] : str.substring(0, 1);
+  }
 
-  // Major variations (usually just the note name, but handle explicit cases)
-  normalized = normalized.replace(/MAJOR/g, "");
-  normalized = normalized.replace(/MAJ/g, "");
-
-  // Diminished variations
-  normalized = normalized.replace(/DIMINISHED/g, "˚");
-  normalized = normalized.replace(/DIM/g, "˚");
+  // Handle chord types in order of specificity
   
-  // Half-diminished (m7b5) variations
-  // Correctly handles 'Bm7b5' -> 'BM7♭5' before it becomes 'B˚7b5'
-  if (normalized.endsWith('m7b5'.toUpperCase())) {
-      const baseNote = normalized.substring(0, normalized.length - 4);
+  // Half-diminished (m7b5) variations - handle before other patterns
+  if (upperNormalized.endsWith('M7B5')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}m7♭5`;
   }
-  normalized = normalized.replace(/HALFDIMINISHED/g, "m7♭5");
-  normalized = normalized.replace(/HALFDIM/g, "m7♭5");
-  normalized = normalized.replace(/Ø/g, "m7♭5"); // Common symbol for half-diminished
   
-  // Major 7th variations
-  normalized = normalized.replace(/MAJ7/g, "maj7"); // Keep 'maj7' distinct
-  normalized = normalized.replace(/M7/g, "maj7"); // Common jazz notation
-  normalized = normalized.replace(/Δ/g, "maj7");
-  normalized = normalized.replace(/∆/g, "maj7"); // Jazz delta symbol
-
-  // All other 'm' instances should now be for minor chords.
-  // Final check for diminished symbol
-  if (normalized.includes('˚') || normalized.includes('°')) {
-      normalized = normalized.replace(/M7♭5/g, "m7♭5"); // Fix for Bm7b5 etc.
-      normalized = normalized.replace('M', 'm'); // A half-dim is a minor chord
+  // Half-diminished text variations
+  if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}m7♭5`;
+  }
+  
+  // Half-diminished symbol
+  if (upperNormalized.includes('Ø')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}m7♭5`;
   }
 
+  // Minor 7th variations (handle BEFORE major 7th to avoid conflicts)
+  // Check for lowercase 'm7' pattern first (before uppercase conversion)
+  if (normalized.endsWith('m7') || upperNormalized.includes('MIN7') || upperNormalized.includes('MINOR7') || 
+      upperNormalized.includes('-7')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}m7`;
+  }
+
+  // Major 7th variations (handle after minor 7th)
+  if (upperNormalized.includes('MAJ7') || 
+      (upperNormalized.includes('M7') && !normalized.endsWith('m7')) || 
+      upperNormalized.includes('Δ') || upperNormalized.includes('∆')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}maj7`;
+  }
+
+  // Diminished variations
+  if (upperNormalized.includes('DIMINISHED') || upperNormalized.includes('DIM')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}˚`;
+  }
+
+  // Minor variations (handle before major)
+  if (upperNormalized.includes('MINOR') || upperNormalized.includes('MIN') || 
+      upperNormalized.includes('-')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}m`;
+  }
+
+  // Major variations (explicit)
+  if (upperNormalized.includes('MAJOR') || upperNormalized.includes('MAJ')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return baseNote;
+  }
+
+  // Handle simple chord symbols
+  if (upperNormalized.endsWith('7')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}7`;
+  }
+
+  // Handle minor chord with 'm' (lowercase m)
+  if (normalized.endsWith('m')) {
+      const baseNote = getBaseNoteWithAccidentals(normalized);
+      return `${baseNote}m`;
+  }
+
+  // If no specific pattern matches, return the normalized note
   return normalized;
 }
 

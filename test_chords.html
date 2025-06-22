@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Theory Practice - Testing Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .chord-test {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .chord-input {
+            font-weight: bold;
+            color: #495057;
+        }
+        .chord-output {
+            font-family: monospace;
+            color: #6c757d;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .error-details {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Music Theory Practice - Testing Platform</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="runChordTests()">Test Chord Normalization</button>
+        <button onclick="runAccidentalTests()">Test Accidental Handling</button>
+        <button onclick="runAdvancedModeTests()">Test Advanced Modes</button>
+        <button onclick="runValidationTests()">Test Chord Validation</button>
+        <button onclick="runEdgeCaseTests()">Test Edge Cases</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="summary" class="summary" style="display: none;">
+        <h3>Test Summary</h3>
+        <div id="summary-content"></div>
+    </div>
+
+    <div id="results"></div>
+
+    <script src="public/js/main.js"></script>
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            errors: []
+        };
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            testResults = { total: 0, passed: 0, failed: 0, errors: [] };
+        }
+
+        function addResult(testName, input, expected, actual, passed) {
+            testResults.total++;
+            if (passed) {
+                testResults.passed++;
+            } else {
+                testResults.failed++;
+                testResults.errors.push({
+                    test: testName,
+                    input: input,
+                    expected: expected,
+                    actual: actual
+                });
+            }
+
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `
+                <strong>${testName}</strong><br>
+                Input: <span class="chord-input">${input}</span><br>
+                Expected: <span class="chord-output">${expected}</span><br>
+                Actual: <span class="chord-output">${actual}</span><br>
+                Status: ${passed ? '✅ PASS' : '❌ FAIL'}
+            `;
+            document.getElementById('results').appendChild(resultDiv);
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            const contentDiv = document.getElementById('summary-content');
+            
+            contentDiv.innerHTML = `
+                <p><strong>Total Tests:</strong> ${testResults.total}</p>
+                <p><strong>Passed:</strong> ${testResults.passed} ✅</p>
+                <p><strong>Failed:</strong> ${testResults.failed} ❌</p>
+                <p><strong>Success Rate:</strong> ${testResults.total > 0 ? Math.round((testResults.passed / testResults.total) * 100) : 0}%</p>
+            `;
+
+            if (testResults.errors.length > 0) {
+                contentDiv.innerHTML += '<h4>Errors:</h4>';
+                testResults.errors.forEach(error => {
+                    contentDiv.innerHTML += `
+                        <div class="error-details">
+                            <strong>${error.test}</strong><br>
+                            Input: ${error.input}<br>
+                            Expected: ${error.expected}<br>
+                            Actual: ${error.actual}
+                        </div>
+                    `;
+                });
+            }
+
+            summaryDiv.style.display = 'block';
+        }
+
+        function testChordNormalization() {
+            const chordTests = [
+                // Basic chord types
+                { input: 'C', expected: 'C', description: 'Basic major chord' },
+                { input: 'Cm', expected: 'Cm', description: 'Basic minor chord' },
+                { input: 'C7', expected: 'C7', description: 'Basic dominant 7th' },
+                { input: 'Cmaj7', expected: 'Cmaj7', description: 'Major 7th' },
+                { input: 'Cm7', expected: 'Cm7', description: 'Minor 7th' },
+                
+                // Jazz notation
+                { input: 'C∆', expected: 'Cmaj7', description: 'Jazz delta symbol' },
+                { input: 'C∆7', expected: 'Cmaj7', description: 'Jazz delta with 7' },
+                { input: 'CM7', expected: 'Cmaj7', description: 'M7 notation' },
+                { input: 'Cmin7', expected: 'Cm7', description: 'min7 notation' },
+                { input: 'C-7', expected: 'Cm7', description: 'Dash notation' },
+                
+                // Accidentals - students use lowercase 'b' for flat
+                { input: 'db7', expected: 'D♭7', description: 'Flat with b (lowercase)' },
+                { input: 'f#7', expected: 'F♯7', description: 'Sharp with #' },
+                { input: 'bb7', expected: 'B♭7', description: 'B flat (lowercase b)' },
+                { input: 'ab∆', expected: 'A♭maj7', description: 'A flat with delta (lowercase)' },
+                { input: 'gb-7', expected: 'G♭m7', description: 'G flat minor 7 (lowercase)' },
+                
+                // Complex cases
+                { input: 'c#m7b5', expected: 'C♯m7♭5', description: 'Half-diminished' },
+                { input: 'Ddim', expected: 'D˚', description: 'Diminished' },
+                { input: 'Ehalfdim', expected: 'Em7♭5', description: 'Half-diminished text' },
+                { input: 'Fø', expected: 'Fm7♭5', description: 'Half-diminished symbol' },
+                
+                // Edge cases
+                { input: 'C MAJOR', expected: 'C', description: 'Uppercase major' },
+                { input: 'c minor', expected: 'Cm', description: 'Lowercase minor' },
+                { input: 'D MINOR 7', expected: 'Dm7', description: 'Uppercase minor 7' },
+                { input: 'E - 7', expected: 'Em7', description: 'Dash with spaces' },
+                { input: 'F  MAJ7  ', expected: 'Fmaj7', description: 'Extra spaces' },
+                { input: 'C∆', expected: 'Cmaj7', description: 'Delta symbol (U+2206)' },
+                { input: 'CΔ', expected: 'Cmaj7', description: 'Delta symbol (U+0394)' }
+            ];
+
+            chordTests.forEach(test => {
+                const actual = normalizeChord(test.input);
+                const passed = actual === test.expected;
+                addResult(test.description, test.input, test.expected, actual, passed);
+            });
+        }
+
+        function testAccidentalHandling() {
+            const accidentalTests = [
+                { input: 'db', expected: 'D♭', description: 'D flat (lowercase)' },
+                { input: 'f#', expected: 'F♯', description: 'F sharp' },
+                { input: 'bb', expected: 'B♭', description: 'B flat (lowercase)' },
+                { input: 'c#', expected: 'C♯', description: 'C sharp' },
+                { input: 'gb', expected: 'G♭', description: 'G flat (lowercase)' },
+                { input: 'ab', expected: 'A♭', description: 'A flat (lowercase)' },
+                { input: 'eb', expected: 'E♭', description: 'E flat (lowercase)' },
+                { input: 'd#', expected: 'D♯', description: 'D sharp' },
+                { input: 'g#', expected: 'G♯', description: 'G sharp' },
+                { input: 'a#', expected: 'A♯', description: 'A sharp' },
+                { input: 'e#', expected: 'E♯', description: 'E sharp' },
+                { input: 'b#', expected: 'B♯', description: 'B sharp' },
+                { input: 'cb', expected: 'C♭', description: 'C flat (lowercase)' },
+                { input: 'fb', expected: 'F♭', description: 'F flat (lowercase)' },
+                { input: 'bb', expected: 'B♭', description: 'Double flat b (lowercase)' },
+                { input: 'bbb', expected: 'B\uD834\uDD2B', description: 'B double flat (lowercase)' },
+                { input: 'f##', expected: 'F\uD834\uDD2A', description: 'F double sharp' },
+                { input: 'fx', expected: 'F\uD834\uDD2A', description: 'F double sharp with x' }
+            ];
+
+            accidentalTests.forEach(test => {
+                const actual = accidentalToUnicode(test.input);
+                const passed = actual === test.expected;
+                addResult(test.description, test.input, test.expected, actual, passed);
+            });
+        }
+
+        function testAdvancedModeLogic() {
+            // Test the A/B pair logic
+            const testCases = [
+                {
+                    description: 'G major accidentals count should trigger naming',
+                    key: 'G',
+                    accidentalsCount: 1,
+                    shouldAskNaming: true
+                },
+                {
+                    description: 'F# major accidentals count should trigger naming',
+                    key: 'F♯',
+                    accidentalsCount: 6,
+                    shouldAskNaming: true
+                }
+            ];
+
+            testCases.forEach(testCase => {
+                const data = quizData[testCase.key];
+                const actualShouldAsk = data.accidentals > 0;
+                const passed = actualShouldAsk === testCase.shouldAskNaming;
+                addResult(
+                    testCase.description,
+                    `${testCase.key} (${testCase.accidentalsCount} accidentals)`,
+                    testCase.shouldAskNaming ? 'Should ask naming' : 'Should NOT ask naming',
+                    actualShouldAsk ? 'Would ask naming' : 'Would NOT ask naming',
+                    passed
+                );
+            });
+        }
+
+        function testChordDataIntegrity() {
+            // Test that all chord data is properly formatted
+            allKeys.forEach(key => {
+                const data = quizData[key];
+                
+                // Test triad data
+                [2, 3, 4, 5, 6, 7].forEach(degree => {
+                    const triad = data.triads[degree];
+                    const seventh = data.sevenths[degree];
+                    
+                    if (!triad) {
+                        addResult(
+                            `Missing triad for ${key} degree ${degree}`,
+                            `${key} degree ${degree}`,
+                            'Should have triad',
+                            'Missing triad',
+                            false
+                        );
+                    }
+                    
+                    if (!seventh) {
+                        addResult(
+                            `Missing seventh for ${key} degree ${degree}`,
+                            `${key} degree ${degree}`,
+                            'Should have seventh',
+                            'Missing seventh',
+                            false
+                        );
+                    }
+                });
+            });
+        }
+
+        function testChordAnswerValidation() {
+            // Test actual chord answer validation scenarios
+            const validationTests = [
+                // Test the specific case that was failing
+                {
+                    description: 'db7 for 5th seventh chord in G♭ major',
+                    key: 'G♭',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'db7',
+                    expected: true,
+                    correctAnswer: 'D♭7'
+                },
+                {
+                    description: 'ab∆ for 4th seventh chord in Eb major',
+                    key: 'E♭',
+                    degree: 4,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'ab∆',
+                    expected: true,
+                    correctAnswer: 'A♭maj7'
+                },
+                {
+                    description: 'f#7 for 5th seventh chord in B major',
+                    key: 'B',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'f#7',
+                    expected: true,
+                    correctAnswer: 'F♯7'
+                },
+                {
+                    description: 'bb7 for 5th seventh chord in Eb major',
+                    key: 'E♭',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'bb7',
+                    expected: true,
+                    correctAnswer: 'B♭7'
+                },
+                // Test various input formats for the same chord
+                {
+                    description: 'D♭7 (unicode) for 5th seventh chord in G♭ major',
+                    key: 'G♭',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'D♭7',
+                    expected: true,
+                    correctAnswer: 'D♭7'
+                },
+                {
+                    description: 'A♭maj7 (unicode) for 4th seventh chord in Eb major',
+                    key: 'E♭',
+                    degree: 4,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'A♭maj7',
+                    expected: true,
+                    correctAnswer: 'A♭maj7'
+                },
+                // Test triad variations
+                {
+                    description: 'db (triad) for 5th triad in G♭ major',
+                    key: 'G♭',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.TRIADS,
+                    input: 'db',
+                    expected: true,
+                    correctAnswer: 'D♭'
+                },
+                {
+                    description: 'ab (triad) for 4th triad in Eb major',
+                    key: 'E♭',
+                    degree: 4,
+                    chapterId: QUESTION_TYPES.TRIADS,
+                    input: 'ab',
+                    expected: true,
+                    correctAnswer: 'A♭'
+                },
+                {
+                    description: 'C∆ for 5th seventh chord in F major (should reject - wrong chord type)',
+                    key: 'F',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'C∆',
+                    expected: false,
+                    correctAnswer: 'C7'
+                },
+                {
+                    description: 'CΔ for 5th seventh chord in F major (should reject - wrong chord type)',
+                    key: 'F',
+                    degree: 5,
+                    chapterId: QUESTION_TYPES.SEVENTHS,
+                    input: 'CΔ',
+                    expected: false,
+                    correctAnswer: 'C7'
+                }
+            ];
+
+            validationTests.forEach(test => {
+                // Create a mock question object
+                const mockQuestion = {
+                    key: test.key,
+                    chapterId: test.chapterId,
+                    degree: test.degree
+                };
+
+                // Store the original currentQuestion
+                const originalQuestion = learningState.currentQuestion;
+                learningState.currentQuestion = mockQuestion;
+
+                // Test the answer
+                const actual = checkAnswer(test.input);
+                const passed = actual === test.expected;
+
+                // Restore original question
+                learningState.currentQuestion = originalQuestion;
+
+                addResult(
+                    test.description,
+                    test.input,
+                    test.expected ? `Should accept (${test.correctAnswer})` : 'Should reject',
+                    actual ? 'Accepted' : 'Rejected',
+                    passed
+                );
+            });
+        }
+
+        function testEdgeCases() {
+            // Test edge cases and potential issues
+            const edgeCases = [
+                {
+                    description: 'Empty string should be rejected',
+                    input: '',
+                    expected: false
+                },
+                {
+                    description: 'Just spaces should be rejected',
+                    input: '   ',
+                    expected: false
+                },
+                {
+                    description: 'Invalid chord should be rejected',
+                    input: 'X7',
+                    expected: false
+                },
+                {
+                    description: 'Case insensitive major chord',
+                    input: 'c',
+                    expected: 'C'
+                },
+                {
+                    description: 'Case insensitive minor chord',
+                    input: 'cm',
+                    expected: 'Cm'
+                },
+                {
+                    description: 'Mixed case with accidentals (lowercase b)',
+                    input: 'db7',
+                    expected: 'D♭7'
+                }
+            ];
+
+            edgeCases.forEach(test => {
+                if (test.expected === false) {
+                    // Test rejection cases
+                    const actual = normalizeChord(test.input);
+                    const passed = actual === '';
+                    addResult(
+                        test.description,
+                        test.input,
+                        'Should be rejected',
+                        actual === '' ? 'Rejected' : `Normalized to: ${actual}`,
+                        passed
+                    );
+                } else {
+                    // Test normalization cases
+                    const actual = normalizeChord(test.input);
+                    const passed = actual === test.expected;
+                    addResult(
+                        test.description,
+                        test.input,
+                        test.expected,
+                        actual,
+                        passed
+                    );
+                }
+            });
+        }
+
+        function testChordDataCompleteness() {
+            // Test that all keys have complete chord data
+            allKeys.forEach(key => {
+                const data = quizData[key];
+                
+                // Check that all required properties exist
+                const requiredProps = ['accidentals', 'notes', 'scale', 'triads', 'sevenths', 'seventhSpelling'];
+                requiredProps.forEach(prop => {
+                    if (!(prop in data)) {
+                        addResult(
+                            `Missing ${prop} for ${key}`,
+                            key,
+                            `Should have ${prop}`,
+                            'Missing property',
+                            false
+                        );
+                    }
+                });
+
+                // Check that accidentals count matches notes array length
+                if (data.accidentals !== data.notes.length) {
+                    addResult(
+                        `Accidentals count mismatch for ${key}`,
+                        `${key}: ${data.accidentals} accidentals, ${data.notes.length} notes`,
+                        'Count should match notes length',
+                        'Mismatch',
+                        false
+                    );
+                }
+
+                // Check that scale has 7 notes
+                if (data.scale.length !== 7) {
+                    addResult(
+                        `Scale length incorrect for ${key}`,
+                        `${key}: ${data.scale.length} notes`,
+                        'Should have 7 notes',
+                        'Incorrect length',
+                        false
+                    );
+                }
+            });
+        }
+
+        function runChordTests() {
+            clearResults();
+            testChordNormalization();
+            updateSummary();
+        }
+
+        function runAccidentalTests() {
+            clearResults();
+            testAccidentalHandling();
+            updateSummary();
+        }
+
+        function runAdvancedModeTests() {
+            clearResults();
+            testAdvancedModeLogic();
+            testChordDataIntegrity();
+            testChordDataCompleteness();
+            updateSummary();
+        }
+
+        function runValidationTests() {
+            clearResults();
+            testChordAnswerValidation();
+            updateSummary();
+        }
+
+        function runEdgeCaseTests() {
+            clearResults();
+            testEdgeCases();
+            updateSummary();
+        }
+
+        function runAllTests() {
+            clearResults();
+            testChordNormalization();
+            testAccidentalHandling();
+            testAdvancedModeLogic();
+            testChordDataIntegrity();
+            testChordAnswerValidation();
+            testEdgeCases();
+            testChordDataCompleteness();
+            updateSummary();
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            console.log('Testing platform loaded. Click "Run All Tests" to begin testing.');
+        });
+    </script>
+</body>
+</html> 
