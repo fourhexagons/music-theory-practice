@@ -211,6 +211,14 @@
             if (!raw) return "";
             let normalized = raw.trim();
 
+            // Check if this is a note spelling (space-separated notes like "C# E G# B")
+            const noteSpellingMatch = normalized.match(/^([A-Ga-g][#♯b♭]?)\s+([A-Ga-g][#♯b♭]?)\s+([A-Ga-g][#♯b♭]?)(?:\s+([A-Ga-g][#♯b♭]?))?$/);
+            if (noteSpellingMatch) {
+                // This is a note spelling, return the root note
+                const rootNote = accidentalToUnicode(noteSpellingMatch[1]);
+                return rootNote;
+            }
+
             // Universal cleanup - remove spaces first
             normalized = normalized.replace(/\s+/g, ""); // Remove all spaces
 
@@ -251,12 +259,13 @@
                 return `${baseNote}m7♭5`;
             }
             
-            // Half-diminished text variations
+            // Half-diminished text variations (including "flat5")
             if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM') || 
                 upperNormalized.includes('HALF DIM') || upperNormalized.includes('HALF-DIMINISHED') ||
                 upperNormalized.includes('HALF-DIM') || upperNormalized.includes('-HALFDIMINISHED') ||
                 upperNormalized.includes('-HALFDIM') || normalized.includes('halfdiminished') ||
-                normalized.includes('halfdim')) {
+                normalized.includes('halfdim') || upperNormalized.includes('FLAT5') ||
+                normalized.includes('flat5')) {
                 const baseNote = getBaseNoteWithAccidentals(normalized);
                 return `${baseNote}m7♭5`;
             }
@@ -265,6 +274,12 @@
             if (upperNormalized.includes('Ø')) {
                 const baseNote = getBaseNoteWithAccidentals(normalized);
                 return `${baseNote}m7♭5`;
+            }
+
+            // Dominant 7th variations (handle before other 7th patterns)
+            if (upperNormalized.includes('DOMINANT') || upperNormalized.includes('DOM')) {
+                const baseNote = getBaseNoteWithAccidentals(normalized);
+                return `${baseNote}7`;
             }
 
             // Minor 7th variations (handle BEFORE major 7th to avoid conflicts)
