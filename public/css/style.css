@@ -91,6 +91,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   width: 100%;
   max-width: var(--max-width-content);
   text-align: center;
+  margin-bottom: var(--spacing-4xl);
 }
 
 /* Question display */
@@ -198,10 +199,11 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 
 /* Feedback */
 .feedback {
-  font-size: 1.3rem;
-  min-height: 1.3125rem;
-  font-weight: 400;
-  color: var(--text-primary);
+  min-height: 1.5em;
+  margin-top: 0.5em;
+  color: #d32f2f; /* error color, can be overridden for success */
+  transition: color 0.2s;
+  display: block;
 }
 
 .feedback.incorrect { 
