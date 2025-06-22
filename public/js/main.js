@@ -199,29 +199,39 @@ function normalizeChord(raw) {
   const normalizedNote = accidentalToUnicode(baseNote + accidentals);
   let chordPart = rest;
 
-  // Tokenize the chord part (split on spaces, hyphens, and other delimiters)
+  // First, try a direct, case-sensitive match for simple single-token chord parts.
+  // This correctly distinguishes "M7" from "m7".
+  const directMatchMap = {
+      'M7': 'MAJ7',
+      'm7': 'M7',
+      'maj7': 'MAJ7'
+  };
+
+  if (directMatchMap.hasOwnProperty(chordPart)) {
+      return normalizedNote + directMatchMap[chordPart];
+  }
+
+  // If no direct match, proceed with case-insensitive token-based mapping.
   const tokens = chordPart.split(/[\s\-]+/).filter(Boolean);
-  
-  // Join tokens with a delimiter for matching, preserving case for M7 vs m7 distinction
-  const tokenKey = tokens.join('-');
-  
-  // Comprehensive mapping table for all chord type variations
+  const tokenKey = tokens.map(t => t.toLowerCase()).join('-');
+
+  // Comprehensive mapping table for all chord type variations (all lowercase)
   const chordTypeMap = {
-    // Major 7th variations (uppercase M)
-    'M7': 'MAJ7',
-    'MAJ7': 'MAJ7',
-    'MAJOR7': 'MAJ7',
-    'MA7': 'MAJ7',
-    'M-7': 'MAJ7',
-    'MAJ-7': 'MAJ7',
-    'MAJOR-7': 'MAJ7',
-    'MA-7': 'MAJ7',
+    // Major 7th variations
+    'maj7': 'MAJ7',
+    'major7': 'MAJ7',
+    'ma7': 'MAJ7',
+    'm7': 'MAJ7', // Handles "CM7" which becomes token "m7"
+    'major-7': 'MAJ7',
+    'maj-7': 'MAJ7',
+    'ma-7': 'MAJ7',
+    'm-7': 'MAJ7',
     
-    // Minor 7th variations (lowercase m)
-    'm7': 'M7',
+    // Minor 7th variations
     'min7': 'M7',
     'minor7': 'M7',
-    'm-7': 'M7',
+    // 'm7' is ambiguous; it's handled by the direct match above for lowercase 'm7'
+    // and by the major 7th section for uppercase 'M7' becoming lowercase.
     'min-7': 'M7',
     'minor-7': 'M7',
     
@@ -233,7 +243,6 @@ function normalizeChord(raw) {
     '7': '7',
     'dom-7': '7',
     'dominant-7': '7',
-    
     // Half-diminished variations
     'halfdim7': 'M7♭5',
     'halfdiminished7': 'M7♭5',
@@ -258,7 +267,6 @@ function normalizeChord(raw) {
     'b5': 'M7♭5',
     'ø': 'M7♭5',
     'ø7': 'M7♭5',
-    
     // Diminished variations
     'dim7': '˚7',
     'diminished7': '˚7',
@@ -270,7 +278,6 @@ function normalizeChord(raw) {
     'o': '˚',
     '°': '˚',
     '˚': '˚',
-    
     // Augmented variations
     'aug7': '+7',
     'augmented7': '+7',
@@ -278,52 +285,31 @@ function normalizeChord(raw) {
     'aug': '+',
     'augmented': '+',
     '+': '+',
-    
     // Minor variations
     'min': 'M',
     'minor': 'M',
     'm': 'M',
     '-': 'M',
-    
     // Major variations
     'major': '',
     'maj': '',
-    
     // Empty chord (just the note)
     '': ''
   };
-  
-  // Try to match the token key
+
+  // Try to match the token key (always lowercase)
   if (chordTypeMap.hasOwnProperty(tokenKey)) {
     chordPart = chordTypeMap[tokenKey];
     return normalizedNote + chordPart;
   }
-  
-  // Fallback: try lowercase version for case-insensitive matching
-  const lowerTokenKey = tokenKey.toLowerCase();
-  if (chordTypeMap.hasOwnProperty(lowerTokenKey)) {
-    chordPart = chordTypeMap[lowerTokenKey];
-    return normalizedNote + chordPart;
-  }
-  
-  // Additional fallback: try individual token matching for multi-token inputs
-  if (tokens.length > 1) {
-    const individualTokens = tokens.map(t => t.toLowerCase());
-    const individualKey = individualTokens.join('-');
-    if (chordTypeMap.hasOwnProperty(individualKey)) {
-      chordPart = chordTypeMap[individualKey];
-      return normalizedNote + chordPart;
-    }
-  }
-  
+
   // If no match, check for simple cases
   if (!chordPart) return normalizedNote;
-  if (chordPart === 'M') return normalizedNote + 'M';
-  if (chordPart === 'm') return normalizedNote + 'M';
+  if (chordPart.toLowerCase() === 'm') return normalizedNote + 'M';
   if (chordPart === '7') return normalizedNote + '7';
   if (chordPart === '+') return normalizedNote + '+';
   if (chordPart === '˚') return normalizedNote + '˚';
-  
+
   // Fallback: return normalized note + original chord part
   return normalizedNote + chordPart;
 }
