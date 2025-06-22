@@ -1,5 +1,7 @@
 console.log('main.js loaded');
 
+const APP_VERSION = 'v1.0.0';
+
 // --- 1. Constants and Data ---
 
 const QUESTION_TYPES = {
