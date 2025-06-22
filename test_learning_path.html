@@ -225,8 +225,10 @@
                     continue;
                 }
                 
-                // Generate question text
+                // Generate question text and degree (simulating askQuestion logic)
                 let questionText = '';
+                let degree = null;
+                
                 switch (chapter.id) {
                     case QUESTION_TYPES.ACCIDENTALS_COUNT:
                         questionText = `How many accidentals are in ${key} major?`;
@@ -238,7 +240,23 @@
                         questionText = `Spell the ${key} major scale.`;
                         break;
                     case QUESTION_TYPES.TRIADS:
-                        questionText = `Name the ${ordinal(state.currentChapterIndex + 1)} triad in ${key} major.`;
+                    case QUESTION_TYPES.SEVENTHS:
+                    case QUESTION_TYPES.SEVENTH_SPELLING:
+                        const allDegrees = [2, 3, 4, 5, 6, 7];
+                        let availableDegrees = allDegrees.filter(d => !state.usedDegrees.includes(d));
+                        
+                        if (availableDegrees.length === 0) {
+                            // All degrees have been used for this key
+                            if (level.mode !== MODES.LINEAR) {
+                                state.usedDegrees = [];
+                                availableDegrees = allDegrees;
+                            }
+                        }
+                        
+                        degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
+                        const chordType = chapter.id === QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
+                        const action = chapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
+                        questionText = `${action} the ${ordinal(degree)} ${chordType} in ${key} major.`;
                         break;
                 }
                 
@@ -254,18 +272,25 @@
                     keyIndex: state.currentKeyIndex,
                     mode: level.mode,
                     question: questionText,
-                    streak: state.correctAnswerStreak
+                    degree: degree,
+                    streak: state.correctAnswerStreak,
+                    usedDegrees: [...state.usedDegrees]
                 };
                 
                 results.path.push(questionRecord);
                 
-                // Simulate correct answer
+                // Simulate correct answer (simulating handleAnswerSubmit logic)
                 state.correctAnswerStreak++;
                 
                 // Handle progression based on mode
                 if (level.mode === MODES.LINEAR) {
                     if (chapter.id === QUESTION_TYPES.TRIADS) {
                         state.correctChordAnswersForCurrentKey++;
+                        
+                        // Add the degree to usedDegrees to prevent asking the same chord again
+                        if (degree) {
+                            state.usedDegrees.push(degree);
+                        }
                         
                         if (state.correctChordAnswersForCurrentKey >= 3) {
                             // Move to next key
@@ -375,7 +400,7 @@
             if (window.lastTestResults) {
                 const jsonText = JSON.stringify(window.lastTestResults.json, null, 2);
                 navigator.clipboard.writeText(jsonText).then(() => {
-                    alert('JSON copied to clipboard!');
+                    // Success - no popup needed
                 }).catch(err => {
                     console.error('Failed to copy:', err);
                     alert('Failed to copy to clipboard. Check console for details.');
