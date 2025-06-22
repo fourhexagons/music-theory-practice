@@ -96,6 +96,7 @@
         <button onclick="runAdvancedModeTests()">Test Advanced Modes</button>
         <button onclick="runValidationTests()">Test Chord Validation</button>
         <button onclick="runEdgeCaseTests()">Test Edge Cases</button>
+        <button onclick="showAllChordVariations()">Show All Chord Variations</button>
         <button onclick="clearResults()">Clear Results</button>
     </div>
 
@@ -588,6 +589,118 @@
             testEdgeCases();
             testChordDataCompleteness();
             updateSummary();
+        }
+
+        function showAllChordVariations() {
+            clearResults();
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>🎵 All Accepted Chord Variations</h2>';
+            
+            // Test all variations for each chord type
+            const chordVariations = {
+                'Major Triads': [
+                    { input: 'C', expected: 'C', description: 'Basic major' },
+                    { input: 'C MAJOR', expected: 'C', description: 'Major with text' },
+                    { input: 'C MAJ', expected: 'C', description: 'Maj abbreviation' }
+                ],
+                'Minor Triads': [
+                    { input: 'Cm', expected: 'Cm', description: 'Basic minor' },
+                    { input: 'C MINOR', expected: 'Cm', description: 'Minor with text' },
+                    { input: 'C MIN', expected: 'Cm', description: 'Min abbreviation' },
+                    { input: 'C-', expected: 'Cm', description: 'Dash notation' }
+                ],
+                'Dominant 7th': [
+                    { input: 'C7', expected: 'C7', description: 'Basic dominant 7th' }
+                ],
+                'Major 7th': [
+                    { input: 'Cmaj7', expected: 'Cmaj7', description: 'Basic major 7th' },
+                    { input: 'C MAJ7', expected: 'Cmaj7', description: 'MAJ7 text' },
+                    { input: 'CM7', expected: 'Cmaj7', description: 'M7 notation' },
+                    { input: 'C∆', expected: 'Cmaj7', description: 'Delta symbol (U+2206)' },
+                    { input: 'CΔ', expected: 'Cmaj7', description: 'Delta symbol (U+0394)' },
+                    { input: 'C∆7', expected: 'Cmaj7', description: 'Delta with 7' },
+                    { input: 'CΔ7', expected: 'Cmaj7', description: 'Delta with 7' }
+                ],
+                'Minor 7th': [
+                    { input: 'Cm7', expected: 'Cm7', description: 'Basic minor 7th' },
+                    { input: 'C MIN7', expected: 'Cm7', description: 'MIN7 text' },
+                    { input: 'C MINOR7', expected: 'Cm7', description: 'MINOR7 text' },
+                    { input: 'C-7', expected: 'Cm7', description: 'Dash with 7' },
+                    { input: 'Cminor7', expected: 'Cm7', description: 'minor7 (no space)' },
+                    { input: 'Cmin7', expected: 'Cm7', description: 'min7 (no space)' }
+                ],
+                'Half-Diminished 7th': [
+                    { input: 'Cm7b5', expected: 'Cm7♭5', description: 'Basic half-diminished' },
+                    { input: 'Cm7b5', expected: 'Cm7♭5', description: 'Lowercase m7b5' },
+                    { input: 'C HALFDIMINISHED', expected: 'Cm7♭5', description: 'Half-diminished text' },
+                    { input: 'C HALFDIM', expected: 'Cm7♭5', description: 'Half-dim abbreviation' },
+                    { input: 'C HALF DIM', expected: 'Cm7♭5', description: 'Half dim with space' },
+                    { input: 'C HALF-DIMINISHED', expected: 'Cm7♭5', description: 'Half-diminished with hyphen' },
+                    { input: 'C HALF-DIM', expected: 'Cm7♭5', description: 'Half-dim with hyphen' },
+                    { input: 'CØ', expected: 'Cm7♭5', description: 'Ø symbol' },
+                    { input: 'CØ7', expected: 'Cm7♭5', description: 'Ø7 symbol' },
+                    { input: 'E half dim', expected: 'Em7♭5', description: 'E half dim (with spaces)' },
+                    { input: 'E halfdim', expected: 'Em7♭5', description: 'E halfdim (no space)' },
+                    { input: 'E HALFDIM', expected: 'Em7♭5', description: 'E HALFDIM (uppercase)' }
+                ],
+                'Diminished Triads': [
+                    { input: 'Cdim', expected: 'C˚', description: 'Basic diminished' },
+                    { input: 'C DIMINISHED', expected: 'C˚', description: 'Diminished text' },
+                    { input: 'C DIM', expected: 'C˚', description: 'Dim abbreviation' }
+                ],
+                'With Accidentals': [
+                    { input: 'Db', expected: 'D♭', description: 'Flat with b' },
+                    { input: 'D♭', expected: 'D♭', description: 'Unicode flat' },
+                    { input: 'F#', expected: 'F♯', description: 'Sharp with #' },
+                    { input: 'F♯', expected: 'F♯', description: 'Unicode sharp' },
+                    { input: 'Db7', expected: 'D♭7', description: 'Flat dominant 7th' },
+                    { input: 'F#m7', expected: 'F♯m7', description: 'Sharp minor 7th' },
+                    { input: 'Abmaj7', expected: 'A♭maj7', description: 'Flat major 7th' },
+                    { input: 'Ab∆', expected: 'A♭maj7', description: 'Flat with delta' }
+                ]
+            };
+            
+            let totalTests = 0;
+            let passedTests = 0;
+            
+            Object.entries(chordVariations).forEach(([category, tests]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'test-section';
+                categoryDiv.innerHTML = `<h3>${category}</h3>`;
+                
+                tests.forEach(test => {
+                    totalTests++;
+                    const result = normalizeChord(test.input);
+                    const passed = result === test.expected;
+                    if (passed) passedTests++;
+                    
+                    const testDiv = document.createElement('div');
+                    testDiv.className = `chord-test ${passed ? 'pass' : 'fail'}`;
+                    testDiv.innerHTML = `
+                        <strong>${test.description}</strong><br>
+                        Input: <span class="chord-input">${test.input}</span><br>
+                        Expected: <span class="chord-output">${test.expected}</span><br>
+                        Actual: <span class="chord-output">${result}</span><br>
+                        Status: ${passed ? '✅ PASS' : '❌ FAIL'}
+                    `;
+                    categoryDiv.appendChild(testDiv);
+                });
+                
+                resultsDiv.appendChild(categoryDiv);
+            });
+            
+            // Add summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'summary';
+            summaryDiv.innerHTML = `
+                <h3>Chord Variations Summary</h3>
+                <p><strong>Total Tests:</strong> ${totalTests}</p>
+                <p><strong>Passed:</strong> ${passedTests} ✅</p>
+                <p><strong>Failed:</strong> ${totalTests - passedTests} ❌</p>
+                <p><strong>Success Rate:</strong> ${Math.round((passedTests / totalTests) * 100)}%</p>
+            `;
+            resultsDiv.appendChild(summaryDiv);
         }
 
         // Auto-run tests on page load

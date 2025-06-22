@@ -211,18 +211,20 @@ function normalizeChord(raw) {
   // Handle chord types in order of specificity
   
   // Half-diminished (m7b5) variations - handle before other patterns
-  if (upperNormalized.endsWith('M7B5')) {
+  if (normalized.endsWith('m7b5') || upperNormalized.endsWith('M7B5')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}m7♭5`;
   }
   
   // Half-diminished text variations
-  if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM')) {
+  if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM') || 
+      upperNormalized.includes('HALF DIM') || upperNormalized.includes('HALF-DIMINISHED') ||
+      upperNormalized.includes('HALF-DIM')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}m7♭5`;
   }
   
-  // Half-diminished symbol
+  // Half-diminished symbol (including Ø7)
   if (upperNormalized.includes('Ø')) {
       const baseNote = getBaseNoteWithAccidentals(normalized);
       return `${baseNote}m7♭5`;
