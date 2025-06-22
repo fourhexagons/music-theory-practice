@@ -184,125 +184,90 @@ function normalizeChord(raw) {
     return rootNote;
   }
 
-  // Universal cleanup - remove spaces first
-  normalized = normalized.replace(/\s+/g, ""); // Remove all spaces
+  // Remove all spaces for normalization
+  normalized = normalized.replace(/\s+/g, "");
 
-  // First, validate that the input starts with a valid note letter (A-G)
+  // Validate that the input starts with a valid note letter (A-G)
   if (!/^[A-Ga-g]/.test(normalized)) {
-    return ""; // Reject invalid chords that don't start with A-G
-  }
-
-  // First, normalize the note names (handle accidentals) BEFORE case conversion
-  // Extract the base note (first character) and any accidentals
-  const noteMatch = normalized.match(/^([A-Ga-g])([#♯b♭]*)(.*)$/);
-  if (noteMatch) {
-    const [, baseNote, accidentals, rest] = noteMatch;
-    const normalizedNote = accidentalToUnicode(baseNote + accidentals);
-    normalized = normalizedNote + rest;
-  } else {
-    // If we can't match a valid note pattern, reject it
     return "";
   }
 
-  // Now do case-insensitive matching for the rest, but preserve the structure
-  // Normalize to NFC to ensure Unicode symbols (like delta) are matched consistently
-  normalized = normalized.normalize('NFC');
-  const upperNormalized = normalized.toUpperCase();
+  // Normalize the note names (handle accidentals) BEFORE case conversion
+  const noteMatch = normalized.match(/^([A-Ga-g])([#♯b♭]*)(.*)$/);
+  if (!noteMatch) return "";
+  const [, baseNote, accidentals, rest] = noteMatch;
+  const normalizedNote = accidentalToUnicode(baseNote + accidentals);
+  let chordPart = rest;
 
-  // Helper function to extract base note with accidentals
-  function getBaseNoteWithAccidentals(str) {
-    // Match a note letter followed by any number of accidentals (♯, ♭, 𝄪, 𝄫, #, b)
-    const match = str.match(/^([A-G][#b♯♭𝄪𝄫]*)/);
-    return match ? match[1] : str.substring(0, 1);
-  }
+  // Apply multi-token rules FIRST (before single-token rules)
+  const multiTokenRules = [
+    { pattern: /^(major|maj|M)[\s\-]?7$/i, replacement: 'maj7' },
+    { pattern: /^(minor|min|m)[\s\-]?7$/i, replacement: 'm7' },
+    { pattern: /^(dominant|dom)[\s\-]?7$/i, replacement: '7' },
+    { pattern: /^(half[\s\-]?dim|halfdiminished|ø)[\s\-]?7$/i, replacement: 'm7♭5' },
+    { pattern: /^(dim|diminished|o|°|˚)[\s\-]?7$/i, replacement: '˚7' },
+    { pattern: /^(aug|augmented|\+)[\s\-]?7$/i, replacement: '+7' },
+  ];
 
-  // Handle chord types in order of specificity
-  
-  // Half-diminished (m7b5) variations - handle before other patterns
-  if (normalized.endsWith('m7b5') || upperNormalized.endsWith('M7B5')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}m7♭5`;
-  }
-  
-  // Half-diminished text variations (including "flat5")
-  if (upperNormalized.includes('HALFDIMINISHED') || upperNormalized.includes('HALFDIM') || 
-      upperNormalized.includes('HALF DIM') || upperNormalized.includes('HALF-DIMINISHED') ||
-      upperNormalized.includes('HALF-DIM') || upperNormalized.includes('-HALFDIMINISHED') ||
-      upperNormalized.includes('-HALFDIM') || normalized.includes('halfdiminished') ||
-      normalized.includes('halfdim') || upperNormalized.includes('FLAT5') ||
-      normalized.includes('flat5')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}m7♭5`;
-  }
-  
-  // Half-diminished symbol (including Ø7)
-  if (upperNormalized.includes('Ø')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}m7♭5`;
+  let matched = false;
+  for (const rule of multiTokenRules) {
+    if (rule.pattern.test(chordPart)) {
+      chordPart = rule.replacement;
+      matched = true;
+      break;
+    }
   }
 
-  // Dominant 7th variations (handle before other 7th patterns)
-  if (upperNormalized.includes('DOMINANT') || upperNormalized.includes('DOM') ||
-      upperNormalized.includes('DOMINANT7') || upperNormalized.includes('DOM7') ||
-      upperNormalized.includes('DOMINANT 7') || upperNormalized.includes('DOM 7')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}7`;
+  // If no multi-token match, apply single-token rules
+  if (!matched) {
+    const singleTokenRules = [
+      // Half-diminished (m7b5, half dim, etc.)
+      { pattern: /^(halfdiminished|half\-?dim|ø|m7b5|min7b5|minor7b5|m7flat5|min7flat5|minor7flat5|m7♭5|min7♭5|minor7♭5|half\-?diminished|half\s*dim|half\s*diminished|half\s*dim7|half\-?dim7|half\s*diminished7|half\-?diminished7|flat5|b5)$/i, replacement: 'm7♭5' },
+      // Major 7th (maj7, M7, major7, etc.)
+      { pattern: /^(major7|maj7|ma7|M7|Δ|∆)$/i, replacement: 'maj7' },
+      // Minor 7th (min7, m7, minor7, etc.)
+      { pattern: /^(minor7|min7|m7)$/i, replacement: 'm7' },
+      // Dominant 7th (dominant7, dom7, dominant, dom)
+      { pattern: /^(dominant7|dom7|dominant|dom)$/i, replacement: '7' },
+      // Diminished (dim, diminished, o, °)
+      { pattern: /^(diminished|dim|o|°|˚)$/i, replacement: '˚' },
+      // Minor (min, m, -)
+      { pattern: /^(minor|min|m|\-)$/i, replacement: 'm' },
+      // Major (major, maj)
+      { pattern: /^(major|maj)$/i, replacement: '' },
+      // Augmented (aug, +)
+      { pattern: /^(augmented|aug|\+)$/i, replacement: '+' },
+      // 7th (7)
+      { pattern: /^7$/, replacement: '7' },
+    ];
+
+    for (const rule of singleTokenRules) {
+      if (rule.pattern.test(chordPart)) {
+        chordPart = rule.replacement;
+        matched = true;
+        break;
+      }
+    }
   }
 
-  // Minor 7th variations (handle BEFORE major 7th to avoid conflicts)
-  // Check for lowercase 'm7' pattern first (before uppercase conversion)
-  if (normalized.endsWith('m7') || upperNormalized.includes('MIN7') || upperNormalized.includes('MINOR7') || 
-      upperNormalized.includes('-7') || upperNormalized.includes('-MIN7') || upperNormalized.includes('-MINOR7') ||
-      normalized.includes('minor7') || normalized.includes('min7')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}m7`;
+  // If no match, check for simple cases
+  if (!matched) {
+    // If the rest is empty, just return the note
+    if (!chordPart) return normalizedNote;
+    // If the rest is 'm', return minor
+    if (chordPart === 'm') return normalizedNote + 'm';
+    // If the rest is '7', return dominant 7
+    if (chordPart === '7') return normalizedNote + '7';
+    // If the rest is '+', return augmented
+    if (chordPart === '+') return normalizedNote + '+';
+    // If the rest is '˚', return diminished
+    if (chordPart === '˚') return normalizedNote + '˚';
+    // Otherwise, return normalizedNote + chordPart (as fallback)
+    return normalizedNote + chordPart;
   }
 
-  // Major 7th variations (handle after minor 7th)
-  if (upperNormalized.includes('MAJ7') || 
-      (upperNormalized.includes('M7') && !normalized.endsWith('m7')) || 
-      upperNormalized.includes('Δ') || upperNormalized.includes('∆') ||
-      upperNormalized.includes('MAJOR7') || upperNormalized.includes('MAJ7') ||
-      normalized.includes('major7') || normalized.includes('maj7')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}maj7`;
-  }
-
-  // Diminished variations
-  if (upperNormalized.includes('DIMINISHED') || upperNormalized.includes('DIM') ||
-      upperNormalized.includes('-DIMINISHED') || upperNormalized.includes('-DIM') ||
-      normalized.includes('diminished') || normalized.includes('dim')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}˚`;
-  }
-
-  // Minor variations (handle before major)
-  if (upperNormalized.includes('MINOR') || upperNormalized.includes('MIN') || 
-      upperNormalized.includes('-')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}m`;
-  }
-
-  // Major variations (explicit)
-  if (upperNormalized.includes('MAJOR') || upperNormalized.includes('MAJ')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return baseNote;
-  }
-
-  // Handle simple chord symbols
-  if (upperNormalized.endsWith('7')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}7`;
-  }
-
-  // Handle minor chord with 'm' (lowercase m)
-  if (normalized.endsWith('m')) {
-      const baseNote = getBaseNoteWithAccidentals(normalized);
-      return `${baseNote}m`;
-  }
-
-  // If no specific pattern matches, return the normalized note
-  return normalized;
+  // Return normalized chord
+  return normalizedNote + chordPart;
 }
 
 function accidentalToUnicode(s) {
@@ -312,7 +277,7 @@ function accidentalToUnicode(s) {
   if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
   if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
   if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
-  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
+  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '#';
   return s.toUpperCase().normalize('NFC');
 }
 
@@ -589,7 +554,7 @@ function handleAnswerSubmit(e) {
             // Check if we've completed all keys in this level
             if (learningState.currentKeyIndex >= level.keys.length) {
               advanceLevel();
-            } else {
+  } else {
               // Reset to first chapter for the new key
               learningState.currentChapterIndex = 0;
             }
