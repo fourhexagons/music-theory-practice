@@ -128,6 +128,7 @@ body {
 
 .status-active { background-color: #d4edda; color: #155724; }
 .status-debug { background-color: #fff3cd; color: #856404; }
+.status-dev { background-color: #e2e3e5; color: #383d41; }
 .status-deprecated { background-color: #f8d7da; color: #721c24; }
 
 /* --- Test Page Specifics --- */

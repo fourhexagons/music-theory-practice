@@ -16,33 +16,35 @@
         <a href="../index.html" class="back-link">← Back to Main App</a>
         
         <div class="test-category">
-            <h2>🎯 Core Functionality Tests</h2>
+            <h2>🎯 Core Application Tests</h2>
+            <p>Essential functionality that must work for the app to function</p>
             <div class="test-grid">
                 <div class="test-card">
                     <h3>Learning Path Progression</h3>
-                    <p>Simulates the complete learning path to verify progression logic, level advancement, and question cycling through all degrees.</p>
+                    <p>Simulates complete learning path to verify progression logic, level advancement, and question cycling.</p>
                     <a href="test_learning_path.html" class="test-link">Run Test</a>
                     <span class="test-status status-active">Active</span>
                 </div>
                 
                 <div class="test-card">
-                    <h3>Chord Normalization</h3>
-                    <p>Tests the chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
-                    <a href="test_chords.html" class="test-link">Run Test</a>
+                    <h3>Core Application Logic</h3>
+                    <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
+                    <a href="test_app_logic.html" class="test-link">Run Test</a>
                     <span class="test-status status-active">Active</span>
                 </div>
                 
                 <div class="test-card">
-                    <h3>Chord Input Validation</h3>
-                    <p>Tests chord input validation and error handling for various user inputs and edge cases.</p>
-                    <a href="test_chord_inputs.html" class="test-link">Run Test</a>
+                    <h3>Chord Normalization</h3>
+                    <p>Tests chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
+                    <a href="test_chords.html" class="test-link">Run Test</a>
                     <span class="test-status status-active">Active</span>
                 </div>
             </div>
         </div>
         
         <div class="test-category">
-            <h2>🎵 Music Theory Tests</h2>
+            <h2>🎵 Music Theory Validation</h2>
+            <p>Domain-specific tests for music theory accuracy and data integrity</p>
             <div class="test-grid">
                 <div class="test-card">
                     <h3>Seventh Chords</h3>
@@ -52,8 +54,8 @@
                 </div>
                 
                 <div class="test-card">
-                    <h3>Validation Errors</h3>
-                    <p>Tests error handling and validation feedback for incorrect chord inputs and edge cases.</p>
+                    <h3>Validation & Edge Cases</h3>
+                    <p>Comprehensive validation suite testing error handling, edge cases, and user input scenarios (56 tests).</p>
                     <a href="test_validation_errors.html" class="test-link">Run Test</a>
                     <span class="test-status status-active">Active</span>
                 </div>
@@ -61,67 +63,41 @@
         </div>
         
         <div class="test-category">
-            <h2>🔧 Debug & Development</h2>
+            <h2>🔍 Data & Integrity Tests</h2>
+            <p>Ensures data quality, consistency, and system reliability</p>
             <div class="test-grid">
                 <div class="test-card">
-                    <h3>🔧 Debug Normalization</h3>
-                    <p>Interactive testing of the chord normalization function with live input/output.</p>
-                    <a href="debug_normalization.html" class="btn">Run Tests</a>
+                    <h3>Data Integrity</h3>
+                    <p>Tests for quiz data completeness, consistency, and relationship validation across all keys and degrees.</p>
+                    <a href="test_data_integrity.html" class="test-link">Run Test</a>
+                    <span class="test-status status-active">Active</span>
                 </div>
                 
                 <div class="test-card">
-                    <h3>🎵 Chord Normalization</h3>
-                    <p>Comprehensive tests for chord symbol normalization and conversion.</p>
-                    <a href="test_chords.html" class="btn">Run Tests</a>
+                    <h3>Error Handling</h3>
+                    <p>Tests for invalid input handling, data corruption recovery, and edge cases to ensure system robustness.</p>
+                    <a href="test_error_handling.html" class="test-link">Run Test</a>
+                    <span class="test-status status-active">Active</span>
                 </div>
-                
+            </div>
+        </div>
+        
+        <div class="test-category">
+            <h2>🛠️ Development Tools</h2>
+            <p>Interactive debugging and development aids</p>
+            <div class="test-grid">
                 <div class="test-card">
-                    <h3>⌨️ Chord Input Tests</h3>
-                    <p>Tests for various chord input formats and edge cases.</p>
-                    <a href="test_chord_inputs.html" class="btn">Run Tests</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>🎼 Seventh Chord Tests</h3>
-                    <p>Validation of seventh chord data structure and spellings.</p>
-                    <a href="test_sevenths.html" class="btn">Run Tests</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>🎯 Learning Path Test</h3>
-                    <p>Simulation of complete learning path progression.</p>
-                    <a href="test_learning_path.html" class="btn">Run Tests</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>✅ Validation Error Tests</h3>
-                    <p>Comprehensive validation and edge case testing (56 tests).</p>
-                    <a href="test_validation_errors.html" class="btn">Run Tests</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>🧠 Core Application Logic</h3>
-                    <p>Tests for state management, question generation, and learning progression.</p>
-                    <a href="test_app_logic.html" class="btn">Run Tests</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>🔍 Data Integrity Tests</h3>
-                    <p>Tests for quiz data completeness, consistency, and relationship validation.</p>
-                    <a href="test_data_integrity.html" class="btn">Run Tests</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>🛡️ Error Handling Tests</h3>
-                    <p>Tests for invalid input handling, data corruption recovery, and edge cases.</p>
-                    <a href="test_error_handling.html" class="btn">Run Tests</a>
+                    <h3>Debug Normalization</h3>
+                    <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
+                    <a href="debug_normalization.html" class="test-link">Open Tool</a>
+                    <span class="test-status status-dev">Development</span>
                 </div>
             </div>
         </div>
         
         <div class="footer">
-            <p>Test files are organized in the <code>tests/</code> directory for easy maintenance and development.</p>
-            <p>Last updated: <span id="last-updated"></span></p>
+            <p><strong>Test Coverage:</strong> 8 test suites covering core functionality, music theory validation, data integrity, and development tools.</p>
+            <p><strong>Last updated:</strong> <span id="last-updated"></span></p>
         </div>
     </div>
     
