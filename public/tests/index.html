@@ -58,21 +58,30 @@
                 <div class="test-card">
                     <h3>Learning Path Progression</h3>
                     <p>Simulates complete learning path to verify progression logic, level advancement, and question cycling.</p>
-                    <a href="test_learning_path.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_learning_path.html" class="test-link">Run Test</a>
+                        <span id="status-learning-path" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Core Application Logic</h3>
                     <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
-                    <a href="test_app_logic.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_app_logic.html" class="test-link">Run Test</a>
+                        <span id="status-app-logic" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Chord Normalization</h3>
                     <p>Tests chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
-                    <a href="test_chords.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_chords.html" class="test-link">Run Test</a>
+                        <span id="status-chords" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
@@ -85,14 +94,20 @@
                 <div class="test-card">
                     <h3>Seventh Chords</h3>
                     <p>Tests seventh chord identification, spelling, and validation across different keys and chord types.</p>
-                    <a href="test_sevenths.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_sevenths.html" class="test-link">Run Test</a>
+                        <span id="status-sevenths" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Validation & Edge Cases</h3>
                     <p>Comprehensive validation suite testing error handling, edge cases, and user input scenarios (56 tests).</p>
-                    <a href="test_validation_errors.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_validation_errors.html" class="test-link">Run Test</a>
+                        <span id="status-validation-errors" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
@@ -105,14 +120,20 @@
                 <div class="test-card">
                     <h3>Data Integrity</h3>
                     <p>Tests for quiz data completeness, consistency, and relationship validation across all keys and degrees.</p>
-                    <a href="test_data_integrity.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_data_integrity.html" class="test-link">Run Test</a>
+                        <span id="status-data-integrity" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Error Handling</h3>
                     <p>Tests for invalid input handling, data corruption recovery, and edge cases to ensure system robustness.</p>
-                    <a href="test_error_handling.html" class="test-link">Run Test</a>
+                    <div class="test-actions">
+                        <a href="test_error_handling.html" class="test-link">Run Test</a>
+                        <span id="status-error-handling" class="status-icon" title="Test status"></span>
+                    </div>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
@@ -125,7 +146,10 @@
                 <div class="test-card">
                     <h3>Debug Normalization</h3>
                     <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
-                    <a href="debug_normalization.html" class="test-link">Open Tool</a>
+                    <div class="test-actions">
+                        <a href="debug_normalization.html" class="test-link">Open Tool</a>
+                        <span id="status-debug-normalization" class="status-icon" title="Tool status"></span>
+                    </div>
                     <span class="test-status status-dev">Development Tool</span>
                 </div>
             </div>
@@ -245,6 +269,45 @@
             } else {
                 document.getElementById('last-updated-status').textContent = 'No tests run yet';
             }
+            
+            // Update simple status icons
+            updateSimpleStatusIcons(testHistory);
+        }
+
+        function updateSimpleStatusIcons(testHistory) {
+            const statusMap = {
+                'test_learning_path.html': 'status-learning-path',
+                'test_app_logic.html': 'status-app-logic',
+                'test_chords.html': 'status-chords',
+                'test_sevenths.html': 'status-sevenths',
+                'test_validation_errors.html': 'status-validation-errors',
+                'test_data_integrity.html': 'status-data-integrity',
+                'test_error_handling.html': 'status-error-handling',
+                'debug_normalization.html': 'status-debug-normalization'
+            };
+            
+            Object.entries(statusMap).forEach(([testFile, elementId]) => {
+                const iconElement = document.getElementById(elementId);
+                if (iconElement) {
+                    const result = testHistory[testFile];
+                    let status = 'not-run';
+                    
+                    if (result) {
+                        status = result.failed === 0 ? 'passed' : 'failed';
+                    }
+                    
+                    // Remove existing classes and add new one
+                    iconElement.className = 'status-icon ' + status;
+                    
+                    // Update tooltip
+                    if (result) {
+                        const passRate = result.total > 0 ? Math.round((result.passed / result.total) * 100) : 0;
+                        iconElement.title = `${result.passed}/${result.total} passed (${passRate}%) - ${result.lastRun}`;
+                    } else {
+                        iconElement.title = 'Not run yet';
+                    }
+                }
+            });
         }
 
         function createStatusCard(testFile, testInfo, result) {

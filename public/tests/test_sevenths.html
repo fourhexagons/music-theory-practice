@@ -137,6 +137,16 @@
                 <p><strong>Success Rate:</strong> ${successRate}%</p>
             `;
 
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_sevenths.html', {
+                    total: stats.total,
+                    passed: stats.passed,
+                    failed: stats.failed,
+                    successRate: successRate
+                });
+            }
+
             // Display detailed results
             container.innerHTML = ''; // Clear previous results
             testData.results.forEach(keyResult => {
