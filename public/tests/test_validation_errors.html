@@ -150,6 +150,16 @@
                 <p><strong>Success Rate:</strong> ${successRate}%</p>
             `;
             document.getElementById('summary').style.display = 'block';
+            
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_validation_errors.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: successRate
+                });
+            }
         }
 
         function testSymbolMismatches() {

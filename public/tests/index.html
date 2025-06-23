@@ -15,6 +15,42 @@
         
         <a href="../index.html" class="back-link">← Back to Main App</a>
         
+        <!-- Test Status Dashboard -->
+        <div class="test-category">
+            <h2>📊 Test Status Dashboard</h2>
+            <p>Overview of last test run results across all test suites</p>
+            <div id="test-dashboard" class="dashboard-container">
+                <div class="dashboard-summary">
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="total-tests">-</span>
+                            <span class="stat-label">Total Tests</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="passed-tests">-</span>
+                            <span class="stat-label">Passed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="failed-tests">-</span>
+                            <span class="stat-label">Failed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="success-rate">-</span>
+                            <span class="stat-label">Success Rate</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-actions">
+                        <button onclick="runAllTests()" class="btn">Run All Tests</button>
+                        <button onclick="clearTestHistory()" class="btn btn-secondary">Clear History</button>
+                        <span id="last-updated-status" class="last-updated"></span>
+                    </div>
+                </div>
+                <div id="test-status-grid" class="test-status-grid">
+                    <!-- Test status cards will be populated here -->
+                </div>
+            </div>
+        </div>
+        
         <div class="test-category">
             <h2>🎯 Core Application Tests</h2>
             <p>Essential functionality that must work for the app to function</p>
@@ -23,21 +59,21 @@
                     <h3>Learning Path Progression</h3>
                     <p>Simulates complete learning path to verify progression logic, level advancement, and question cycling.</p>
                     <a href="test_learning_path.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Core Application Logic</h3>
                     <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
                     <a href="test_app_logic.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Chord Normalization</h3>
                     <p>Tests chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
                     <a href="test_chords.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
         </div>
@@ -50,14 +86,14 @@
                     <h3>Seventh Chords</h3>
                     <p>Tests seventh chord identification, spelling, and validation across different keys and chord types.</p>
                     <a href="test_sevenths.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Validation & Edge Cases</h3>
                     <p>Comprehensive validation suite testing error handling, edge cases, and user input scenarios (56 tests).</p>
                     <a href="test_validation_errors.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
         </div>
@@ -70,14 +106,14 @@
                     <h3>Data Integrity</h3>
                     <p>Tests for quiz data completeness, consistency, and relationship validation across all keys and degrees.</p>
                     <a href="test_data_integrity.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Error Handling</h3>
                     <p>Tests for invalid input handling, data corruption recovery, and edge cases to ensure system robustness.</p>
                     <a href="test_error_handling.html" class="test-link">Run Test</a>
-                    <span class="test-status status-active">Active</span>
+                    <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
         </div>
@@ -90,7 +126,7 @@
                     <h3>Debug Normalization</h3>
                     <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
                     <a href="debug_normalization.html" class="test-link">Open Tool</a>
-                    <span class="test-status status-dev">Development</span>
+                    <span class="test-status status-dev">Development Tool</span>
                 </div>
             </div>
         </div>
@@ -102,15 +138,165 @@
     </div>
     
     <script>
-        // Set last updated date
-        document.getElementById('last-updated').textContent = new Date().toLocaleDateString();
-        
-        // Add click tracking for analytics (optional)
-        document.querySelectorAll('.test-link').forEach(link => {
-            link.addEventListener('click', function() {
-                console.log('Test accessed:', this.href);
+        // Test Status Dashboard System
+        const TEST_SUITES = {
+            'test_learning_path.html': {
+                name: 'Learning Path Progression',
+                category: 'Core Application',
+                description: 'Simulates complete learning path progression'
+            },
+            'test_app_logic.html': {
+                name: 'Core Application Logic',
+                category: 'Core Application',
+                description: 'Tests state management and core logic'
+            },
+            'test_chords.html': {
+                name: 'Chord Normalization',
+                category: 'Core Application',
+                description: 'Tests chord normalization logic'
+            },
+            'test_sevenths.html': {
+                name: 'Seventh Chords',
+                category: 'Music Theory',
+                description: 'Tests seventh chord validation'
+            },
+            'test_validation_errors.html': {
+                name: 'Validation & Edge Cases',
+                category: 'Music Theory',
+                description: 'Comprehensive validation suite'
+            },
+            'test_data_integrity.html': {
+                name: 'Data Integrity',
+                category: 'Data & Integrity',
+                description: 'Tests data completeness and consistency'
+            },
+            'test_error_handling.html': {
+                name: 'Error Handling',
+                category: 'Data & Integrity',
+                description: 'Tests error handling and edge cases'
+            },
+            'debug_normalization.html': {
+                name: 'Debug Normalization',
+                category: 'Development Tools',
+                description: 'Interactive debugging tool'
+            }
+        };
+
+        // Test result storage
+        function saveTestResult(testFile, result) {
+            const testHistory = JSON.parse(localStorage.getItem('testHistory') || '{}');
+            testHistory[testFile] = {
+                ...result,
+                timestamp: new Date().toISOString(),
+                lastRun: new Date().toLocaleString()
+            };
+            localStorage.setItem('testHistory', JSON.stringify(testHistory));
+            updateDashboard();
+        }
+
+        function getTestResults() {
+            return JSON.parse(localStorage.getItem('testHistory') || '{}');
+        }
+
+        function clearTestHistory() {
+            localStorage.removeItem('testHistory');
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const testHistory = getTestResults();
+            const statusGrid = document.getElementById('test-status-grid');
+            
+            // Clear existing status cards
+            statusGrid.innerHTML = '';
+            
+            let totalTests = 0;
+            let totalPassed = 0;
+            let totalFailed = 0;
+            
+            // Create status cards for each test suite
+            Object.entries(TEST_SUITES).forEach(([testFile, testInfo]) => {
+                const result = testHistory[testFile];
+                const statusCard = createStatusCard(testFile, testInfo, result);
+                statusGrid.appendChild(statusCard);
+                
+                if (result) {
+                    totalTests += result.total || 0;
+                    totalPassed += result.passed || 0;
+                    totalFailed += result.failed || 0;
+                }
+            });
+            
+            // Update summary stats
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = totalPassed;
+            document.getElementById('failed-tests').textContent = totalFailed;
+            document.getElementById('success-rate').textContent = 
+                totalTests > 0 ? `${Math.round((totalPassed / totalTests) * 100)}%` : '-';
+            
+            // Update last updated timestamp
+            const lastUpdated = Object.values(testHistory)
+                .map(r => new Date(r.timestamp))
+                .sort((a, b) => b - a)[0];
+            
+            if (lastUpdated) {
+                document.getElementById('last-updated-status').textContent = 
+                    `Last updated: ${lastUpdated.toLocaleString()}`;
+            } else {
+                document.getElementById('last-updated-status').textContent = 'No tests run yet';
+            }
+        }
+
+        function createStatusCard(testFile, testInfo, result) {
+            const card = document.createElement('div');
+            card.className = 'test-status-card';
+            
+            const status = result ? (result.failed === 0 ? 'passed' : 'failed') : 'not-run';
+            const statusText = result ? `${result.passed}/${result.total} passed` : 'Not run';
+            const lastRun = result ? result.lastRun : 'Never';
+            
+            card.innerHTML = `
+                <div class="status-indicator ${status}"></div>
+                <h4>${testInfo.name}</h4>
+                <div class="test-stats">${statusText}</div>
+                <div class="last-run">Last run: ${lastRun}</div>
+            `;
+            
+            // Add click handler to run the test
+            card.addEventListener('click', () => {
+                window.open(testFile, '_blank');
+            });
+            card.style.cursor = 'pointer';
+            
+            return card;
+        }
+
+        // Function to run all tests (placeholder - would need to be implemented)
+        function runAllTests() {
+            alert('Running all tests would require implementing automated test execution. For now, please run tests individually.');
+        }
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboard();
+            
+            // Set last updated date for footer
+            document.getElementById('last-updated').textContent = new Date().toLocaleDateString();
+            
+            // Add click tracking for analytics (optional)
+            document.querySelectorAll('.test-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    console.log('Test accessed:', this.href);
+                });
             });
         });
+
+        // Expose functions for test pages to call
+        window.TestDashboard = {
+            saveTestResult,
+            getTestResults,
+            updateDashboard
+        };
     </script>
 </body>
 </html> 

@@ -127,6 +127,7 @@ body {
 }
 
 .status-active { background-color: #d4edda; color: #155724; }
+.status-production { background-color: #d1ecf1; color: #0c5460; }
 .status-debug { background-color: #fff3cd; color: #856404; }
 .status-dev { background-color: #e2e3e5; color: #383d41; }
 .status-deprecated { background-color: #f8d7da; color: #721c24; }
@@ -220,4 +221,131 @@ pre {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+}
+
+/* --- Test Status Dashboard --- */
+.dashboard-container {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.summary-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    min-width: 80px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.last-updated {
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+}
+
+.test-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.test-status-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    position: relative;
+}
+
+.test-status-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.test-status-card .status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-indicator.passed { background-color: #28a745; }
+.status-indicator.failed { background-color: #dc3545; }
+.status-indicator.not-run { background-color: #6c757d; }
+
+.test-status-card .test-stats {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.test-status-card .last-run {
+    font-size: 0.8em;
+    color: #999;
+    font-style: italic;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+@media (max-width: 768px) {
+    .dashboard-summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .summary-stats {
+        justify-content: center;
+    }
+    
+    .dashboard-actions {
+        justify-content: center;
+    }
+    
+    .test-status-grid {
+        grid-template-columns: 1fr;
+    }
 } 

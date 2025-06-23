@@ -195,6 +195,16 @@
             }
 
             summaryDiv.style.display = 'block';
+            
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_chords.html', {
+                    total: testResults.total,
+                    passed: testResults.passed,
+                    failed: testResults.failed,
+                    errors: testResults.errors
+                });
+            }
         }
 
         function accidentalToUnicode(input) {
