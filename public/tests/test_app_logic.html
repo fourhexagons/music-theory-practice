@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Application Logic Tests</title>
+    <link rel="stylesheet" href="css/test-suite.css">
+    <style>
+        .test-result {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .test-result.pass {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .test-result.fail {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .test-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .status {
+            font-weight: bold;
+        }
+        
+        .test-details {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>🧠 Core Application Logic Tests</h1>
+            <p>Tests for state management, question generation, answer validation, and learning progression.</p>
+        </div>
+        
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="runAllTests()">Run All Tests</button>
+                <button class="btn" onclick="runStateTests()">State Management Only</button>
+                <button class="btn" onclick="runQuestionTests()">Question Generation Only</button>
+                <button class="btn" onclick="runValidationTests()">Answer Validation Only</button>
+                <button class="btn" onclick="runProgressionTests()">Learning Progression Only</button>
+                <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
+            </div>
+            
+            <div id="copy-status" class="status-area"></div>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/normalization.js"></script>
+    <script src="../js/utils/helpers.js"></script>
+    <script src="../js/utils/errorHandler.js"></script>
+    <script src="../js/main.js"></script>
+    
+    <script>
+        let testResults = [];
+        
+        function addResult(name, passed, expected, actual, category, details = '') {
+            const result = {
+                name,
+                passed,
+                expected,
+                actual,
+                category,
+                details
+            };
+            testResults.push(result);
+        }
+        
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            const failed = testResults.filter(r => !r.passed);
+            const passed = testResults.filter(r => r.passed);
+            
+            if (failed.length > 0) {
+                const failHeader = document.createElement('h2');
+                failHeader.textContent = '❌ Failing Tests';
+                failHeader.style.color = '#dc3545';
+                resultsDiv.appendChild(failHeader);
+                
+                const failContainer = document.createElement('div');
+                failContainer.className = 'test-columns';
+                failed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result fail';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">❌ FAIL</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                        ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                    `;
+                    failContainer.appendChild(resultDiv);
+                });
+                resultsDiv.appendChild(failContainer);
+            }
+            
+            if (passed.length > 0) {
+                const passHeader = document.createElement('h2');
+                passHeader.textContent = '✅ Passing Tests';
+                passHeader.style.color = '#28a745';
+                passHeader.style.marginTop = '2rem';
+                resultsDiv.appendChild(passHeader);
+                
+                const passContainer = document.createElement('div');
+                passContainer.className = 'test-columns';
+                passed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result pass';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">✅ PASS</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                        ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                    `;
+                    passContainer.appendChild(resultDiv);
+                });
+                resultsDiv.appendChild(passContainer);
+            }
+
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+            const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
+            const summaryContent = document.getElementById('summary-content');
+            summaryContent.innerHTML = `
+                <p><strong>Total Tests:</strong> ${testResults.length}</p>
+                <p><strong>Passed:</strong> ${passCount} ✅</p>
+                <p><strong>Failed:</strong> ${failCount} ❌</p>
+                <p><strong>Success Rate:</strong> ${successRate}%</p>
+            `;
+            document.getElementById('summary').style.display = 'block';
+        }
+        
+        // State Management Tests
+        function testStateManagement() {
+            // Test learning state initialization
+            const initialState = {
+                currentLevelIndex: 0,
+                currentChapterIndex: 0,
+                currentKeyIndex: 0,
+                correctAnswerStreak: 0,
+                usedDegrees: [],
+                correctChordAnswersForCurrentKey: 0
+            };
+            
+            addResult(
+                'Learning State Initialization',
+                JSON.stringify(learningState) === JSON.stringify(initialState),
+                'Initial state should match expected structure',
+                `Current state: ${JSON.stringify(learningState)}`,
+                'State Management'
+            );
+            
+            // Test getCurrentLevel function
+            const currentLevel = getCurrentLevel();
+            const expectedLevel = learningPath[0];
+            addResult(
+                'Get Current Level',
+                currentLevel === expectedLevel,
+                expectedLevel.name,
+                currentLevel ? currentLevel.name : 'undefined',
+                'State Management'
+            );
+            
+            // Test level advancement
+            const originalLevelIndex = learningState.currentLevelIndex;
+            advanceLevel();
+            const newLevelIndex = learningState.currentLevelIndex;
+            addResult(
+                'Level Advancement',
+                newLevelIndex === originalLevelIndex + 1,
+                originalLevelIndex + 1,
+                newLevelIndex,
+                'State Management',
+                `Advanced from level ${originalLevelIndex} to ${newLevelIndex}`
+            );
+            
+            // Reset for other tests
+            learningState.currentLevelIndex = 0;
+        }
+        
+        // Question Generation Tests
+        function testQuestionGeneration() {
+            // Test ordinal function
+            const ordinalTests = [
+                { input: 1, expected: '1st' },
+                { input: 2, expected: '2nd' },
+                { input: 3, expected: '3rd' },
+                { input: 4, expected: '4th' },
+                { input: 21, expected: '21st' },
+                { input: 22, expected: '22nd' }
+            ];
+            
+            ordinalTests.forEach(test => {
+                const actual = ordinal(test.input);
+                addResult(
+                    `Ordinal Function (${test.input})`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Question Generation'
+                );
+            });
+            
+            // Test wordToNumber function
+            const wordTests = [
+                { input: 'one', expected: 1 },
+                { input: 'five', expected: 5 },
+                { input: 'ten', expected: 10 },
+                { input: 'invalid', expected: null }
+            ];
+            
+            wordTests.forEach(test => {
+                const actual = wordToNumber(test.input);
+                addResult(
+                    `Word to Number (${test.input})`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Question Generation'
+                );
+            });
+            
+            // Test accidentalToUnicode function
+            const accidentalTests = [
+                { input: 'C#', expected: 'C♯' },
+                { input: 'Db', expected: 'D♭' },
+                { input: 'F##', expected: 'F𝄪' },
+                { input: 'Bbb', expected: 'B𝄫' }
+            ];
+            
+            accidentalTests.forEach(test => {
+                const actual = accidentalToUnicode(test.input);
+                addResult(
+                    `Accidental to Unicode (${test.input})`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Question Generation'
+                );
+            });
+        }
+        
+        // Answer Validation Tests
+        function testAnswerValidation() {
+            // Test chord normalization in validation context
+            const chordTests = [
+                { input: 'CM7', expected: 'Cmaj7', key: 'C', degree: 1, type: 'SEVENTHS' },
+                { input: 'Cm', expected: 'Cm', key: 'F', degree: 2, type: 'TRIADS' },
+                { input: 'G7', expected: 'G7', key: 'C', degree: 5, type: 'SEVENTHS' }
+            ];
+            
+            chordTests.forEach(test => {
+                const normalized = normalizeChord(test.input);
+                const isValid = checkAnswer(normalized, test.type, test.key, test.degree);
+                addResult(
+                    `Chord Validation (${test.input})`,
+                    isValid === true,
+                    true,
+                    isValid,
+                    'Answer Validation',
+                    `Normalized: ${normalized}, Key: ${test.key}, Degree: ${test.degree}`
+                );
+            });
+            
+            // Test scale spelling validation
+            const scaleTests = [
+                { input: 'C D E F G A B', key: 'C', expected: true },
+                { input: 'G A B C D E F#', key: 'G', expected: true },
+                { input: 'C D E F G A', key: 'C', expected: false } // Missing B
+            ];
+            
+            scaleTests.forEach(test => {
+                const isValid = checkAnswer(test.input, 'SCALE_SPELLING', test.key);
+                addResult(
+                    `Scale Spelling (${test.key})`,
+                    isValid === test.expected,
+                    test.expected,
+                    isValid,
+                    'Answer Validation',
+                    `Input: ${test.input}`
+                );
+            });
+            
+            // Test accidentals count validation
+            const accidentalsTests = [
+                { input: '0', key: 'C', expected: true },
+                { input: '1', key: 'G', expected: true },
+                { input: '2', key: 'D', expected: true },
+                { input: '3', key: 'A', expected: true }
+            ];
+            
+            accidentalsTests.forEach(test => {
+                const isValid = checkAnswer(test.input, 'ACCIDENTALS_COUNT', test.key);
+                addResult(
+                    `Accidentals Count (${test.key})`,
+                    isValid === test.expected,
+                    test.expected,
+                    isValid,
+                    'Answer Validation',
+                    `Expected: ${quizData[test.key].accidentals}, Input: ${test.input}`
+                );
+            });
+        }
+        
+        // Learning Progression Tests
+        function testLearningProgression() {
+            // Test question pointer advancement
+            const originalChapterIndex = learningState.currentChapterIndex;
+            advanceQuestionPointer();
+            const newChapterIndex = learningState.currentChapterIndex;
+            
+            addResult(
+                'Question Pointer Advancement',
+                newChapterIndex === originalChapterIndex + 1,
+                originalChapterIndex + 1,
+                newChapterIndex,
+                'Learning Progression',
+                `Advanced from chapter ${originalChapterIndex} to ${newChapterIndex}`
+            );
+            
+            // Reset for other tests
+            learningState.currentChapterIndex = 0;
+            
+            // Test learning path structure
+            const pathLength = learningPath.length;
+            addResult(
+                'Learning Path Structure',
+                pathLength > 0 && Array.isArray(learningPath),
+                'Valid learning path array',
+                `Path has ${pathLength} levels`,
+                'Learning Progression'
+            );
+            
+            // Test each level has required properties
+            let validLevels = 0;
+            learningPath.forEach((level, index) => {
+                const hasRequiredProps = level.name && level.keys && level.mode && level.chapters;
+                if (hasRequiredProps) validLevels++;
+            });
+            
+            addResult(
+                'Level Structure Validation',
+                validLevels === learningPath.length,
+                learningPath.length,
+                validLevels,
+                'Learning Progression',
+                `All ${learningPath.length} levels should have required properties`
+            );
+        }
+        
+        function runStateTests() {
+            testResults = [];
+            testStateManagement();
+            displayResults();
+        }
+        
+        function runQuestionTests() {
+            testResults = [];
+            testQuestionGeneration();
+            displayResults();
+        }
+        
+        function runValidationTests() {
+            testResults = [];
+            testAnswerValidation();
+            displayResults();
+        }
+        
+        function runProgressionTests() {
+            testResults = [];
+            testLearningProgression();
+            displayResults();
+        }
+        
+        function runAllTests() {
+            testResults = [];
+            testStateManagement();
+            testQuestionGeneration();
+            testAnswerValidation();
+            testLearningProgression();
+            displayResults();
+        }
+        
+        function copyResults() {
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+            
+            const exportData = {
+                summary: { total: testResults.length, passed: passCount, failed: failCount },
+                results: testResults
+            };
+            
+            const jsonText = JSON.stringify(exportData, null, 2);
+            navigator.clipboard.writeText(jsonText).then(() => {
+                document.getElementById('copy-status').textContent = '✅ JSON results copied to clipboard!';
+            }).catch(err => {
+                document.getElementById('copy-status').textContent = '❌ Failed to copy.';
+            });
+        }
+    </script>
+</body>
+</html> 

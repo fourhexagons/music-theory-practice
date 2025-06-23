@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Integrity Tests</title>
+    <link rel="stylesheet" href="css/test-suite.css">
+    <style>
+        .test-result {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .test-result.pass {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .test-result.fail {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .test-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .status {
+            font-weight: bold;
+        }
+        
+        .test-details {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>🔍 Data Integrity Tests</h1>
+            <p>Tests for quiz data completeness, consistency, and relationship validation.</p>
+        </div>
+        
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="runAllTests()">Run All Tests</button>
+                <button class="btn" onclick="runCompletenessTests()">Data Completeness Only</button>
+                <button class="btn" onclick="runConsistencyTests()">Data Consistency Only</button>
+                <button class="btn" onclick="runRelationshipTests()">Data Relationships Only</button>
+                <button class="btn" onclick="runConfigurationTests()">Configuration Only</button>
+                <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
+            </div>
+            
+            <div id="copy-status" class="status-area"></div>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/normalization.js"></script>
+    
+    <script>
+        let testResults = [];
+        
+        function addResult(name, passed, expected, actual, category, details = '') {
+            const result = {
+                name,
+                passed,
+                expected,
+                actual,
+                category,
+                details
+            };
+            testResults.push(result);
+        }
+        
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            const failed = testResults.filter(r => !r.passed);
+            const passed = testResults.filter(r => r.passed);
+            
+            if (failed.length > 0) {
+                const failHeader = document.createElement('h2');
+                failHeader.textContent = '❌ Failing Tests';
+                failHeader.style.color = '#dc3545';
+                resultsDiv.appendChild(failHeader);
+                
+                const failContainer = document.createElement('div');
+                failContainer.className = 'test-columns';
+                failed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result fail';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">❌ FAIL</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                        ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                    `;
+                    failContainer.appendChild(resultDiv);
+                });
+                resultsDiv.appendChild(failContainer);
+            }
+            
+            if (passed.length > 0) {
+                const passHeader = document.createElement('h2');
+                passHeader.textContent = '✅ Passing Tests';
+                passHeader.style.color = '#28a745';
+                passHeader.style.marginTop = '2rem';
+                resultsDiv.appendChild(passHeader);
+                
+                const passContainer = document.createElement('div');
+                passContainer.className = 'test-columns';
+                passed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result pass';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">✅ PASS</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                        ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                    `;
+                    passContainer.appendChild(resultDiv);
+                });
+                resultsDiv.appendChild(passContainer);
+            }
+
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+            const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
+            const summaryContent = document.getElementById('summary-content');
+            summaryContent.innerHTML = `
+                <p><strong>Total Tests:</strong> ${testResults.length}</p>
+                <p><strong>Passed:</strong> ${passCount} ✅</p>
+                <p><strong>Failed:</strong> ${failCount} ❌</p>
+                <p><strong>Success Rate:</strong> ${successRate}%</p>
+            `;
+            document.getElementById('summary').style.display = 'block';
+        }
+        
+        // Data Completeness Tests
+        function testDataCompleteness() {
+            const allKeys = Object.keys(quizData);
+            
+            // Test that all keys have required properties
+            allKeys.forEach(key => {
+                const keyData = quizData[key];
+                const requiredProps = ['accidentals', 'notes', 'scale', 'triads', 'sevenths', 'seventhSpelling'];
+                
+                requiredProps.forEach(prop => {
+                    const hasProp = keyData.hasOwnProperty(prop);
+                    addResult(
+                        `${key} - ${prop} Property`,
+                        hasProp,
+                        'Property exists',
+                        hasProp ? 'Property exists' : 'Property missing',
+                        'Data Completeness',
+                        `Key: ${key}, Property: ${prop}`
+                    );
+                });
+                
+                // Test scale has exactly 7 notes
+                const scaleLength = keyData.scale ? keyData.scale.length : 0;
+                addResult(
+                    `${key} - Scale Length`,
+                    scaleLength === 7,
+                    7,
+                    scaleLength,
+                    'Data Completeness',
+                    `Scale: ${keyData.scale ? keyData.scale.join(' ') : 'undefined'}`
+                );
+                
+                // Test triads has exactly 7 degrees
+                const triadsLength = keyData.triads ? Object.keys(keyData.triads).length : 0;
+                addResult(
+                    `${key} - Triads Length`,
+                    triadsLength === 7,
+                    7,
+                    triadsLength,
+                    'Data Completeness',
+                    `Degrees: ${keyData.triads ? Object.keys(keyData.triads).join(', ') : 'undefined'}`
+                );
+                
+                // Test sevenths has exactly 7 degrees
+                const seventhsLength = keyData.sevenths ? Object.keys(keyData.sevenths).length : 0;
+                addResult(
+                    `${key} - Sevenths Length`,
+                    seventhsLength === 7,
+                    7,
+                    seventhsLength,
+                    'Data Completeness',
+                    `Degrees: ${keyData.sevenths ? Object.keys(keyData.sevenths).join(', ') : 'undefined'}`
+                );
+                
+                // Test seventhSpelling has exactly 7 degrees
+                const spellingLength = keyData.seventhSpelling ? Object.keys(keyData.seventhSpelling).length : 0;
+                addResult(
+                    `${key} - Seventh Spelling Length`,
+                    spellingLength === 7,
+                    7,
+                    spellingLength,
+                    'Data Completeness',
+                    `Degrees: ${keyData.seventhSpelling ? Object.keys(keyData.seventhSpelling).join(', ') : 'undefined'}`
+                );
+            });
+        }
+        
+        // Data Consistency Tests
+        function testDataConsistency() {
+            const allKeys = Object.keys(quizData);
+            
+            allKeys.forEach(key => {
+                const keyData = quizData[key];
+                
+                // Test accidentals count matches notes array length
+                const accidentalsCount = keyData.accidentals || 0;
+                const notesLength = keyData.notes ? keyData.notes.length : 0;
+                addResult(
+                    `${key} - Accidentals Count Consistency`,
+                    accidentalsCount === notesLength,
+                    accidentalsCount,
+                    notesLength,
+                    'Data Consistency',
+                    `Accidentals: ${accidentalsCount}, Notes: ${notesLength}`
+                );
+                
+                // Test scale notes are valid
+                if (keyData.scale) {
+                    const validNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 
+                                       'C♭', 'D♭', 'E♭', 'F♭', 'G♭', 'A♭', 'B♭', 'E#', 'B#', 'C♯', 'D♯', 'F♯', 'G♯', 'A♯'];
+                    const invalidNotes = keyData.scale.filter(note => !validNotes.includes(note));
+                    addResult(
+                        `${key} - Scale Note Validity`,
+                        invalidNotes.length === 0,
+                        'All notes valid',
+                        invalidNotes.length > 0 ? `Invalid notes: ${invalidNotes.join(', ')}` : 'All notes valid',
+                        'Data Consistency',
+                        `Scale: ${keyData.scale.join(' ')}`
+                    );
+                }
+                
+                // Test triad chord names are valid
+                if (keyData.triads) {
+                    const validTriadTypes = ['', 'm', '°', 'dim'];
+                    const invalidTriads = [];
+                    
+                    Object.entries(keyData.triads).forEach(([degree, chord]) => {
+                        const chordType = chord.replace(/^[A-G][#♯b♭]?/, '');
+                        if (!validTriadTypes.includes(chordType)) {
+                            invalidTriads.push(`${degree}: ${chord}`);
+                        }
+                    });
+                    
+                    addResult(
+                        `${key} - Triad Type Validity`,
+                        invalidTriads.length === 0,
+                        'All triad types valid',
+                        invalidTriads.length > 0 ? `Invalid: ${invalidTriads.join(', ')}` : 'All valid',
+                        'Data Consistency'
+                    );
+                }
+                
+                // Test seventh chord names are valid
+                if (keyData.sevenths) {
+                    const validSeventhTypes = ['maj7', 'm7', '7', 'm7♭5', 'dim7'];
+                    const invalidSevenths = [];
+                    
+                    Object.entries(keyData.sevenths).forEach(([degree, chord]) => {
+                        const chordType = chord.replace(/^[A-G][#♯b♭]?/, '');
+                        if (!validSeventhTypes.includes(chordType)) {
+                            invalidSevenths.push(`${degree}: ${chord}`);
+                        }
+                    });
+                    
+                    addResult(
+                        `${key} - Seventh Type Validity`,
+                        invalidSevenths.length === 0,
+                        'All seventh types valid',
+                        invalidSevenths.length > 0 ? `Invalid: ${invalidSevenths.join(', ')}` : 'All valid',
+                        'Data Consistency'
+                    );
+                }
+            });
+        }
+        
+        // Data Relationship Tests
+        function testDataRelationships() {
+            const allKeys = Object.keys(quizData);
+            
+            allKeys.forEach(key => {
+                const keyData = quizData[key];
+                
+                // Test that triad and seventh degrees match
+                const triadDegrees = keyData.triads ? Object.keys(keyData.triads).sort() : [];
+                const seventhDegrees = keyData.sevenths ? Object.keys(keyData.sevenths).sort() : [];
+                const spellingDegrees = keyData.seventhSpelling ? Object.keys(keyData.seventhSpelling).sort() : [];
+                
+                addResult(
+                    `${key} - Degree Consistency`,
+                    JSON.stringify(triadDegrees) === JSON.stringify(seventhDegrees) && 
+                    JSON.stringify(seventhDegrees) === JSON.stringify(spellingDegrees),
+                    'All degree sets match',
+                    `Triads: [${triadDegrees}], Sevenths: [${seventhDegrees}], Spelling: [${spellingDegrees}]`,
+                    'Data Relationships'
+                );
+                
+                // Test seventh spelling has exactly 4 notes per degree
+                if (keyData.seventhSpelling) {
+                    Object.entries(keyData.seventhSpelling).forEach(([degree, spelling]) => {
+                        const noteCount = spelling.length;
+                        addResult(
+                            `${key} - Seventh Spelling Note Count (${degree})`,
+                            noteCount === 4,
+                            4,
+                            noteCount,
+                            'Data Relationships',
+                            `Degree ${degree}: ${spelling.join(' ')}`
+                        );
+                    });
+                }
+                
+                // Test that scale notes match the key signature
+                if (keyData.scale && keyData.notes) {
+                    const scaleHasAccidentals = keyData.scale.some(note => note.includes('#') || note.includes('♯') || note.includes('b') || note.includes('♭'));
+                    const hasAccidentals = keyData.accidentals > 0;
+                    
+                    addResult(
+                        `${key} - Scale Accidentals Consistency`,
+                        scaleHasAccidentals === hasAccidentals,
+                        hasAccidentals,
+                        scaleHasAccidentals,
+                        'Data Relationships',
+                        `Scale: ${keyData.scale.join(' ')}, Accidentals: ${keyData.accidentals}`
+                    );
+                }
+            });
+        }
+        
+        // Configuration Tests
+        function testConfiguration() {
+            // Test learning path structure
+            const pathLength = learningPath.length;
+            addResult(
+                'Learning Path Length',
+                pathLength > 0,
+                'Path has levels',
+                `Path has ${pathLength} levels`,
+                'Configuration'
+            );
+            
+            // Test each level has required properties
+            let validLevels = 0;
+            learningPath.forEach((level, index) => {
+                const hasRequiredProps = level.name && level.keys && level.mode && level.chapters;
+                if (hasRequiredProps) validLevels++;
+            });
+            
+            addResult(
+                'Learning Path Level Structure',
+                validLevels === learningPath.length,
+                learningPath.length,
+                validLevels,
+                'Configuration',
+                `All ${learningPath.length} levels should have required properties`
+            );
+            
+            // Test chapter configuration
+            const chaptersLength = Object.keys(CHAPTERS).length;
+            addResult(
+                'Chapter Configuration',
+                chaptersLength > 0,
+                'Chapters configured',
+                `${chaptersLength} chapters configured`,
+                'Configuration'
+            );
+            
+            // Test question types configuration
+            const questionTypesLength = Object.keys(QUESTION_TYPES).length;
+            addResult(
+                'Question Types Configuration',
+                questionTypesLength > 0,
+                'Question types configured',
+                `${questionTypesLength} question types configured`,
+                'Configuration'
+            );
+            
+            // Test modes configuration
+            const modesLength = Object.keys(MODES).length;
+            addResult(
+                'Modes Configuration',
+                modesLength > 0,
+                'Modes configured',
+                `${modesLength} modes configured`,
+                'Configuration'
+            );
+        }
+        
+        function runCompletenessTests() {
+            testResults = [];
+            testDataCompleteness();
+            displayResults();
+        }
+        
+        function runConsistencyTests() {
+            testResults = [];
+            testDataConsistency();
+            displayResults();
+        }
+        
+        function runRelationshipTests() {
+            testResults = [];
+            testDataRelationships();
+            displayResults();
+        }
+        
+        function runConfigurationTests() {
+            testResults = [];
+            testConfiguration();
+            displayResults();
+        }
+        
+        function runAllTests() {
+            testResults = [];
+            testDataCompleteness();
+            testDataConsistency();
+            testDataRelationships();
+            testConfiguration();
+            displayResults();
+        }
+        
+        function copyResults() {
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+            
+            const exportData = {
+                summary: { total: testResults.length, passed: passCount, failed: failCount },
+                results: testResults
+            };
+            
+            const jsonText = JSON.stringify(exportData, null, 2);
+            navigator.clipboard.writeText(jsonText).then(() => {
+                document.getElementById('copy-status').textContent = '✅ JSON results copied to clipboard!';
+            }).catch(err => {
+                document.getElementById('copy-status').textContent = '❌ Failed to copy.';
+            });
+        }
+    </script>
+</body>
+</html> 
