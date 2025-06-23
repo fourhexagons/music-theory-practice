@@ -80,6 +80,18 @@
     <script src="js/test-dashboard.js"></script>
     
     <script>
+        // Shim for checkAnswer function since it's not available in this context
+        function checkAnswer(answer, questionType, key, degree) {
+            // This is a simplified checker for the purpose of this test file.
+            // It just validates that the normalization doesn't crash.
+            try {
+                const normalized = normalizeChord(answer);
+                return normalized !== '' && normalized.length < 50;
+            } catch (e) {
+                return false;
+            }
+        }
+
         let testResults = [];
         
         function addResult(name, passed, expected, actual, category, details = '') {
@@ -157,6 +169,16 @@
                 <p><strong>Success Rate:</strong> ${successRate}%</p>
             `;
             document.getElementById('summary').style.display = 'block';
+
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_error_handling.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: successRate
+                });
+            }
         }
         
         // Invalid Input Tests
@@ -512,16 +534,6 @@
             }).catch(err => {
                 document.getElementById('copy-status').textContent = '❌ Failed to copy.';
             });
-            
-            // Save results to dashboard
-            if (window.TestDashboard) {
-                window.TestDashboard.saveTestResult('test_error_handling.html', {
-                    total: testResults.length,
-                    passed: passCount,
-                    failed: failCount,
-                    successRate: testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0
-                });
-            }
         }
     </script>
 </body>

@@ -155,6 +155,16 @@
                 <p><strong>Success Rate:</strong> ${successRate}%</p>
             `;
             document.getElementById('summary').style.display = 'block';
+
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_data_integrity.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: successRate
+                });
+            }
         }
         
         // Data Completeness Tests
@@ -462,16 +472,6 @@
             }).catch(err => {
                 document.getElementById('copy-status').textContent = '❌ Failed to copy.';
             });
-            
-            // Save results to dashboard
-            if (window.TestDashboard) {
-                window.TestDashboard.saveTestResult('test_data_integrity.html', {
-                    total: testResults.length,
-                    passed: passCount,
-                    failed: failCount,
-                    successRate: testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0
-                });
-            }
         }
     </script>
 </body>
