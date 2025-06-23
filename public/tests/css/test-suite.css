@@ -70,6 +70,11 @@ body {
     border-bottom: 2px solid #f0f0f0;
 }
 
+.test-category p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
 /* --- Test Cards (For Menu Page) --- */
 .test-grid {
     display: grid;
@@ -359,14 +364,15 @@ pre {
 .status-indicator.not-run { background-color: #6c757d; }
 
 .test-status-card .test-stats {
-    font-size: 1em;
-    color: #555;
-    margin-bottom: 10px;
+    font-size: 0.9em;
+    margin: 8px 0;
+    color: #777;
 }
 
 .test-status-card .last-run {
-    font-size: 0.9em;
-    color: #777;
+    font-size: 0.8em;
+    color: #999;
+    margin-top: 8px;
     font-style: italic;
 }
 

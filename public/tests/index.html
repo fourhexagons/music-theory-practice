@@ -63,14 +63,14 @@
                 </div>
                 
                 <div class="test-card">
-                    <h3>Core Logic <span id="status-app-logic" class="status-icon" title="Test status"></span></h3>
+                    <h3>Core Logic <span id="status-core-logic" class="status-icon" title="Test status"></span></h3>
                     <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
                     <a href="test_app_logic.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
-                    <h3>Chord Normalization <span id="status-chords" class="status-icon" title="Test status"></span></h3>
+                    <h3>Chord Normalization <span id="status-chord-normalization" class="status-icon" title="Test status"></span></h3>
                     <p>Tests chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
                     <a href="test_chords.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
@@ -83,14 +83,14 @@
             <p>Domain-specific tests for music theory accuracy and data integrity</p>
             <div class="test-grid">
                 <div class="test-card">
-                    <h3>Seventh Chords <span id="status-sevenths" class="status-icon" title="Test status"></span></h3>
+                    <h3>Seventh Chords <span id="status-seventh-chords" class="status-icon" title="Test status"></span></h3>
                     <p>Tests seventh chord identification, spelling, and validation across different keys and chord types.</p>
                     <a href="test_sevenths.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
-                    <h3>Validation &amp; Edges <span id="status-validation-errors" class="status-icon" title="Test status"></span></h3>
+                    <h3>Validation &amp; Edges <span id="status-validation-edges" class="status-icon" title="Test status"></span></h3>
                     <p>Comprehensive validation suite testing error handling, edge cases, and user input scenarios (56 tests).</p>
                     <a href="test_validation_errors.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
@@ -123,7 +123,7 @@
             <p>Interactive debugging and development aids</p>
             <div class="test-grid">
                 <div class="test-card">
-                    <h3>Debug Normalize <span id="status-debug-normalization" class="status-icon" title="Tool status"></span></h3>
+                    <h3>Debug Normalize <span id="status-debug-normalize" class="status-icon" title="Tool status"></span></h3>
                     <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
                     <a href="debug_normalization.html" class="test-link">Open Tool</a>
                     <span class="test-status status-dev">Development Tool</span>
@@ -183,6 +183,39 @@
             }
         };
 
+        function runAllTests() {
+            const testFiles = Object.keys(TEST_SUITES).filter(
+                file => TEST_SUITES[file].category !== 'Development Tools'
+            );
+            
+            const userConfirmed = confirm(
+                `This will open ${testFiles.length} test suites in new tabs. ` +
+                `Please ensure your browser allows pop-ups for this site.\n\n` +
+                `Do you want to proceed?`
+            );
+
+            if (userConfirmed) {
+                testFiles.forEach((file, index) => {
+                    setTimeout(() => {
+                        window.open(file, '_blank');
+                    }, index * 200); // Stagger opening new tabs
+                });
+                alert('Running all tests... Please check the new tabs that have been opened.');
+            }
+        }
+
+        function clearTestHistory() {
+            const userConfirmed = confirm(
+                `Are you sure you want to clear the entire test history? ` +
+                `This action cannot be undone.`
+            );
+            if (userConfirmed) {
+                window.TestDashboard.clearTestHistory();
+                updateDashboard(); // Refresh the view immediately
+                alert('Test history has been cleared.');
+            }
+        }
+
         function updateDashboard() {
             const testHistory = window.TestDashboard.getTestResults();
             const statusGrid = document.getElementById('test-status-grid');
@@ -208,64 +241,63 @@
             });
             
             // Update summary stats
+            const successRate = totalTests > 0 ? ((totalPassed / totalTests) * 100).toFixed(0) : '-';
             document.getElementById('total-tests').textContent = totalTests;
             document.getElementById('passed-tests').textContent = totalPassed;
             document.getElementById('failed-tests').textContent = totalFailed;
-            document.getElementById('success-rate').textContent = 
-                totalTests > 0 ? `${Math.round((totalPassed / totalTests) * 100)}%` : '-';
+            document.getElementById('success-rate').textContent = successRate !== '-' ? `${successRate}%` : '-';
             
             // Update last updated timestamp
-            const lastUpdated = Object.values(testHistory)
-                .map(r => new Date(r.timestamp))
-                .sort((a, b) => b - a)[0];
-            
-            if (lastUpdated) {
-                document.getElementById('last-updated-status').textContent = 
-                    `Last updated: ${lastUpdated.toLocaleString()}`;
+            const lastUpdatedElement = document.getElementById('last-updated-status');
+            const timestamps = Object.values(testHistory).map(r => new Date(r.timestamp));
+            if (timestamps.length > 0) {
+                const lastUpdated = new Date(Math.max.apply(null, timestamps));
+                lastUpdatedElement.textContent = `Last run: ${lastUpdated.toLocaleString()}`;
             } else {
-                document.getElementById('last-updated-status').textContent = 'No tests run yet';
+                lastUpdatedElement.textContent = 'No test history';
             }
             
-            // Update simple status icons
+            // Update status icons
             updateSimpleStatusIcons(testHistory);
         }
 
         function updateSimpleStatusIcons(testHistory) {
-            const statusMap = {
+            // Map test files to their actual HTML element IDs
+            const idMapping = {
                 'test_learning_path.html': 'status-learning-path',
-                'test_app_logic.html': 'status-app-logic',
-                'test_chords.html': 'status-chords',
-                'test_sevenths.html': 'status-sevenths',
-                'test_validation_errors.html': 'status-validation-errors',
+                'test_app_logic.html': 'status-core-logic',
+                'test_chords.html': 'status-chord-normalization',
+                'test_sevenths.html': 'status-seventh-chords',
+                'test_validation_errors.html': 'status-validation-edges',
                 'test_data_integrity.html': 'status-data-integrity',
                 'test_error_handling.html': 'status-error-handling',
-                'debug_normalization.html': 'status-debug-normalization'
+                'debug_normalization.html': 'status-debug-normalize'
             };
-            
-            Object.entries(statusMap).forEach(([testFile, elementId]) => {
-                const iconElement = document.getElementById(elementId);
+
+            Object.entries(TEST_SUITES).forEach(([testFile, suiteInfo]) => {
+                const iconId = idMapping[testFile];
+                const iconElement = document.getElementById(iconId);
+
                 if (iconElement) {
                     const result = testHistory[testFile];
-                    let status = 'not-run';
-                    
+                    let statusClass = 'status-icon'; // Default: not-run
+                    let title = 'Not run yet';
+
                     if (result) {
-                        status = result.failed === 0 ? 'passed' : 'failed';
-                    }
-                    
-                    // Remove existing classes and add new one
-                    iconElement.className = 'status-icon ' + status;
-                    
-                    // Update tooltip
-                    if (result) {
+                        if (result.failed > 0) {
+                            statusClass += ' fail';
+                        } else if (result.passed > 0) {
+                            statusClass += ' pass';
+                        }
                         const passRate = result.total > 0 ? Math.round((result.passed / result.total) * 100) : 0;
-                        iconElement.title = `${result.passed}/${result.total} passed (${passRate}%) - ${result.lastRun}`;
-                    } else {
-                        iconElement.title = 'Not run yet';
+                        title = `${result.passed}/${result.total} passed (${passRate}%) - ${result.lastRun}`;
                     }
+                    iconElement.className = statusClass;
+                    iconElement.title = title;
                 }
             });
         }
-
+        
         function createStatusCard(testFile, testInfo, result) {
             const card = document.createElement('div');
             card.className = 'test-status-card';
@@ -290,23 +322,21 @@
             return card;
         }
 
-        // Function to run all tests (placeholder - would need to be implemented)
-        function runAllTests() {
-            alert('Running all tests would require implementing automated test execution. For now, please run tests individually.');
-        }
-
-        // Initialize dashboard on page load
         document.addEventListener('DOMContentLoaded', () => {
             updateDashboard();
-            
-            // Set last updated date for footer
-            document.getElementById('last-updated').textContent = new Date().toLocaleDateString();
-            
-            // Add click tracking for analytics (optional)
-            document.querySelectorAll('.test-link').forEach(link => {
-                link.addEventListener('click', function() {
-                    console.log('Test accessed:', this.href);
-                });
+
+            // Also update the main footer last updated time
+            const lastUpdatedFooter = document.getElementById('last-updated');
+            if (lastUpdatedFooter) {
+                lastUpdatedFooter.textContent = new Date().toLocaleString();
+            }
+
+            // Set up a listener to refresh the dashboard if tests are run in other tabs
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'testHistory') {
+                    console.log('Test history updated in another tab. Refreshing dashboard...');
+                    updateDashboard();
+                }
             });
         });
     </script>
