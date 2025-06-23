@@ -511,6 +511,16 @@
             }).catch(err => {
                 document.getElementById('copy-status').textContent = '❌ Failed to copy.';
             });
+            
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_error_handling.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0
+                });
+            }
         }
     </script>
 </body>

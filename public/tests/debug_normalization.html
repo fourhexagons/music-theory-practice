@@ -172,6 +172,16 @@
                 console.error('Failed to copy JSON:', err);
                 copyStatus.textContent = '❌ Failed to copy. See console for details.';
             });
+            
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('debug_normalization.html', {
+                    total: testResults.length,
+                    passed: passedCount,
+                    failed: failedCount,
+                    successRate: testResults.length > 0 ? Math.round((passedCount / testResults.length) * 100) : 0
+                });
+            }
         }
 
         // Initial run on page load

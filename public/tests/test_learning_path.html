@@ -272,6 +272,17 @@
                 <p><strong>Errors Encountered:</strong> ${errorsEncountered} ${errorsEncountered === 0 ? '✅' : '❌'}</p>
             `;
             summaryDiv.style.display = 'block';
+            
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_learning_path.html', {
+                    total: totalQuestions,
+                    passed: totalQuestions - errorsEncountered,
+                    failed: errorsEncountered,
+                    levelsCompleted: levelsCompleted,
+                    successRate: errorsEncountered === 0 ? 100 : Math.round(((totalQuestions - errorsEncountered) / totalQuestions) * 100)
+                });
+            }
         }
 
         function clearOutput() {
