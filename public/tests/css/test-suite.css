@@ -94,6 +94,9 @@ body {
     color: #333;
     margin-bottom: 10px;
     font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .test-card p {
@@ -117,13 +120,6 @@ body {
     background-color: #5a6fd8;
 }
 
-.test-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
 .status-icon {
     width: 16px;
     height: 16px;
@@ -131,6 +127,8 @@ body {
     display: inline-block;
     border: 2px solid #e0e0e0;
     position: relative;
+    flex-shrink: 0;
+    margin-left: 10px;
 }
 
 .status-icon.passed {
