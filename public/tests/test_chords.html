@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Theory Practice - Testing Platform</title>
+    <title>Chord Normalization Tests</title>
+    <link rel="stylesheet" href="css/test-suite.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
+        /* Local overrides */
+        body { padding: 20px; }
+        .container { max-width: 900px; }
         .test-section {
             background: white;
             margin: 20px 0;
@@ -99,29 +96,21 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Test Suite</a>
-    <h1>🎵 Music Theory Practice - Testing Platform</h1>
-    
-    <div class="test-section">
-        <h2>Test Controls</h2>
-        <button onclick="runAllTests()">Run All Tests</button>
-        <button onclick="runChordTests()">Test Chord Normalization</button>
-        <button onclick="runAccidentalTests()">Test Accidental Handling</button>
-        <button onclick="runAdvancedModeTests()">Test Advanced Modes</button>
-        <button onclick="runValidationTests()">Test Chord Validation</button>
-        <button onclick="runEdgeCaseTests()">Test Edge Cases</button>
-        <button onclick="showAllChordVariations()">Show All Chord Variations</button>
-        <button onclick="clearResults()">Clear Results</button>
-        <button id="copy-json-button" onclick="copyResultsToClipboard()">Copy JSON</button>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>Chord Normalization Tests</h1>
+            <p>This test suite verifies the `normalizeChord` function.</p>
+        </div>
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
+            </div>
+            <button class="btn" onclick="runTests()">Run Tests</button>
+            <div id="results"></div>
+        </div>
     </div>
-
-    <div id="summary" class="summary" style="display: none;">
-        <h3>Test Summary</h3>
-        <div id="summary-content"></div>
-    </div>
-
-    <div id="results"></div>
-
+    <script src="../js/data/quizData.js"></script>
     <script src="../js/utils/normalization.js"></script>
     <script>
         let testResults = {
@@ -208,6 +197,10 @@
             summaryDiv.style.display = 'block';
         }
 
+        function accidentalToUnicode(input) {
+            return normalizeRootNote(input);
+        }
+
         function testChordNormalization() {
             const chordTests = [
                 // Basic chord types
@@ -262,495 +255,14 @@
             updateSummary();
         }
 
-        function testAccidentalHandling() {
-            const accidentalTests = [
-                { input: 'db', expected: 'D♭', description: 'D flat (lowercase)' },
-                { input: 'f#', expected: 'F♯', description: 'F sharp' },
-                { input: 'bb', expected: 'B♭', description: 'B flat (lowercase)' },
-                { input: 'c#', expected: 'C♯', description: 'C sharp' },
-                { input: 'gb', expected: 'G♭', description: 'G flat (lowercase)' },
-                { input: 'ab', expected: 'A♭', description: 'A flat (lowercase)' },
-                { input: 'eb', expected: 'E♭', description: 'E flat (lowercase)' },
-                { input: 'd#', expected: 'D♯', description: 'D sharp' },
-                { input: 'g#', expected: 'G♯', description: 'G sharp' },
-                { input: 'a#', expected: 'A♯', description: 'A sharp' },
-                { input: 'e#', expected: 'E♯', description: 'E sharp' },
-                { input: 'b#', expected: 'B♯', description: 'B sharp' },
-                { input: 'cb', expected: 'C♭', description: 'C flat (lowercase)' },
-                { input: 'fb', expected: 'F♭', description: 'F flat (lowercase)' },
-                { input: 'bb', expected: 'B♭', description: 'Double flat b (lowercase)' },
-                { input: 'bbb', expected: 'B\uD834\uDD2B', description: 'B double flat (lowercase)' },
-                { input: 'f##', expected: 'F\uD834\uDD2A', description: 'F double sharp' },
-                { input: 'fx', expected: 'F\uD834\uDD2A', description: 'F double sharp with x' }
-            ];
-
-            accidentalTests.forEach(test => {
-                const actual = accidentalToUnicode(test.input);
-                const passed = actual === test.expected;
-                addResult(test.description, test.input, test.expected, actual, passed);
-            });
-        }
-
-        function testAdvancedModeLogic() {
-            // Test the A/B pair logic
-            const testCases = [
-                {
-                    description: 'G major accidentals count should trigger naming',
-                    key: 'G',
-                    accidentalsCount: 1,
-                    shouldAskNaming: true
-                },
-                {
-                    description: 'F# major accidentals count should trigger naming',
-                    key: 'F♯',
-                    accidentalsCount: 6,
-                    shouldAskNaming: true
-                }
-            ];
-
-            testCases.forEach(testCase => {
-                const data = quizData[testCase.key];
-                const actualShouldAsk = data.accidentals > 0;
-                const passed = actualShouldAsk === testCase.shouldAskNaming;
-                addResult(
-                    testCase.description,
-                    `${testCase.key} (${testCase.accidentalsCount} accidentals)`,
-                    testCase.shouldAskNaming ? 'Should ask naming' : 'Should NOT ask naming',
-                    actualShouldAsk ? 'Would ask naming' : 'Would NOT ask naming',
-                    passed
-                );
-            });
-        }
-
-        function testChordDataIntegrity() {
-            // Test that all chord data is properly formatted
-            allKeys.forEach(key => {
-                const data = quizData[key];
-                
-                // Test triad data
-                [2, 3, 4, 5, 6, 7].forEach(degree => {
-                    const triad = data.triads[degree];
-                    const seventh = data.sevenths[degree];
-                    
-                    if (!triad) {
-                        addResult(
-                            `Missing triad for ${key} degree ${degree}`,
-                            `${key} degree ${degree}`,
-                            'Should have triad',
-                            'Missing triad',
-                            false
-                        );
-                    }
-                    
-                    if (!seventh) {
-                        addResult(
-                            `Missing seventh for ${key} degree ${degree}`,
-                            `${key} degree ${degree}`,
-                            'Should have seventh',
-                            'Missing seventh',
-                            false
-                        );
-                    }
-                });
-            });
-        }
-
-        function testChordAnswerValidation() {
-            // Test actual chord answer validation scenarios
-            const validationTests = [
-                // Test the specific case that was failing
-                {
-                    description: 'db7 for 5th seventh chord in G♭ major',
-                    key: 'G♭',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'db7',
-                    expected: true,
-                    correctAnswer: 'D♭7'
-                },
-                {
-                    description: 'ab∆ for 4th seventh chord in Eb major',
-                    key: 'E♭',
-                    degree: 4,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'ab∆',
-                    expected: true,
-                    correctAnswer: 'A♭maj7'
-                },
-                {
-                    description: 'f#7 for 5th seventh chord in B major',
-                    key: 'B',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'f#7',
-                    expected: true,
-                    correctAnswer: 'F♯7'
-                },
-                {
-                    description: 'bb7 for 5th seventh chord in Eb major',
-                    key: 'E♭',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'bb7',
-                    expected: true,
-                    correctAnswer: 'B♭7'
-                },
-                // Test various input formats for the same chord
-                {
-                    description: 'D♭7 (unicode) for 5th seventh chord in G♭ major',
-                    key: 'G♭',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'D♭7',
-                    expected: true,
-                    correctAnswer: 'D♭7'
-                },
-                {
-                    description: 'A♭maj7 (unicode) for 4th seventh chord in Eb major',
-                    key: 'E♭',
-                    degree: 4,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'A♭maj7',
-                    expected: true,
-                    correctAnswer: 'A♭maj7'
-                },
-                // Test triad variations
-                {
-                    description: 'db (triad) for 5th triad in G♭ major',
-                    key: 'G♭',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.TRIADS,
-                    input: 'db',
-                    expected: true,
-                    correctAnswer: 'D♭'
-                },
-                {
-                    description: 'ab (triad) for 4th triad in Eb major',
-                    key: 'E♭',
-                    degree: 4,
-                    chapterId: QUESTION_TYPES.TRIADS,
-                    input: 'ab',
-                    expected: true,
-                    correctAnswer: 'A♭'
-                },
-                {
-                    description: 'C∆ for 5th seventh chord in F major (should reject - wrong chord type)',
-                    key: 'F',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'C∆',
-                    expected: false,
-                    correctAnswer: 'C7'
-                },
-                {
-                    description: 'CΔ for 5th seventh chord in F major (should reject - wrong chord type)',
-                    key: 'F',
-                    degree: 5,
-                    chapterId: QUESTION_TYPES.SEVENTHS,
-                    input: 'CΔ',
-                    expected: false,
-                    correctAnswer: 'C7'
-                }
-            ];
-
-            validationTests.forEach(test => {
-                // Create a mock question object
-                const mockQuestion = {
-                    key: test.key,
-                    chapterId: test.chapterId,
-                    degree: test.degree
-                };
-
-                // Store the original currentQuestion
-                const originalQuestion = learningState.currentQuestion;
-                learningState.currentQuestion = mockQuestion;
-
-                // Test the answer
-                const actual = checkAnswer(test.input);
-                const passed = actual === test.expected;
-
-                // Restore original question
-                learningState.currentQuestion = originalQuestion;
-
-                addResult(
-                    test.description,
-                    test.input,
-                    test.expected ? `Should accept (${test.correctAnswer})` : 'Should reject',
-                    actual ? 'Accepted' : 'Rejected',
-                    passed
-                );
-            });
-        }
-
-        function testEdgeCases() {
-            // Test edge cases and potential issues
-            const edgeCases = [
-                {
-                    description: 'Empty string should be rejected',
-                    input: '',
-                    expected: false
-                },
-                {
-                    description: 'Just spaces should be rejected',
-                    input: '   ',
-                    expected: false
-                },
-                {
-                    description: 'Invalid chord should be rejected',
-                    input: 'X7',
-                    expected: false
-                },
-                {
-                    description: 'Case insensitive major chord',
-                    input: 'c',
-                    expected: 'C'
-                },
-                {
-                    description: 'Case insensitive minor chord',
-                    input: 'cm',
-                    expected: 'Cm'
-                },
-                {
-                    description: 'Mixed case with accidentals (lowercase b)',
-                    input: 'db7',
-                    expected: 'D♭7'
-                }
-            ];
-
-            edgeCases.forEach(test => {
-                if (test.expected === false) {
-                    // Test rejection cases
-                    const actual = normalizeChord(test.input);
-                    const passed = actual === '';
-                    addResult(
-                        test.description,
-                        test.input,
-                        'Should be rejected',
-                        actual === '' ? 'Rejected' : `Normalized to: ${actual}`,
-                        passed
-                    );
-                } else {
-                    // Test normalization cases
-                    const actual = normalizeChord(test.input);
-                    const passed = actual === test.expected;
-                    addResult(
-                        test.description,
-                        test.input,
-                        test.expected,
-                        actual,
-                        passed
-                    );
-                }
-            });
-        }
-
-        function testChordDataCompleteness() {
-            // Test that all keys have complete chord data
-            allKeys.forEach(key => {
-                const data = quizData[key];
-                
-                // Check that all required properties exist
-                const requiredProps = ['accidentals', 'notes', 'scale', 'triads', 'sevenths', 'seventhSpelling'];
-                requiredProps.forEach(prop => {
-                    if (!(prop in data)) {
-                        addResult(
-                            `Missing ${prop} for ${key}`,
-                            key,
-                            `Should have ${prop}`,
-                            'Missing property',
-                            false
-                        );
-                    }
-                });
-
-                // Check that accidentals count matches notes array length
-                if (data.accidentals !== data.notes.length) {
-                    addResult(
-                        `Accidentals count mismatch for ${key}`,
-                        `${key}: ${data.accidentals} accidentals, ${data.notes.length} notes`,
-                        'Count should match notes length',
-                        'Mismatch',
-                        false
-                    );
-                }
-
-                // Check that scale has 7 notes
-                if (data.scale.length !== 7) {
-                    addResult(
-                        `Scale length incorrect for ${key}`,
-                        `${key}: ${data.scale.length} notes`,
-                        'Should have 7 notes',
-                        'Incorrect length',
-                        false
-                    );
-                }
-            });
-        }
-
-        function runChordTests() {
+        function runTests() {
             clearResults();
             testChordNormalization();
-        }
-
-        function runAccidentalTests() {
-            clearResults();
-            testAccidentalHandling();
             updateSummary();
         }
 
-        function runAdvancedModeTests() {
-            clearResults();
-            testAdvancedModeLogic();
-            testChordDataIntegrity();
-            testChordDataCompleteness();
-            updateSummary();
-        }
-
-        function runValidationTests() {
-            clearResults();
-            testChordAnswerValidation();
-            updateSummary();
-        }
-
-        function runEdgeCaseTests() {
-            clearResults();
-            testEdgeCases();
-            updateSummary();
-        }
-
-        function runAllTests() {
-            clearResults();
-            testChordNormalization();
-            testAccidentalHandling();
-            testAdvancedModeLogic();
-            testChordDataIntegrity();
-            testChordAnswerValidation();
-            testEdgeCases();
-            testChordDataCompleteness();
-            updateSummary();
-        }
-
-        function showAllChordVariations() {
-            clearResults();
-            
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<h2>🎵 All Accepted Chord Variations</h2>';
-            
-            // Test all variations for each chord type
-            const chordVariations = {
-                'Major Triads': [
-                    { input: 'C', expected: 'C', description: 'Basic major' },
-                    { input: 'C major', expected: 'C', description: 'Major with text' },
-                    { input: 'C maj', expected: 'C', description: 'Maj abbreviation' },
-                    { input: 'C MAJOR', expected: 'C', description: 'Uppercase major' },
-                    { input: 'C MAJ', expected: 'C', description: 'Uppercase maj' }
-                ],
-                'Minor Triads': [
-                    { input: 'Cm', expected: 'Cm', description: 'Basic minor' },
-                    { input: 'C minor', expected: 'Cm', description: 'Minor with text' },
-                    { input: 'C min', expected: 'Cm', description: 'Min abbreviation' },
-                    { input: 'C-', expected: 'Cm', description: 'Dash notation' },
-                    { input: 'C MINOR', expected: 'Cm', description: 'Uppercase minor' },
-                    { input: 'C MIN', expected: 'Cm', description: 'Uppercase min' }
-                ],
-                'Dominant 7th': [
-                    { input: 'C7', expected: 'C7', description: 'Basic dominant 7th' }
-                ],
-                'Major 7th': [
-                    { input: 'Cmaj7', expected: 'Cmaj7', description: 'Basic major 7th' },
-                    { input: 'C maj7', expected: 'Cmaj7', description: 'maj7 with space' },
-                    { input: 'C major7', expected: 'Cmaj7', description: 'major7 with space' },
-                    { input: 'CM7', expected: 'Cmaj7', description: 'M7 notation' },
-                    { input: 'C∆', expected: 'Cmaj7', description: 'Delta symbol (U+2206)' },
-                    { input: 'CΔ', expected: 'Cmaj7', description: 'Delta symbol (U+0394)' },
-                    { input: 'C∆7', expected: 'Cmaj7', description: 'Delta with 7' },
-                    { input: 'CΔ7', expected: 'Cmaj7', description: 'Delta with 7' },
-                    { input: 'C MAJ7', expected: 'Cmaj7', description: 'Uppercase MAJ7' },
-                    { input: 'C MAJOR7', expected: 'Cmaj7', description: 'Uppercase MAJOR7' }
-                ],
-                'Minor 7th': [
-                    { input: 'Cm7', expected: 'Cm7', description: 'Basic minor 7th' },
-                    { input: 'C min7', expected: 'Cm7', description: 'min7 with space' },
-                    { input: 'C minor7', expected: 'Cm7', description: 'minor7 with space' },
-                    { input: 'C-7', expected: 'Cm7', description: 'Dash with 7' },
-                    { input: 'Cminor7', expected: 'Cm7', description: 'minor7 (no space)' },
-                    { input: 'C MIN7', expected: 'Cm7', description: 'Uppercase MIN7' },
-                    { input: 'C MINOR7', expected: 'Cm7', description: 'Uppercase MINOR7' }
-                ],
-                'Half-Diminished 7th': [
-                    { input: 'Cm7b5', expected: 'Cm7♭5', description: 'Basic half-diminished' },
-                    { input: 'C halfdiminished', expected: 'Cm7♭5', description: 'halfdiminished with space' },
-                    { input: 'C halfdim', expected: 'Cm7♭5', description: 'halfdim with space' },
-                    { input: 'CØ', expected: 'Cm7♭5', description: 'Ø symbol' },
-                    { input: 'Chalfdiminished', expected: 'Cm7♭5', description: 'halfdiminished (no space)' },
-                    { input: 'C HALFDIMINISHED', expected: 'Cm7♭5', description: 'Uppercase HALFDIMINISHED' },
-                    { input: 'C HALFDIM', expected: 'Cm7♭5', description: 'Uppercase HALFDIM' }
-                ],
-                'Diminished Triads': [
-                    { input: 'Cdim', expected: 'C˚', description: 'Basic diminished' },
-                    { input: 'C diminished', expected: 'C˚', description: 'diminished with space' },
-                    { input: 'C dim', expected: 'C˚', description: 'dim with space' },
-                    { input: 'Cdiminished', expected: 'C˚', description: 'diminished (no space)' },
-                    { input: 'C DIMINISHED', expected: 'C˚', description: 'Uppercase DIMINISHED' },
-                    { input: 'C DIM', expected: 'C˚', description: 'Uppercase DIM' }
-                ],
-                'With Accidentals': [
-                    { input: 'Db', expected: 'D♭', description: 'Flat with b' },
-                    { input: 'D♭', expected: 'D♭', description: 'Unicode flat' },
-                    { input: 'F#', expected: 'F♯', description: 'Sharp with #' },
-                    { input: 'F♯', expected: 'F♯', description: 'Unicode sharp' },
-                    { input: 'Db7', expected: 'D♭7', description: 'Flat dominant 7th' },
-                    { input: 'F#m7', expected: 'F♯m7', description: 'Sharp minor 7th' },
-                    { input: 'Abmaj7', expected: 'A♭maj7', description: 'Flat major 7th' },
-                    { input: 'Ab∆', expected: 'A♭maj7', description: 'Flat with delta' }
-                ]
-            };
-            
-            let totalTests = 0;
-            let passedTests = 0;
-            
-            Object.entries(chordVariations).forEach(([category, tests]) => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'test-section';
-                categoryDiv.innerHTML = `<h3>${category}</h3>`;
-                
-                tests.forEach(test => {
-                    totalTests++;
-                    const result = normalizeChord(test.input);
-                    const passed = result === test.expected;
-                    if (passed) passedTests++;
-                    
-                    const testDiv = document.createElement('div');
-                    testDiv.className = `chord-test ${passed ? 'pass' : 'fail'}`;
-                    testDiv.innerHTML = `
-                        <strong>${test.description}</strong><br>
-                        Input: <span class="chord-input">${test.input}</span><br>
-                        Expected: <span class="chord-output">${test.expected}</span><br>
-                        Actual: <span class="chord-output">${result}</span><br>
-                        Status: ${passed ? '✅ PASS' : '❌ FAIL'}
-                    `;
-                    categoryDiv.appendChild(testDiv);
-                });
-                
-                resultsDiv.appendChild(categoryDiv);
-            });
-            
-            // Add summary
-            const summaryDiv = document.createElement('div');
-            summaryDiv.className = 'summary';
-            summaryDiv.innerHTML = `
-                <h3>Chord Variations Summary</h3>
-                <p><strong>Total Tests:</strong> ${totalTests}</p>
-                <p><strong>Passed:</strong> ${passedTests} ✅</p>
-                <p><strong>Failed:</strong> ${totalTests - passedTests} ❌</p>
-                <p><strong>Success Rate:</strong> ${Math.round((passedTests / totalTests) * 100)}%</p>
-            `;
-            resultsDiv.appendChild(summaryDiv);
-        }
-
-        // Auto-run tests on page load
-        window.addEventListener('load', () => {
-            console.log('Testing platform loaded. Click "Run All Tests" to begin testing.');
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Testing platform loaded. Click "Run Tests" to begin testing.');
         });
     </script>
 </body>

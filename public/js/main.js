@@ -1,6 +1,7 @@
 console.log('main.js loaded');
 
 // --- 1. Constants and Data ---
+// Data is now loaded from quizData.js and is available on the window object.
 
 const QUESTION_TYPES = {
   ACCIDENTALS_COUNT: 'accCount',
@@ -17,129 +18,6 @@ const MODES = {
   RANDOM_ALL: 'random_all',
   COMPLETE: 'complete'
 };
-
-const quizData = {
-  C: {
-    accidentals:0, notes:[],
-    scale:["C","D","E","F","G","A","B"],
-    triads:{2:"Dm",3:"Em",4:"F",5:"G",6:"Am",7:"B˚"},
-    sevenths:{2:"Dm7",3:"Em7",4:"Fmaj7",5:"G7",6:"Am7",7:"Bm7♭5"},
-    seventhSpelling:{2:["D","F","A","C"],3:["E","G","B","D"],4:["F","A","C","E"],5:["G","B","D","F"],6:["A","C","E","G"],7:["B","D","F","A"]}
-  },
-  G: {
-    accidentals:1, notes:["F#"],
-    scale:["G","A","B","C","D","E","F#"],
-    triads:{2:"Am",3:"Bm",4:"C",5:"D",6:"Em",7:"F#˚"},
-    sevenths:{2:"Am7",3:"Bm7",4:"Cmaj7",5:"D7",6:"Em7",7:"F#m7♭5"},
-    seventhSpelling:{2:["A","C","E","G"],3:["B","D","F#","A"],4:["C","E","G","B"],5:["D","F#","A","C"],6:["E","G","B","D"],7:["F#","A","C","E"]}
-  },
-  D: {
-    accidentals:2, notes:["F#","C#"],
-    scale:["D","E","F#","G","A","B","C#"],
-    triads:{2:"Em",3:"F#m",4:"G",5:"A",6:"Bm",7:"C#˚"},
-    sevenths:{2:"Em7",3:"F#m7",4:"Gmaj7",5:"A7",6:"Bm7",7:"C#m7♭5"},
-    seventhSpelling:{2:["E","G","B","D"],3:["F#","A","C#","E"],4:["G","B","D","F#"],5:["A","C#","E","G"],6:["B","D","F#","A"],7:["C#","E","G","B"]}
-  },
-  A: {
-    accidentals:3, notes:["F#","C#","G#"],
-    scale:["A","B","C#","D","E","F#","G#"],
-    triads:{2:"Bm",3:"C#m",4:"D",5:"E",6:"F#m",7:"G#˚"},
-    sevenths:{2:"Bm7",3:"C#m7",4:"Dmaj7",5:"E7",6:"F#m7",7:"G#m7♭5"},
-    seventhSpelling:{2:["B","D","F#","A"],3:["C#","E","G#","B"],4:["D","F#","A","C#"],5:["E","G#","B","D"],6:["F#","A","C#","E"],7:["G#","B","D","F#"]}
-  },
-  E: {
-    accidentals:4, notes:["F#","C#","G#","D#"],
-    scale:["E","F#","G#","A","B","C#","D#"],
-    triads:{2:"F#m",3:"G#m",4:"A",5:"B",6:"C#m",7:"D#˚"},
-    sevenths:{2:"F#m7",3:"G#m7",4:"Amaj7",5:"B7",6:"C#m7",7:"D#m7♭5"},
-    seventhSpelling:{2:["F#","A","C#","E"],3:["G#","B","D#","F#"],4:["A","C#","E","G#"],5:["B","D#","F#","A"],6:["C#","E","G#","B"],7:["D#","F#","A#","C#"]}
-  },
-  B: {
-    accidentals:5, notes:["F#","C#","G#","D#","A#"],
-    scale:["B","C#","D#","E","F#","G#","A#"],
-    triads:{2:"C#m",3:"D#m",4:"E",5:"F#",6:"G#m",7:"A#˚"},
-    sevenths:{2:"C#m7",3:"D#m7",4:"Emaj7",5:"F#7",6:"G#m7",7:"A#m7♭5"},
-    seventhSpelling:{2:["C#","E","G#","B"],3:["D#","F#","A#","C#"],4:["E","G#","B","D#"],5:["F#","A#","C#","E"],6:["G#","B","D#","F#"],7:["A#","C#","E","G#"]}
-  },
-  "B♭": {
-    accidentals:2, notes:["B♭","E♭"],
-    scale:["B♭","C","D","E♭","F","G","A"],
-    triads:{2:"Cm",3:"Dm",4:"E♭",5:"F",6:"Gm",7:"A˚"},
-    sevenths:{2:"Cm7",3:"Dm7",4:"E♭maj7",5:"F7",6:"Gm7",7:"Am7♭5"},
-    seventhSpelling:{2:["C","E♭","G","B♭"],3:["D","F","A","C"],4:["E♭","G","B♭","D"],5:["F","A","C","E♭"],6:["G","B♭","D","F"],7:["A","C","E♭","G"]}
-  },
-  "E♭": {
-    accidentals:3, notes:["B♭","E♭","A♭"],
-    scale:["E♭","F","G","A♭","B♭","C","D"],
-    triads:{2:"Fm",3:"Gm",4:"A♭",5:"B♭",6:"Cm",7:"D˚"},
-    sevenths:{2:"Fm7",3:"Gm7",4:"A♭maj7",5:"B♭7",6:"Cm7",7:"Dm7♭5"},
-    seventhSpelling:{2:["F","A♭","C","E♭"],3:["G","B♭","D","F"],4:["A♭","C","E♭","G"],5:["B♭","D","F","A♭"],6:["C","E♭","G","B♭"],7:["D","F","A♭","C"]}
-  },
-  F: {
-    accidentals:1, notes:["B♭"],
-    scale:["F","G","A","B♭","C","D","E"],
-    triads:{2:"Gm",3:"Am",4:"B♭",5:"C",6:"Dm",7:"E˚"},
-    sevenths:{2:"Gm7",3:"Am7",4:"B♭maj7",5:"C7",6:"Dm7",7:"Em7♭5"},
-    seventhSpelling:{2:["G","B♭","D","F"],3:["A","C","E","G"],4:["B♭","D","F","A"],5:["C","E","G","B♭"],6:["D","F","A","C"],7:["E","G","B♭","D"]}
-  },
-  "A♭": {
-    accidentals:4, notes:["B♭","E♭","A♭","D♭"],
-    scale:["A♭","B♭","C","D♭","E♭","F","G"],
-    triads:{2:"B♭m",3:"Cm",4:"D♭",5:"E♭",6:"Fm",7:"G˚"},
-    sevenths:{2:"B♭m7",3:"Cm7",4:"D♭maj7",5:"E♭7",6:"Fm7",7:"Gm7♭5"},
-    seventhSpelling:{2:["B♭","D♭","F","A♭"],3:["C","E♭","G","B♭"],4:["D♭","F","A♭","C"],5:["E♭","G","B♭","D♭"],6:["F","A♭","C","E♭"],7:["G","B♭","D♭","F"]}
-  },
-  "D♭": {
-    accidentals:5, notes:["B♭","E♭","A♭","D♭","G♭"],
-    scale:["D♭","E♭","F","G♭","A♭","B♭","C"],
-    triads:{2:"E♭m",3:"Fm",4:"G♭",5:"A♭",6:"B♭m",7:"C˚"},
-    sevenths:{2:"E♭m7",3:"Fm7",4:"G♭maj7",5:"A♭7",6:"B♭m7",7:"Cm7♭5"},
-    seventhSpelling:{2:["E♭","G♭","B♭","D♭"],3:["F","A♭","C","E♭"],4:["G♭","B♭","D♭","F"],5:["A♭","C","E♭","G♭"],6:["B♭","D♭","F","A♭"],7:["C","E♭","G♭","B♭"]}
-  },
-  "F♯": {
-    accidentals:6, notes:["F#","C#","G#","D#","A#","E#"],
-    scale:["F#","G#","A#","B","C#","D#","E#"],
-    triads:{2:"G#m",3:"A#m",4:"B",5:"C#",6:"D#m",7:"E#˚"},
-    sevenths:{2:"G#m7",3:"A#m7",4:"Bmaj7",5:"C#7",6:"D#m7",7:"E#m7♭5"},
-    seventhSpelling:{2:["G#","B","D#","F#"],3:["A#","C#","E#","G#"],4:["B","D#","F#","A#"],5:["C#","E#","G#","B"],6:["D#","F#","A#","C#"],7:["E#","G#","B","D#"]}
-  },
-  "G♭": {
-    accidentals:6, notes:["B♭","E♭","A♭","D♭","G♭","C♭"],
-    scale:["G♭","A♭","B♭","C♭","D♭","E♭","F"],
-    triads:{2:"A♭m",3:"B♭m",4:"C♭",5:"D♭",6:"E♭m",7:"F˚"},
-    sevenths:{2:"A♭m7",3:"B♭m7",4:"C♭maj7",5:"D♭7",6:"E♭m7",7:"Fm7♭5"},
-    seventhSpelling:{2:["A♭","C♭","E♭","G♭"],3:["B♭","D♭","F","A♭"],4:["C♭","E♭","G♭","B♭"],5:["D♭","F","A♭","C♭"],6:["E♭","G♭","B♭","D♭"],7:["F","A♭","C♭","E♭"]}
-  }
-};
-
-const allKeys = Object.keys(quizData);
-
-const CHAPTERS = {
-  ACCIDENTALS_COUNT: { id: QUESTION_TYPES.ACCIDENTALS_COUNT, name: 'Accidentals Count' },
-  ACCIDENTALS_NAMES: { id: QUESTION_TYPES.ACCIDENTALS_NAMES, name: 'Accidentals Naming' },
-  SCALE_SPELLING: { id: QUESTION_TYPES.SCALE_SPELLING, name: 'Scale Spelling' },
-  TRIADS: { id: QUESTION_TYPES.TRIADS, name: 'Triads' },
-  SEVENTHS: { id: QUESTION_TYPES.SEVENTHS, name: 'Sevenths' },
-  SEVENTH_SPELLING: { id: QUESTION_TYPES.SEVENTH_SPELLING, name: 'Seventh Spelling' }
-};
-
-const CORE_CHAPTERS = [CHAPTERS.ACCIDENTALS_COUNT, CHAPTERS.ACCIDENTALS_NAMES, CHAPTERS.SCALE_SPELLING, CHAPTERS.TRIADS];
-const ALL_CHAPTERS = Object.values(CHAPTERS);
-
-const learningPath = [
-    { name: '1. Introduction', keys: ['C'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '2. Level 1a Sharps', keys: ['G', 'D', 'A'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '3. Level 1b Sharps', keys: ['G', 'D', 'A'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-    { name: '4. Level 1a Flats', keys: ['F', 'B♭', 'E♭'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '5. Level 1b Flats', keys: ['F', 'B♭', 'E♭'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-    { name: '6. Level 2a Sharps', keys: ['E', 'B', 'F♯'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '7. Level 2b Sharps', keys: ['E', 'B', 'F♯'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-    { name: '8. Level 2a Flats', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '9. Level 2b Flats', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-    { name: '10. Level 3 Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F♯'], mode: MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
-    { name: '11. Level 3 Flats', keys: ['C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'], mode: MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
-    { name: 'Complete!', keys: [], mode: MODES.COMPLETE, chapters: [], requiredStreak: Infinity }
-];
 
 const learningState = {
   currentLevelIndex: 0,
@@ -197,7 +75,7 @@ function initLearningState() {
 }
 
 function getCurrentLevel() {
-  return learningPath[learningState.currentLevelIndex];
+  return window.learningPath[learningState.currentLevelIndex];
 }
 
 function advanceQuestionPointer() {
@@ -210,7 +88,7 @@ function advanceQuestionPointer() {
         // If the key is C and we would now ask to NAME the accidentals, skip it.
         const key = level.keys[learningState.currentKeyIndex];
         const nextChapter = level.chapters[learningState.currentChapterIndex];
-        if (key === 'C' && nextChapter && nextChapter.id === CHAPTERS.ACCIDENTALS_NAMES.id) {
+        if (key === 'C' && nextChapter && nextChapter.id === window.CHAPTERS.ACCIDENTALS_NAMES.id) {
             learningState.currentChapterIndex++; // Skip ahead
         }
         
@@ -373,6 +251,7 @@ function askQuestion() {
       break;
     case QUESTION_TYPES.ACCIDENTALS_NAMES:
       text = `Name the accidentals in ${key} major.`;
+      learningState.lastAccidentalsKey = key;
       break;
     case QUESTION_TYPES.SCALE_SPELLING:
       text = `Spell the ${key} major scale.`;
@@ -422,7 +301,7 @@ function handleAnswerSubmit(e) {
       // Handle A/B pair logic for accidentals questions
       if (learningState.currentQuestion && 
           learningState.currentQuestion.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT &&
-          quizData[learningState.currentQuestion.key].accidentals > 0) {
+          window.quizData[learningState.currentQuestion.key].accidentals > 0) {
         // We just answered accidentals count correctly, now ask naming for the same key
         const key = learningState.currentQuestion.key;
         learningState.currentQuestion = { key: key, chapterId: QUESTION_TYPES.ACCIDENTALS_NAMES };
@@ -496,7 +375,7 @@ function checkAnswer(answer) {
   if (!q) return false;
 
   const { key, chapterId, degree } = q;
-  const data = quizData[key];
+  const data = window.quizData[key];
 
   switch(chapterId) {
     case QUESTION_TYPES.ACCIDENTALS_COUNT:
@@ -546,27 +425,27 @@ function startAdvancedPractice(mode) {
   if (mode === 'random_all') {
     // For random practice, we'll use a simple approach
     // Pick a random key and random chapter
-    let randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
+    let randomKey = Object.keys(window.quizData).filter(k => k !== learningState.lastAccidentalsKey);
     let randomChapter;
     
     // Pick a random chapter, but exclude accidentals naming and seventh spelling
-    const availableChapters = ALL_CHAPTERS.filter(chapter => 
+    const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
       chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
       chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
     );
     randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
     
-    learningState.currentQuestion = { key: randomKey, chapterId: randomChapter.id };
+    learningState.currentQuestion = { key: randomKey[Math.floor(Math.random() * randomKey.length)], chapterId: randomChapter.id };
     
     let text = '';
     let degree;
 
     switch (randomChapter.id) {
       case QUESTION_TYPES.ACCIDENTALS_COUNT:
-        text = `How many accidentals are in ${randomKey} major?`;
+        text = `How many accidentals are in ${randomKey[Math.floor(Math.random() * randomKey.length)]} major?`;
         break;
       case QUESTION_TYPES.SCALE_SPELLING:
-        text = `Spell the ${randomKey} major scale.`;
+        text = `Spell the ${randomKey[Math.floor(Math.random() * randomKey.length)]} major scale.`;
         break;
       case QUESTION_TYPES.TRIADS:
       case QUESTION_TYPES.SEVENTHS:
@@ -575,7 +454,7 @@ function startAdvancedPractice(mode) {
         
         const chordType = randomChapter.id === QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
         const action = 'Name';
-        text = `${action} the ${ordinal(degree)} ${chordType} in ${randomKey} major.`;
+        text = `${action} the ${ordinal(degree)} ${chordType} in ${randomKey[Math.floor(Math.random() * randomKey.length)]} major.`;
         break;
     }
     
@@ -583,17 +462,17 @@ function startAdvancedPractice(mode) {
     
   } else if (mode === 'sevenths_only') {
     // For sevenths practice, focus ONLY on seventh chord spelling
-    const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
-    const randomChapter = CHAPTERS.SEVENTH_SPELLING; // Only spelling, not naming
+    const randomKey = Object.keys(window.quizData).filter(k => k !== learningState.lastAccidentalsKey);
+    const randomChapter = window.CHAPTERS.SEVENTH_SPELLING; // Only spelling, not naming
     
-    learningState.currentQuestion = { key: randomKey, chapterId: randomChapter.id };
+    learningState.currentQuestion = { key: randomKey[Math.floor(Math.random() * randomKey.length)], chapterId: randomChapter.id };
     
     const degree = [2, 3, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
     learningState.currentQuestion.degree = degree;
     
     const chordType = 'seventh chord';
     const action = 'Spell';
-    const text = `${action} the ${ordinal(degree)} ${chordType} in ${randomKey} major.`;
+    const text = `${action} the ${ordinal(degree)} ${chordType} in ${randomKey[Math.floor(Math.random() * randomKey.length)]} major.`;
     
     updateQuestionUI(text);
   }
@@ -601,8 +480,12 @@ function startAdvancedPractice(mode) {
 
 
 // --- 7. Initializer ---
-document.addEventListener('DOMContentLoaded', () => {
-  initLearningState();
-  renderAppLayout();
+function initializeApp() {
+    renderAppLayout();
+    attachEventListeners();
+    initLearningState();
     askQuestion();
-}); 
+}
+
+// Kick off the app
+initializeApp(); 

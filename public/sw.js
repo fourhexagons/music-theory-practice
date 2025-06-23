@@ -1,4 +1,4 @@
-const CACHE_NAME = 'music-theory-v12';
+const CACHE_NAME = 'music-theory-v17';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,7 +15,17 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
+      .then(cache => {
+        // Cache assets individually to handle failures gracefully
+        return Promise.allSettled(
+          ASSETS.map(asset => 
+            cache.add(asset).catch(error => {
+              console.warn(`Failed to cache ${asset}:`, error);
+              return null;
+            })
+          )
+        );
+      })
       .then(() => self.skipWaiting())
   );
 });
@@ -38,6 +48,13 @@ self.addEventListener('activate', event => {
 // Fetch event - handle network and cache strategies
 self.addEventListener('fetch', event => {
   const { request } = event;
+  const url = new URL(request.url);
+
+  // Skip caching for test pages and their assets
+  if (url.pathname.startsWith('/tests/') || url.pathname.includes('test_') || url.pathname.includes('debug_')) {
+    event.respondWith(fetch(request));
+    return;
+  }
 
   // For navigation requests, use a "network-first, falling back to offline page" strategy.
   if (request.mode === 'navigate') {

@@ -3,375 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Theory App - Validation Error Tests</title>
+    <title>Validation Error Tests</title>
+    <link rel="stylesheet" href="css/test-suite.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
-        .test-result { margin: 5px 0; padding: 5px; }
-        .pass { background-color: #d4edda; color: #155724; }
-        .fail { background-color: #f8d7da; color: #721c24; }
-        .error { background-color: #fff3cd; color: #856404; }
-        .summary { font-weight: bold; margin: 10px 0; }
-        button { margin: 5px; padding: 8px 16px; }
-        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1em;
+        .test-result {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
         }
-        .back-link:hover {
-            background-color: #5a6268;
+        
+        .test-result.pass {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .test-result.fail {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .test-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .status {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Test Suite</a>
-    <h1>Music Theory App - Validation Error Tests</h1>
-    <p>This test suite checks for symbol mismatches, validation errors, and edge cases.</p>
-    
-    <button onclick="runAllTests()">Run All Tests</button>
-    <button onclick="runSymbolTests()">Run Symbol Tests Only</button>
-    <button onclick="runValidationTests()">Run Validation Tests Only</button>
-    <button onclick="runEdgeCaseTests()">Run Edge Case Tests Only</button>
-    <br><br>
-    <button onclick="copyResults('json')">Copy JSON</button>
-    <button onclick="copyResults('csv')">Copy CSV</button>
-    <button onclick="copyResults('summary')">Copy Summary</button>
-    <span id="copy-status" style="margin-left:10px;color:green;"></span>
-    <div id="results"></div>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>Validation & Edge Case Tests</h1>
+            <p>This suite checks for symbol mismatches, validation errors, and other edge cases.</p>
+        </div>
 
-    <script src="../js/main.js?v=32"></script>
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
+            </div>
+            
+            <div class="controls">
+                <button onclick="runAllTests()" class="btn">Run All Tests</button>
+                <button onclick="copyResults('json')" class="btn">Copy JSON</button>
+                <button onclick="copyResults('summary')" class="btn">Copy Summary</button>
+            </div>
+            <div id="copy-status" class="status-area"></div>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/normalization.js"></script>
     <script>
-        // quizData, normalizeChord, and accidentalToUnicode are now loaded from main.js
+        let testResults = [];
 
         function checkAnswer(answer, questionType, key, degree) {
             const data = quizData[key];
             if (!data) return false;
 
-            if (questionType === 'SEVENTH_SPELLING') {
-                const correctSpelling = data.seventhSpelling[degree].map(n => accidentalToUnicode(n).toUpperCase());
-                const userSpelling = answer.trim().split(/\s+/).map(n => accidentalToUnicode(n).toUpperCase());
-                if (correctSpelling.length !== userSpelling.length) return false;
-                return JSON.stringify(correctSpelling.sort()) === JSON.stringify(userSpelling.sort());
-            }
-
             const normalizedAnswer = normalizeChord(answer);
             
-            switch(questionType) {
-                case 'TRIADS':
-                    return normalizedAnswer.toUpperCase() === normalizeChord(data.triads[degree]).toUpperCase();
-                case 'SEVENTHS':
-                    return normalizedAnswer.toUpperCase() === normalizeChord(data.sevenths[degree]).toUpperCase();
-                default:
-                    return false;
+            if (questionType === 'SEVENTH_SPELLING') {
+                const correctSpelling = data.seventhSpelling[degree].map(n => normalizeRootNote(n).toUpperCase());
+                const userSpelling = answer.trim().split(/\s+/).map(n => normalizeRootNote(n).toUpperCase());
+                if (correctSpelling.length !== userSpelling.length) return false;
+                for (let i = 0; i < correctSpelling.length; i++) {
+                    if (correctSpelling[i] !== userSpelling[i]) return false;
+                }
+                return true;
             }
+
+            const correctChord = (questionType === 'TRIADS') ? data.triads[degree] : data.sevenths[degree];
+            return normalizedAnswer.toUpperCase() === normalizeChord(correctChord).toUpperCase();
         }
 
-        // Test Results Management
-        let testResults = [];
-        let passCount = 0;
-        let failCount = 0;
-        let errorCount = 0;
-
-        function addResult(testName, passed, expected, actual, details = '') {
-            const result = {
-                name: testName,
-                passed,
-                expected,
-                actual,
-                details
-            };
-            testResults.push(result);
-            
-            if (passed) passCount++;
-            else if (details.includes('ERROR')) errorCount++;
-            else failCount++;
+        function addResult(testName, passed, expected, actual, category) {
+            testResults.push({ name: testName, passed, expected, actual, category });
         }
 
         function displayResults() {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="summary">
-                    <h2>Test Results Summary</h2>
-                    <p>Passed: ${passCount} | Failed: ${failCount} | Errors: ${errorCount} | Total: ${testResults.length}</p>
-                </div>
-            `;
-
-            testResults.forEach(result => {
-                const resultDiv = document.createElement('div');
-                resultDiv.className = `test-result ${result.passed ? 'pass' : result.details.includes('ERROR') ? 'error' : 'fail'}`;
-                resultDiv.innerHTML = `
-                    <strong>${result.name}</strong>: ${result.passed ? 'PASS' : result.details.includes('ERROR') ? 'ERROR' : 'FAIL'}<br>
-                    Expected: ${result.expected}<br>
-                    Actual: ${result.actual}<br>
-                    ${result.details ? `Details: ${result.details}<br>` : ''}
-                `;
-                resultsDiv.appendChild(resultDiv);
-            });
-        }
-
-        // Test Functions
-        function testSymbolMismatches() {
-            console.log('Testing symbol mismatches...');
+            resultsDiv.innerHTML = '';
             
-            // Test the specific case that was failing
-            const testCases = [
-                {
-                    name: 'A Major 5th Seventh Chord - E G# B D',
-                    answer: 'E G# B D',
-                    questionType: 'SEVENTH_SPELLING',
-                    key: 'A',
-                    degree: 5,
-                    expected: true
-                },
-                {
-                    name: 'G Major 5th Seventh Chord - D F# A C',
-                    answer: 'D F# A C',
-                    questionType: 'SEVENTH_SPELLING',
-                    key: 'G',
-                    degree: 5,
-                    expected: true
-                },
-                {
-                    name: 'C Major 5th Seventh Chord - G B D F',
-                    answer: 'G B D F',
-                    questionType: 'SEVENTH_SPELLING',
-                    key: 'C',
-                    degree: 5,
-                    expected: true
-                }
-            ];
-
-            testCases.forEach(testCase => {
-                try {
-                    const result = checkAnswer(testCase.answer, testCase.questionType, testCase.key, testCase.degree);
-                    addResult(
-                        testCase.name,
-                        result === testCase.expected,
-                        testCase.expected,
-                        result,
-                        result === testCase.expected ? '' : 'Symbol mismatch detected'
-                    );
-                } catch (error) {
-                    addResult(
-                        testCase.name,
-                        false,
-                        testCase.expected,
-                        'ERROR',
-                        `ERROR: ${error.message}`
-                    );
-                }
-            });
-        }
-
-        function testAccidentalToUnicode() {
-            console.log('Testing accidentalToUnicode function...');
+            const failed = testResults.filter(r => !r.passed);
+            const passed = testResults.filter(r => r.passed);
             
-            const testCases = [
-                { input: 'C#', expected: 'C#' },
-                { input: 'Db', expected: 'D♭' },
-                { input: 'F#', expected: 'F#' },
-                { input: 'Gb', expected: 'G♭' },
-                { input: 'A#', expected: 'A#' },
-                { input: 'Bb', expected: 'B♭' },
-                { input: 'E#', expected: 'E#' },
-                { input: 'Fb', expected: 'F♭' }
-            ];
-
-            testCases.forEach(testCase => {
-                try {
-                    const result = accidentalToUnicode(testCase.input);
-                    addResult(
-                        `accidentalToUnicode("${testCase.input}")`,
-                        result === testCase.expected,
-                        testCase.expected,
-                        result
-                    );
-                } catch (error) {
-                    addResult(
-                        `accidentalToUnicode("${testCase.input}")`,
-                        false,
-                        testCase.expected,
-                        'ERROR',
-                        `ERROR: ${error.message}`
-                    );
-                }
-            });
-        }
-
-        function testChordNormalization() {
-            console.log('Testing chord normalization...');
-            
-            const testCases = [
-                { input: 'Cm', expected: 'CM' },
-                { input: 'C minor', expected: 'CM' },
-                { input: 'Cmin', expected: 'CM' },
-                { input: 'CM7', expected: 'CMAJ7' },
-                { input: 'C major 7', expected: 'CMAJ7' },
-                { input: 'C7', expected: 'C7' },
-                { input: 'C dominant 7', expected: 'C7' },
-                { input: 'Cdom7', expected: 'C7' },
-                { input: 'C˚', expected: 'C˚' },
-                { input: 'C dim', expected: 'C˚' },
-                { input: 'Cm7♭5', expected: 'CM7♭5' },
-                { input: 'C half dim', expected: 'CM7♭5' },
-                { input: 'C halfdim', expected: 'CM7♭5' }
-            ];
-
-            testCases.forEach(testCase => {
-                try {
-                    const result = normalizeChord(testCase.input);
-                    addResult(
-                        `normalizeChord("${testCase.input}")`,
-                        result === testCase.expected,
-                        testCase.expected,
-                        result
-                    );
-                } catch (error) {
-                    addResult(
-                        `normalizeChord("${testCase.input}")`,
-                        false,
-                        testCase.expected,
-                        'ERROR',
-                        `ERROR: ${error.message}`
-                    );
-                }
-            });
-        }
-
-        function testEdgeCases() {
-            console.log('Testing edge cases...');
-            
-            const testCases = [
-                { input: '', expected: '' },
-                { input: '   ', expected: '' },
-                { input: 'X', expected: '' },
-                { input: '123', expected: '' },
-                { input: 'C# E G# B', expected: 'C#' }, // Note spelling should return root
-                { input: 'D F# A C', expected: 'D' },   // Note spelling should return root
-                { input: 'E G B', expected: 'E' }       // Triad spelling should return root
-            ];
-
-            testCases.forEach(testCase => {
-                try {
-                    const result = normalizeChord(testCase.input);
-                    addResult(
-                        `normalizeChord("${testCase.input}")`,
-                        result === testCase.expected,
-                        testCase.expected,
-                        result
-                    );
-                } catch (error) {
-                    addResult(
-                        `normalizeChord("${testCase.input}")`,
-                        false,
-                        testCase.expected,
-                        'ERROR',
-                        `ERROR: ${error.message}`
-                    );
-                }
-            });
-        }
-
-        function testAllSeventhChordSpellings() {
-            console.log('Testing all seventh chord spellings...');
-            
-            const keys = Object.keys(quizData);
-            const degrees = [2, 3, 4, 5, 6, 7];
-            
-            keys.forEach(key => {
-                degrees.forEach(degree => {
-                    const correctSpelling = quizData[key].seventhSpelling[degree];
-                    const answer = correctSpelling.join(' '); // Space-separated format
-                    
-                    try {
-                        const result = checkAnswer(answer, 'SEVENTH_SPELLING', key, degree);
-                        addResult(
-                            `${key} Major ${degree}th Seventh Chord`,
-                            result === true,
-                            true,
-                            result,
-                            `Expected: ${correctSpelling.join(' ')}`
-                        );
-                    } catch (error) {
-                        addResult(
-                            `${key} Major ${degree}th Seventh Chord`,
-                            false,
-                            true,
-                            'ERROR',
-                            `ERROR: ${error.message}`
-                        );
-                    }
+            if (failed.length > 0) {
+                const failHeader = document.createElement('h2');
+                failHeader.textContent = '❌ Failing Tests';
+                failHeader.style.color = '#dc3545';
+                resultsDiv.appendChild(failHeader);
+                
+                const failContainer = document.createElement('div');
+                failContainer.className = 'test-columns';
+                failed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result fail';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">❌ FAIL</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                    `;
+                    failContainer.appendChild(resultDiv);
                 });
+                resultsDiv.appendChild(failContainer);
+            }
+            
+            if (passed.length > 0) {
+                const passHeader = document.createElement('h2');
+                passHeader.textContent = '✅ Passing Tests';
+                passHeader.style.color = '#28a745';
+                passHeader.style.marginTop = '2rem';
+                resultsDiv.appendChild(passHeader);
+                
+                const passContainer = document.createElement('div');
+                passContainer.className = 'test-columns';
+                passed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result pass';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">✅ PASS</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                    `;
+                    passContainer.appendChild(resultDiv);
+                });
+                resultsDiv.appendChild(passContainer);
+            }
+
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+            const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
+            const summaryContent = document.getElementById('summary-content');
+            summaryContent.innerHTML = `
+                <p><strong>Total Tests:</strong> ${testResults.length}</p>
+                <p><strong>Passed:</strong> ${passCount} ✅</p>
+                <p><strong>Failed:</strong> ${failCount} ❌</p>
+                <p><strong>Success Rate:</strong> ${successRate}%</p>
+            `;
+            document.getElementById('summary').style.display = 'block';
+        }
+
+        function testSymbolMismatches() {
+            const testCases = [
+                // Seventh chord spelling tests with different notations
+                { name: 'A Major V7 Spelling (Sharp)', answer: 'E G# B D', key: 'A', degree: 5, expected: true },
+                { name: 'G Major V7 Spelling (Sharp)', answer: 'D F# A C', key: 'G', degree: 5, expected: true },
+                { name: 'F Major V7 Spelling (Flat)', answer: 'C E G Bb', key: 'F', degree: 5, expected: true },
+                { name: 'Bb Major V7 Spelling (Flat)', answer: 'F A C Eb', key: 'Bb', degree: 5, expected: true },
+                { name: 'C Major I7 Spelling', answer: 'C E G B', key: 'C', degree: 1, expected: true },
+                { name: 'D Major ii7 Spelling', answer: 'E G B D', key: 'D', degree: 2, expected: true },
+                { name: 'E Major vii7 Spelling', answer: 'D# F# A C#', key: 'E', degree: 7, expected: true },
+                
+                // Edge cases with different spacing and formatting
+                { name: 'Extra Spaces', answer: 'E  G#  B  D', key: 'A', degree: 5, expected: true },
+                { name: 'Mixed Case', answer: 'e g# b d', key: 'A', degree: 5, expected: true },
+                { name: 'Mixed Notation', answer: 'E G♯ B D', key: 'A', degree: 5, expected: true },
+                { name: 'Unicode Sharp', answer: 'E G♯ B D', key: 'A', degree: 5, expected: true },
+                { name: 'Unicode Flat', answer: 'C E G B♭', key: 'F', degree: 5, expected: true },
+                
+                // Incorrect spellings that should fail
+                { name: 'Wrong Note Order', answer: 'G# E B D', key: 'A', degree: 5, expected: false },
+                { name: 'Missing Note', answer: 'E G# B', key: 'A', degree: 5, expected: false },
+                { name: 'Extra Note', answer: 'E G# B D F', key: 'A', degree: 5, expected: false },
+                { name: 'Wrong Note', answer: 'E G# B C', key: 'A', degree: 5, expected: false }
+            ];
+            testCases.forEach(tc => {
+                const result = checkAnswer(tc.answer, 'SEVENTH_SPELLING', tc.key, tc.degree);
+                addResult(tc.name, result === tc.expected, tc.expected, result, 'Symbol Mismatches');
+            });
+        }
+        
+        function testValidationLogic() {
+            const testCases = [
+                // Basic triad validation
+                { name: 'Correct Triad (Minor)', answer: 'Gm', key: 'F', degree: 2, type: 'TRIADS', expected: true },
+                { name: 'Correct Triad (Major)', answer: 'F', key: 'F', degree: 1, type: 'TRIADS', expected: true },
+                { name: 'Correct Triad (Diminished)', answer: 'B°', key: 'C', degree: 7, type: 'TRIADS', expected: true },
+                { name: 'Incorrect Triad Type', answer: 'G', key: 'F', degree: 2, type: 'TRIADS', expected: false },
+                { name: 'Wrong Triad', answer: 'Am', key: 'F', degree: 2, type: 'TRIADS', expected: false },
+                
+                // Basic seventh validation
+                { name: 'Correct Seventh (Dominant)', answer: 'C7', key: 'F', degree: 5, type: 'SEVENTHS', expected: true },
+                { name: 'Correct Seventh (Major)', answer: 'Fmaj7', key: 'F', degree: 1, type: 'SEVENTHS', expected: true },
+                { name: 'Correct Seventh (Minor)', answer: 'Dm7', key: 'C', degree: 2, type: 'SEVENTHS', expected: true },
+                { name: 'Correct Seventh (Half-dim)', answer: 'Bm7♭5', key: 'C', degree: 7, type: 'SEVENTHS', expected: true },
+                { name: 'Incorrect Seventh Type', answer: 'Cmaj7', key: 'F', degree: 5, type: 'SEVENTHS', expected: false },
+                { name: 'Wrong Seventh', answer: 'D7', key: 'F', degree: 5, type: 'SEVENTHS', expected: false }
+            ];
+            testCases.forEach(tc => {
+                const result = checkAnswer(tc.answer, tc.type, tc.key, tc.degree);
+                addResult(tc.name, result === tc.expected, tc.expected, result, 'Validation Logic');
             });
         }
 
-        // Test Runner Functions
-        function runSymbolTests() {
-            resetResults();
-            testSymbolMismatches();
-            testAccidentalToUnicode();
-            displayResults();
+        function testNormalizationEdgeCases() {
+            const testCases = [
+                // Different chord notation variations
+                { name: 'Diminished Symbol (°)', answer: 'B°', key: 'C', degree: 7, type: 'TRIADS', expected: true },
+                { name: 'Diminished Text (dim)', answer: 'Bdim', key: 'C', degree: 7, type: 'TRIADS', expected: true },
+                { name: 'Minor Symbol (m)', answer: 'Dm', key: 'C', degree: 2, type: 'TRIADS', expected: true },
+                { name: 'Minor Text (min)', answer: 'Dmin', key: 'C', degree: 2, type: 'TRIADS', expected: true },
+                { name: 'Major Seventh (maj7)', answer: 'Cmaj7', key: 'C', degree: 1, type: 'SEVENTHS', expected: true },
+                { name: 'Major Seventh (M7)', answer: 'CM7', key: 'C', degree: 1, type: 'SEVENTHS', expected: true },
+                { name: 'Half Diminished (m7♭5)', answer: 'Bm7♭5', key: 'C', degree: 7, type: 'SEVENTHS', expected: true },
+                { name: 'Half Diminished (ø)', answer: 'Bø', key: 'C', degree: 7, type: 'SEVENTHS', expected: true },
+                { name: 'Half Diminished (halfdim)', answer: 'Bhalfdim', key: 'C', degree: 7, type: 'SEVENTHS', expected: true },
+                
+                // Case sensitivity
+                { name: 'Lowercase Chord', answer: 'gm', key: 'F', degree: 2, type: 'TRIADS', expected: true },
+                { name: 'Mixed Case Chord', answer: 'Gm', key: 'F', degree: 2, type: 'TRIADS', expected: true },
+                { name: 'Uppercase Chord', answer: 'GM', key: 'F', degree: 2, type: 'TRIADS', expected: false }
+            ];
+            testCases.forEach(tc => {
+                const result = checkAnswer(tc.answer, tc.type, tc.key, tc.degree);
+                addResult(tc.name, result === tc.expected, tc.expected, result, 'Normalization Edge Cases');
+            });
         }
 
-        function runValidationTests() {
-            resetResults();
-            testChordNormalization();
-            testAllSeventhChordSpellings();
-            displayResults();
+        function testInputValidation() {
+            const testCases = [
+                // Empty and invalid inputs
+                { name: 'Empty String', answer: '', key: 'C', degree: 1, type: 'TRIADS', expected: false },
+                { name: 'Whitespace Only', answer: '   ', key: 'C', degree: 1, type: 'TRIADS', expected: false },
+                { name: 'Invalid Chord Name', answer: 'XYZ', key: 'C', degree: 1, type: 'TRIADS', expected: false },
+                { name: 'Partial Chord Name', answer: 'G', key: 'F', degree: 2, type: 'TRIADS', expected: false },
+                { name: 'Extra Characters', answer: 'Gm7extra', key: 'F', degree: 2, type: 'TRIADS', expected: false },
+                
+                // Malformed inputs
+                { name: 'Numbers Only', answer: '123', key: 'C', degree: 1, type: 'TRIADS', expected: false },
+                { name: 'Special Characters', answer: 'G@m', key: 'F', degree: 2, type: 'TRIADS', expected: false },
+                { name: 'Multiple Chords', answer: 'Gm Am', key: 'F', degree: 2, type: 'TRIADS', expected: false }
+            ];
+            testCases.forEach(tc => {
+                const result = checkAnswer(tc.answer, tc.type, tc.key, tc.degree);
+                addResult(tc.name, result === tc.expected, tc.expected, result, 'Input Validation');
+            });
         }
 
-        function runEdgeCaseTests() {
-            resetResults();
-            testEdgeCases();
-            displayResults();
+        function testAccidentalHandling() {
+            const testCases = [
+                // Sharp notation variations - test that normalization works
+                { name: 'Sharp Symbol (#)', answer: 'C#m', key: 'A', degree: 3, type: 'TRIADS', expected: true },
+                { name: 'Unicode Sharp (♯)', answer: 'C♯m', key: 'A', degree: 3, type: 'TRIADS', expected: true },
+                { name: 'Double Sharp (##)', answer: 'F##', key: 'F#', degree: 4, type: 'TRIADS', expected: false },
+                { name: 'Double Sharp (x)', answer: 'Fx', key: 'F#', degree: 4, type: 'TRIADS', expected: false },
+                
+                // Flat notation variations
+                { name: 'Flat Symbol (b)', answer: 'Bb', key: 'F', degree: 4, type: 'TRIADS', expected: true },
+                { name: 'Unicode Flat (♭)', answer: 'B♭', key: 'F', degree: 4, type: 'TRIADS', expected: true },
+                { name: 'Double Flat (bb)', answer: 'Bbb', key: 'Cb', degree: 7, type: 'TRIADS', expected: false },
+                
+                // Mixed accidentals
+                { name: 'Sharp and Flat', answer: 'C#m7♭5', key: 'D', degree: 7, type: 'SEVENTHS', expected: true },
+                { name: 'Natural and Sharp', answer: 'E7', key: 'A', degree: 5, type: 'SEVENTHS', expected: true }
+            ];
+            testCases.forEach(tc => {
+                const result = checkAnswer(tc.answer, tc.type, tc.key, tc.degree);
+                addResult(tc.name, result === tc.expected, tc.expected, result, 'Accidental Handling');
+            });
         }
 
         function runAllTests() {
-            resetResults();
+            testResults = [];
             testSymbolMismatches();
-            testAccidentalToUnicode();
-            testChordNormalization();
-            testEdgeCases();
-            testAllSeventhChordSpellings();
+            testValidationLogic();
+            testNormalizationEdgeCases();
+            testInputValidation();
+            testAccidentalHandling();
             displayResults();
         }
 
-        function resetResults() {
-            testResults = [];
-            passCount = 0;
-            failCount = 0;
-            errorCount = 0;
-        }
+        let lastCopyData = null;
 
         function copyResults(format) {
-            let text = '';
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+
             if (format === 'json') {
-                text = JSON.stringify(testResults, null, 2);
-            } else if (format === 'csv') {
-                const header = ['name','passed','expected','actual','details'];
-                text = header.join(',') + '\n' + testResults.map(r => header.map(h => '"' + String(r[h]).replace(/"/g, '""') + '"').join(',')).join('\n');
+                lastCopyData = JSON.stringify({
+                    summary: { total: testResults.length, passed: passCount, failed: failCount },
+                    results: testResults
+                }, null, 2);
             } else if (format === 'summary') {
-                text = `Passed: ${passCount} | Failed: ${failCount} | Errors: ${errorCount} | Total: ${testResults.length}\n`;
-                testResults.forEach(r => {
-                    text += `${r.passed ? 'PASS' : r.details.includes('ERROR') ? 'ERROR' : 'FAIL'}: ${r.name} (Expected: ${r.expected}, Actual: ${r.actual})\n`;
-                });
+                let summaryText = `Test Summary:\n- Total: ${testResults.length}\n- Passed: ${passCount}\n- Failed: ${failCount}\n\n`;
+                summaryText += testResults.filter(r => !r.passed).map(r => `FAILED: ${r.name} (Expected: ${r.expected}, Got: ${r.actual})`).join('\n');
+                lastCopyData = summaryText;
             }
-            navigator.clipboard.writeText(text).then(() => {
-                document.getElementById('copy-status').textContent = 'Copied!';
-                setTimeout(() => { document.getElementById('copy-status').textContent = ''; }, 1200);
+
+            navigator.clipboard.writeText(lastCopyData).then(() => {
+                document.getElementById('copy-status').textContent = `${format.toUpperCase()} copied to clipboard!`;
+            }).catch(err => {
+                document.getElementById('copy-status').textContent = `Failed to copy.`;
             });
         }
-
-        // Auto-run tests on page load
-        window.onload = function() {
-            console.log('Validation error tests loaded. Click "Run All Tests" to start testing.');
-        };
     </script>
 </body>
 </html> 

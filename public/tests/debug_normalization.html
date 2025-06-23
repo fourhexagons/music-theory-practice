@@ -4,76 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debug Chord Normalization</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background-color: #f9f9f9; }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        .back-link:hover {
-            background-color: #5a6268;
-        }
-        h1 { color: #333; }
-        .debug { margin: 10px 0; padding: 15px; border: 1px solid #ccc; border-left-width: 5px; border-radius: 5px; }
-        .result { margin: 5px 0; padding: 5px; font-family: monospace; }
-        .correct { border-left-color: #28a745; background-color: #e9f7ec; }
-        .incorrect { border-left-color: #dc3545; background-color: #fceeee; }
-        .status-bar {
-            background-color: #eee;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-        }
-        .controls {
-            margin-bottom: 20px;
-        }
-        .controls button {
-            padding: 8px 15px;
-            border: none;
-            background-color: #667eea;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .controls button:hover {
-            background-color: #5a6fd8;
-        }
-        .status-area {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        h2 {
-            margin-top: 30px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/test-suite.css">
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Test Suite</a>
-    <h1>Debug Chord Normalization</h1>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>Debug Chord Normalization</h1>
+            <p>A simple interface to test the `normalizeChord` function live.</p>
+        </div>
 
-    <div class="status-bar">
-        <strong>Total Tests:</strong> <span id="total-count">0</span> |
-        <strong style="color: #28a745;">Passed:</strong> <span id="passed-count">0</span> |
-        <strong style="color: #dc3545;">Failed:</strong> <span id="failed-count">0</span>
+        <div class="content-box">
+            <div class="summary" style="display: none;">
+                <div id="summary-content"></div>
+            </div>
+
+            <div class="controls">
+                 <button class="btn" onclick="rerunTests()">Rerun Tests</button>
+                 <button class="btn" onclick="exportJSON()">Export Results (JSON)</button>
+                 <div id="copy-status" class="status-area"></div>
+            </div>
+
+            <div id="debug" class="test-output"></div>
+        </div>
     </div>
-
-    <div class="controls">
-         <button onclick="rerunTests()">Rerun Tests</button>
-         <button onclick="exportJSON()">Export Results (JSON)</button>
-         <div id="copy-status" class="status-area"></div>
-    </div>
-
-    <div id="debug"></div>
 
     <script src="../js/utils/normalization.js"></script>
     <script>
@@ -83,9 +37,17 @@
         let failedCount = 0;
 
         function updateCounts() {
-            document.getElementById('total-count').textContent = testResults.length;
-            document.getElementById('passed-count').textContent = passedCount;
-            document.getElementById('failed-count').textContent = failedCount;
+            const summaryDiv = document.querySelector('.summary');
+            const summaryContent = document.getElementById('summary-content');
+            const successRate = testResults.length > 0 ? Math.round((passedCount / testResults.length) * 100) : 0;
+
+            summaryContent.innerHTML = `
+                <p><strong>Total Tests:</strong> ${testResults.length}</p>
+                <p><strong>Passed:</strong> ${passedCount} ✅</p>
+                <p><strong>Failed:</strong> ${failedCount} ❌</p>
+                <p><strong>Success Rate:</strong> ${successRate}%</p>
+            `;
+            summaryDiv.style.display = 'block';
         }
 
         function debugNormalizeChord(input, expected) {
@@ -108,7 +70,7 @@
                 failedCount++;
             }
 
-            div.className = isCorrect ? 'debug correct' : 'debug incorrect';
+            div.className = 'debug-item' + (isCorrect ? ' correct' : ' incorrect');
 
             div.innerHTML += `<div class="result"><strong>Input:</strong> "${input}"</div>`;
             div.innerHTML += `<div class="result"><strong>Output:</strong> "${finalResult}"</div>`;
@@ -213,7 +175,7 @@
         }
 
         // Initial run on page load
-        document.addEventListener('DOMContentLoaded', rerunTests);
+        // document.addEventListener('DOMContentLoaded', rerunTests);
     </script>
 </body>
 </html> 

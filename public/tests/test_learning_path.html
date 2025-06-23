@@ -4,199 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Path Progression Test</title>
-    <link rel="stylesheet" href="../css/style.css?v=2">
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #007acc;
-            padding-bottom: 10px;
-        }
-        .test-section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fafafa;
-        }
-        .test-section h3 {
-            margin-top: 0;
-            color: #007acc;
-        }
-        button {
-            background-color: #007acc;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px 5px;
-        }
-        button:hover {
-            background-color: #005a9e;
-        }
-        .output {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            white-space: pre-wrap;
-            max-height: 600px;
-            overflow-y: auto;
-            margin: 10px 0;
-        }
-        .json-output {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .summary {
-            background-color: #e8f5e8;
-            border: 1px solid #4caf50;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .error {
-            background-color: #ffebee;
-            border: 1px solid #f44336;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .controls {
-            margin-bottom: 20px;
-        }
-        .btn {
-            margin-right: 10px;
-        }
-        .status-area {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .output-container {
-            margin-bottom: 20px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        .back-link:hover {
-            background-color: #5a6268;
-        }
-    </style>
+    <link rel="stylesheet" href="css/test-suite.css">
 </head>
 <body>
     <div class="container">
         <a href="index.html" class="back-link">← Back to Test Suite</a>
-        <h1>🎯 Learning Path Progression Test</h1>
-        <p>This test simulates the complete learning path progression to verify the app's logic.</p>
-        
-        <div class="controls">
-            <button onclick="runTest()" class="btn btn-primary">Run Learning Path Test</button>
-            <button onclick="clearOutput()" class="btn btn-secondary">Clear Output</button>
-            <button onclick="copyJSON()" class="btn btn-success">Copy JSON</button>
+        <div class="header">
+            <h1>🎯 Learning Path Progression Test</h1>
+            <p>This test simulates the complete learning path to verify the app's logic.</p>
         </div>
         
-        <div id="copy-status" class="status-area"></div>
-        
-        <div class="output-container">
-            <h3>Test Results:</h3>
-            <pre id="output">Click "Run Learning Path Test" to start...</pre>
-        </div>
-        
-        <div class="output-container">
-            <h3>JSON Output:</h3>
-            <pre id="json-output">JSON output will appear here...</pre>
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                 <div id="stats" class="stats-grid"></div>
+            </div>
+            <div class="controls">
+                <button onclick="runTest()" class="btn">Run Learning Path Test</button>
+                <button onclick="clearOutput()" class="btn">Clear Output</button>
+                <button onclick="copyJSON()" class="btn">Copy JSON</button>
+            </div>
+            
+            <div id="copy-status" class="status-area"></div>
+            
+            <div class="output-container">
+                <h3>Test Results:</h3>
+                <pre id="output">Click "Run Learning Path Test" to start...</pre>
+            </div>
+            
+            <div class="output-container">
+                <h3>JSON Output:</h3>
+                <pre id="json-output">JSON output will appear here...</pre>
+            </div>
         </div>
     </div>
 
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/normalization.js"></script>
     <script>
-        // Learning Path Data (copied from main.js)
-        const QUESTION_TYPES = {
-            ACCIDENTALS_COUNT: 'accCount',
-            ACCIDENTALS_NAMES: 'accNotes',
-            SCALE_SPELLING: 'scale',
-            TRIADS: 'triads',
-            SEVENTHS: 'sevenths',
-            SEVENTH_SPELLING: 'seventhSpelling'
-        };
-
-        const MODES = {
-            LINEAR: 'linear',
-            RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
-            RANDOM_ALL: 'random_all',
-            COMPLETE: 'complete'
-        };
-
-        const CHAPTERS = {
-            ACCIDENTALS_COUNT: { id: QUESTION_TYPES.ACCIDENTALS_COUNT, name: 'Accidentals Count' },
-            ACCIDENTALS_NAMES: { id: QUESTION_TYPES.ACCIDENTALS_NAMES, name: 'Accidentals Naming' },
-            SCALE_SPELLING: { id: QUESTION_TYPES.SCALE_SPELLING, name: 'Scale Spelling' },
-            TRIADS: { id: QUESTION_TYPES.TRIADS, name: 'Triads' },
-            SEVENTHS: { id: QUESTION_TYPES.SEVENTHS, name: 'Sevenths' },
-            SEVENTH_SPELLING: { id: QUESTION_TYPES.SEVENTH_SPELLING, name: 'Seventh Spelling' }
-        };
-
-        const CORE_CHAPTERS = [CHAPTERS.ACCIDENTALS_COUNT, CHAPTERS.ACCIDENTALS_NAMES, CHAPTERS.SCALE_SPELLING, CHAPTERS.TRIADS];
-        const ALL_CHAPTERS = Object.values(CHAPTERS);
-
-        const learningPath = [
-            { name: '1. Introduction', keys: ['C'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-            { name: '2. Level 1a Sharps', keys: ['G', 'D', 'A'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-            { name: '3. Level 1b Sharps', keys: ['G', 'D', 'A'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-            { name: '4. Level 1a Flats', keys: ['F', 'B♭', 'E♭'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-            { name: '5. Level 1b Flats', keys: ['F', 'B♭', 'E♭'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-            { name: '6. Level 2a Sharps', keys: ['E', 'B', 'F♯'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-            { name: '7. Level 2b Sharps', keys: ['E', 'B', 'F♯'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-            { name: '8. Level 2a Flats', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-            { name: '9. Level 2b Flats', keys: ['A♭', 'D♭', 'G♭'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
-            { name: '10. Level 3 Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F♯'], mode: MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
-            { name: '11. Level 3 Flats', keys: ['C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'], mode: MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
-            { name: 'Complete!', keys: [], mode: MODES.COMPLETE, chapters: [], requiredStreak: Infinity }
-        ];
-
-        // Mock quiz data for testing
-        const quizData = {
-            C: { accidentals: 0, notes: [], scale: ["C","D","E","F","G","A","B"], triads: {2:"Dm",3:"Em",4:"F",5:"G",6:"Am",7:"B˚"} },
-            G: { accidentals: 1, notes: ["F#"], scale: ["G","A","B","C","D","E","F#"], triads: {2:"Am",3:"Bm",4:"C",5:"D",6:"Em",7:"F#˚"} },
-            D: { accidentals: 2, notes: ["F#","C#"], scale: ["D","E","F#","G","A","B","C#"], triads: {2:"Em",3:"F#m",4:"G",5:"A",6:"Bm",7:"C#˚"} },
-            A: { accidentals: 3, notes: ["F#","C#","G#"], scale: ["A","B","C#","D","E","F#","G#"], triads: {2:"Bm",3:"C#m",4:"D",5:"E",6:"F#m",7:"G#˚"} },
-            F: { accidentals: 1, notes: ["B♭"], scale: ["F","G","A","B♭","C","D","E"], triads: {2:"Gm",3:"Am",4:"B♭",5:"C",6:"Dm",7:"E˚"} },
-            "B♭": { accidentals: 2, notes: ["B♭","E♭"], scale: ["B♭","C","D","E♭","F","G","A"], triads: {2:"Cm",3:"Dm",4:"E♭",5:"F",6:"Gm",7:"A˚"} },
-            "E♭": { accidentals: 3, notes: ["B♭","E♭","A♭"], scale: ["E♭","F","G","A♭","B♭","C","D"], triads: {2:"Fm",3:"Gm",4:"A♭",5:"B♭",6:"Cm",7:"D˚"} }
-        };
-
+        // Learning path data is now loaded from quizData.js
         function ordinal(n) {
             const s = ["th", "st", "nd", "rd"];
             const v = n % 100;
@@ -227,11 +72,10 @@
             let questionCount = 0;
             const maxQuestions = 1000; // Safety limit
             
-            while (state.currentLevelIndex < learningPath.length - 1 && questionCount < maxQuestions) {
+            while (state.currentLevelIndex < learningPath.length && questionCount < maxQuestions) {
                 const level = learningPath[state.currentLevelIndex];
-                const nextLevel = learningPath[state.currentLevelIndex + 1];
                 
-                if (level.mode === MODES.COMPLETE) {
+                if (!level || level.mode === 'complete') { // Check for undefined level or complete mode
                     break;
                 }
                 
@@ -337,10 +181,13 @@
                                 state.currentKeyIndex = 0;
                                 state.correctAnswerStreak = 0;
                                 
-                                results.summary.push(`✅ Completed ${level.name} -> ${nextLevel.name}`);
+                                const nextLevel = learningPath[state.currentLevelIndex];
+                                
+                                const summaryMessage = `✅ Completed ${level.name} -> ${nextLevel ? nextLevel.name : 'Test Complete!'}`;
+                                results.summary.push(summaryMessage);
                                 results.json.levelProgression.push({
                                     from: level.name,
-                                    to: nextLevel.name,
+                                    to: nextLevel ? nextLevel.name : 'Test Complete!',
                                     questionsInLevel: questionCount - (results.json.totalQuestions || 0)
                                 });
                                 results.json.totalQuestions = questionCount;
@@ -363,11 +210,15 @@
                         state.currentChapterIndex = 0;
                         state.currentKeyIndex = 0;
                         state.correctAnswerStreak = 0;
+                        state.usedDegrees = [];
                         
-                        results.summary.push(`✅ Completed ${level.name} -> ${nextLevel.name}`);
+                        const nextLevel = learningPath[state.currentLevelIndex];
+                        
+                        const summaryMessage = `✅ Completed ${level.name} -> ${nextLevel ? nextLevel.name : 'Test Complete!'}`;
+                        results.summary.push(summaryMessage);
                         results.json.levelProgression.push({
                             from: level.name,
-                            to: nextLevel.name,
+                            to: nextLevel ? nextLevel.name : 'Test Complete!',
                             questionsInLevel: questionCount - (results.json.totalQuestions || 0)
                         });
                         results.json.totalQuestions = questionCount;
@@ -384,43 +235,43 @@
         }
 
         function runTest() {
-            const outputDiv = document.getElementById('output');
-            const jsonDiv = document.getElementById('json-output');
+            const output = document.getElementById('output');
+            const jsonOutput = document.getElementById('json-output');
             
-            outputDiv.textContent = '🎯 Learning Path Progression Test\n================================\n';
-            
-            try {
+            output.textContent = 'Running test...';
+            jsonOutput.textContent = 'Running test...';
+
+            // Use a timeout to allow the UI to update before the heavy lifting
+            setTimeout(() => {
                 const results = simulateLearningPath();
                 
-                // Display summary
-                outputDiv.textContent += '\n📊 SUMMARY:\n===========\n';
-                results.summary.forEach(summary => {
-                    outputDiv.textContent += summary + '\n';
-                });
-                
-                // Display detailed path
-                outputDiv.textContent += '\n🔍 DETAILED PATH (First 20 questions):\n=====================================\n';
-                results.path.slice(0, 20).forEach((q, i) => {
-                    outputDiv.textContent += `${i + 1}. ${q.level} | ${q.key} | ${q.chapter} | Q: ${q.question}\n`;
-                });
-                
-                if (results.path.length > 20) {
-                    outputDiv.textContent += `... and ${results.path.length - 20} more questions\n`;
-                }
-                
-                outputDiv.textContent += `\n✅ Total questions simulated: ${results.json.totalQuestions}\n`;
-                outputDiv.textContent += `✅ Levels completed: ${results.json.levelProgression.length}\n`;
-                
-                // Display JSON
-                jsonDiv.textContent = JSON.stringify(results.json, null, 2);
-                
-                // Store results globally for copy function
-                window.lastTestResults = results;
-                
-            } catch (error) {
-                outputDiv.textContent += `\n❌ ERROR: ${error.message}\n`;
-                console.error('Test error:', error);
-            }
+                displayResults(results);
+            }, 50);
+        }
+
+        function displayResults(results) {
+            const output = document.getElementById('output');
+            const jsonOutput = document.getElementById('json-output');
+            const summaryDiv = document.getElementById('summary');
+            const statsGrid = document.getElementById('stats');
+
+            output.textContent = results.path.map(p => 
+                `Q${p.questionNumber.toString().padStart(2, '0')}: [${p.level}] - ${p.question} (Streak: ${p.streak})`
+            ).join('\n');
+
+            jsonOutput.textContent = JSON.stringify(results.json, null, 2);
+            
+            const totalQuestions = results.json.totalQuestions;
+            const levelsCompleted = results.json.levelProgression.length;
+            const errorsEncountered = results.json.errors.length;
+
+            statsGrid.innerHTML = `
+                <p><strong>Test Complete!</strong></p>
+                <p><strong>Total Questions Simulated:</strong> ${totalQuestions}</p>
+                <p><strong>Levels Completed:</strong> ${levelsCompleted}</p>
+                <p><strong>Errors Encountered:</strong> ${errorsEncountered} ${errorsEncountered === 0 ? '✅' : '❌'}</p>
+            `;
+            summaryDiv.style.display = 'block';
         }
 
         function clearOutput() {

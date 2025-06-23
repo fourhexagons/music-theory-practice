@@ -3,245 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seventh Chord Spelling Tests</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .test-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .test-section h2 {
-            color: #555;
-            margin-bottom: 15px;
-        }
-        .key-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-        }
-        .key-section h3 {
-            color: #666;
-            margin-bottom: 10px;
-        }
-        .chord-test {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-        .chord-test:nth-child(even) {
-            background-color: #f0f0f0;
-        }
-        .degree {
-            font-weight: bold;
-            color: #333;
-        }
-        .expected {
-            font-family: monospace;
-            background-color: #e8f5e8;
-            padding: 5px;
-            border-radius: 3px;
-        }
-        .chord-name {
-            font-family: monospace;
-            background-color: #e8f0ff;
-            padding: 5px;
-            border-radius: 3px;
-        }
-        .spelling {
-            font-family: monospace;
-            background-color: #fff3e8;
-            padding: 5px;
-            border-radius: 3px;
-        }
-        .status {
-            font-weight: bold;
-            padding: 5px;
-            border-radius: 3px;
-            text-align: center;
-        }
-        .pass {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .fail {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .summary {
-            background-color: #e2e3e5;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .summary h3 {
-            margin-top: 0;
-            color: #495057;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .stat-box {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #007bff;
-        }
-        .stat-label {
-            color: #6c757d;
-            font-size: 14px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        .back-link:hover {
-            background-color: #5a6268;
-        }
-    </style>
+    <title>Seventh Chord Tests</title>
+    <link rel="stylesheet" href="css/test-suite.css">
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Test Suite</a>
     <div class="container">
-        <h1>Seventh Chord Spelling Tests</h1>
-        <div id="test-results"></div>
-        <div id="summary" class="summary" style="display: none;">
-            <h3>Test Summary</h3>
-            <div id="stats" class="stats"></div>
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>Seventh Chord Tests</h1>
+            <p>This test suite verifies seventh chord normalization and validation.</p>
+        </div>
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="stats" class="stats-grid"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" onclick="runTests()">Run Tests</button>
+            </div>
+            <div id="results"></div>
         </div>
     </div>
 
+    <script src="../js/data/quizData.js"></script>
     <script>
-        // Import the quiz data and functions from main.js
-        const quizData = {
-            C: {
-                accidentals:0, notes:[],
-                scale:["C","D","E","F","G","A","B"],
-                triads:{2:"Dm",3:"Em",4:"F",5:"G",6:"Am",7:"B˚"},
-                sevenths:{2:"Dm7",3:"Em7",4:"Fmaj7",5:"G7",6:"Am7",7:"Bm7♭5"},
-                seventhSpelling:{2:["D","F","A","C"],3:["E","G","B","D"],4:["F","A","C","E"],5:["G","B","D","F"],6:["A","C","E","G"],7:["B","D","F","A"]}
-            },
-            G: {
-                accidentals:1, notes:["F#"],
-                scale:["G","A","B","C","D","E","F#"],
-                triads:{2:"Am",3:"Bm",4:"C",5:"D",6:"Em",7:"F#˚"},
-                sevenths:{2:"Am7",3:"Bm7",4:"Cmaj7",5:"D7",6:"Em7",7:"F#m7♭5"},
-                seventhSpelling:{2:["A","C","E","G"],3:["B","D","F#","A"],4:["C","E","G","B"],5:["D","F#","A","C"],6:["E","G","B","D"],7:["F#","A","C","E"]}
-            },
-            D: {
-                accidentals:2, notes:["F#","C#"],
-                scale:["D","E","F#","G","A","B","C#"],
-                triads:{2:"Em",3:"F#m",4:"G",5:"A",6:"Bm",7:"C#˚"},
-                sevenths:{2:"Em7",3:"F#m7",4:"Gmaj7",5:"A7",6:"Bm7",7:"C#m7♭5"},
-                seventhSpelling:{2:["E","G","B","D"],3:["F#","A","C#","E"],4:["G","B","D","F#"],5:["A","C#","E","G"],6:["B","D","F#","A"],7:["C#","E","G","B"]}
-            },
-            A: {
-                accidentals:3, notes:["F#","C#","G#"],
-                scale:["A","B","C#","D","E","F#","G#"],
-                triads:{2:"Bm",3:"C#m",4:"D",5:"E",6:"F#m",7:"G#˚"},
-                sevenths:{2:"Bm7",3:"C#m7",4:"Dmaj7",5:"E7",6:"F#m7",7:"G#m7♭5"},
-                seventhSpelling:{2:["B","D","F#","A"],3:["C#","E","G#","B"],4:["D","F#","A","C#"],5:["E","G#","B","D"],6:["F#","A","C#","E"],7:["G#","B","D","F#"]}
-            },
-            E: {
-                accidentals:4, notes:["F#","C#","G#","D#"],
-                scale:["E","F#","G#","A","B","C#","D#"],
-                triads:{2:"F#m",3:"G#m",4:"A",5:"B",6:"C#m",7:"D#˚"},
-                sevenths:{2:"F#m7",3:"G#m7",4:"Amaj7",5:"B7",6:"C#m7",7:"D#m7♭5"},
-                seventhSpelling:{2:["F#","A","C#","E"],3:["G#","B","D#","F#"],4:["A","C#","E","G#"],5:["B","D#","F#","A"],6:["C#","E","G#","B"],7:["D#","F#","A","C#"]}
-            },
-            B: {
-                accidentals:5, notes:["F#","C#","G#","D#","A#"],
-                scale:["B","C#","D#","E","F#","G#","A#"],
-                triads:{2:"C#m",3:"D#m",4:"E",5:"F#",6:"G#m",7:"A#˚"},
-                sevenths:{2:"C#m7",3:"D#m7",4:"Emaj7",5:"F#7",6:"G#m7",7:"A#m7♭5"},
-                seventhSpelling:{2:["C#","E","G#","B"],3:["D#","F#","A#","C#"],4:["E","G#","B","D#"],5:["F#","A#","C#","E"],6:["G#","B","D#","F#"],7:["A#","C#","E","G#"]}
-            },
-            "B♭": {
-                accidentals:2, notes:["B♭","E♭"],
-                scale:["B♭","C","D","E♭","F","G","A"],
-                triads:{2:"Cm",3:"Dm",4:"E♭",5:"F",6:"Gm",7:"A˚"},
-                sevenths:{2:"Cm7",3:"Dm7",4:"E♭maj7",5:"F7",6:"Gm7",7:"Am7♭5"},
-                seventhSpelling:{2:["C","E♭","G","B♭"],3:["D","F","A","C"],4:["E♭","G","B♭","D"],5:["F","A","C","E♭"],6:["G","B♭","D","F"],7:["A","C","E♭","G"]}
-            },
-            "E♭": {
-                accidentals:3, notes:["B♭","E♭","A♭"],
-                scale:["E♭","F","G","A♭","B♭","C","D"],
-                triads:{2:"Fm",3:"Gm",4:"A♭",5:"B♭",6:"Cm",7:"D˚"},
-                sevenths:{2:"Fm7",3:"Gm7",4:"A♭maj7",5:"B♭7",6:"Cm7",7:"Dm7♭5"},
-                seventhSpelling:{2:["F","A♭","C","E♭"],3:["G","B♭","D","F"],4:["A♭","C","E♭","G"],5:["B♭","D","F","A♭"],6:["C","E♭","G","B♭"],7:["D","F","A♭","C"]}
-            },
-            F: {
-                accidentals:1, notes:["B♭"],
-                scale:["F","G","A","B♭","C","D","E"],
-                triads:{2:"Gm",3:"Am",4:"B♭",5:"C",6:"Dm",7:"E˚"},
-                sevenths:{2:"Gm7",3:"Am7",4:"B♭maj7",5:"C7",6:"Dm7",7:"Em7♭5"},
-                seventhSpelling:{2:["G","B♭","D","F"],3:["A","C","E","G"],4:["B♭","D","F","A"],5:["C","E","G","B♭"],6:["D","F","A","C"],7:["E","G","B♭","D"]}
-            },
-            "A♭": {
-                accidentals:4, notes:["B♭","E♭","A♭","D♭"],
-                scale:["A♭","B♭","C","D♭","E♭","F","G"],
-                triads:{2:"B♭m",3:"Cm",4:"D♭",5:"E♭",6:"Fm",7:"G˚"},
-                sevenths:{2:"B♭m7",3:"Cm7",4:"D♭maj7",5:"E♭7",6:"Fm7",7:"Gm7♭5"},
-                seventhSpelling:{2:["B♭","D♭","F","A♭"],3:["C","E♭","G","B♭"],4:["D♭","F","A♭","C"],5:["E♭","G","B♭","D♭"],6:["F","A♭","C","E♭"],7:["G","B♭","D♭","F"]}
-            },
-            "D♭": {
-                accidentals:5, notes:["B♭","E♭","A♭","D♭","G♭"],
-                scale:["D♭","E♭","F","G♭","A♭","B♭","C"],
-                triads:{2:"E♭m",3:"Fm",4:"G♭",5:"A♭",6:"B♭m",7:"C˚"},
-                sevenths:{2:"E♭m7",3:"Fm7",4:"G♭maj7",5:"A♭7",6:"B♭m7",7:"Cm7♭5"},
-                seventhSpelling:{2:["E♭","G♭","B♭","D♭"],3:["F","A♭","C","E♭"],4:["G♭","B♭","D♭","F"],5:["A♭","C","E♭","G♭"],6:["B♭","D♭","F","A♭"],7:["C","E♭","G♭","B♭"]}
-            },
-            "F♯": {
-                accidentals:6, notes:["F#","C#","G#","D#","A#","E#"],
-                scale:["F#","G#","A#","B","C#","D#","E#"],
-                triads:{2:"G#m",3:"A#m",4:"B",5:"C#",6:"D#m",7:"E#˚"},
-                sevenths:{2:"G#m7",3:"A#m7",4:"Bmaj7",5:"C#7",6:"D#m7",7:"E#m7♭5"},
-                seventhSpelling:{2:["G#","B","D#","F#"],3:["A#","C#","E#","G#"],4:["B","D#","F#","A#"],5:["C#","E#","G#","B"],6:["D#","F#","A#","C#"],7:["E#","G#","B","D#"]}
-            },
-            "G♭": {
-                accidentals:6, notes:["B♭","E♭","A♭","D♭","G♭","C♭"],
-                scale:["G♭","A♭","B♭","C♭","D♭","E♭","F"],
-                triads:{2:"A♭m",3:"B♭m",4:"C♭",5:"D♭",6:"E♭m",7:"F˚"},
-                sevenths:{2:"A♭m7",3:"B♭m7",4:"C♭maj7",5:"D♭7",6:"E♭m7",7:"Fm7♭5"},
-                seventhSpelling:{2:["A♭","C♭","E♭","G♭"],3:["B♭","D♭","F","A♭"],4:["C♭","E♭","G♭","B♭"],5:["D♭","F","A♭","C♭"],6:["E♭","G♭","B♭","D♭"],7:["F","A♭","C♭","E♭"]}
-            }
-        };
-
         const allKeys = Object.keys(quizData);
         const degrees = [2, 3, 4, 5, 6, 7];
         const degreeNames = ['ii', 'iii', 'IV', 'V', 'vi', 'vii°'];
@@ -249,6 +33,14 @@
         function ordinal(n) {
             const s = ["th", "st", "nd", "rd"], v = n % 100;
             return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        function runTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            const testData = runSeventhChordTests();
+            displayResults(testData);
         }
 
         function runSeventhChordTests() {
@@ -328,83 +120,49 @@
         }
 
         function displayResults(testData) {
-            const container = document.getElementById('test-results');
+            const container = document.getElementById('results');
             const summary = document.getElementById('summary');
-            const stats = document.getElementById('stats');
+            const statsEl = document.getElementById('stats');
+            container.innerHTML = ''; // Clear previous results
 
             // Display summary
             summary.style.display = 'block';
-            stats.innerHTML = `
-                <div class="stat-box">
-                    <div class="stat-number">${testData.stats.total}</div>
-                    <div class="stat-label">Total Tests</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" style="color: #28a745;">${testData.stats.passed}</div>
-                    <div class="stat-label">Passed</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" style="color: #dc3545;">${testData.stats.failed}</div>
-                    <div class="stat-label">Failed</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" style="color: #007bff;">${((testData.stats.passed / testData.stats.total) * 100).toFixed(1)}%</div>
-                    <div class="stat-label">Success Rate</div>
-                </div>
+            const stats = testData.stats;
+            const successRate = stats.total > 0 ? ((stats.passed / stats.total) * 100).toFixed(0) : 0;
+
+            statsEl.innerHTML = `
+                <p><strong>Total Tests:</strong> ${stats.total}</p>
+                <p><strong>Passed:</strong> ${stats.passed} ✅</p>
+                <p><strong>Failed:</strong> ${stats.failed} ❌</p>
+                <p><strong>Success Rate:</strong> ${successRate}%</p>
             `;
 
             // Display detailed results
+            container.innerHTML = ''; // Clear previous results
             testData.results.forEach(keyResult => {
                 const keySection = document.createElement('div');
-                keySection.className = 'key-section';
+                keySection.className = 'test-category';
                 
                 const keyHeader = document.createElement('h3');
-                keyHeader.textContent = `${keyResult.key} Major`;
+                keyHeader.textContent = `${keyResult.key} Major Sevenths`;
                 keySection.appendChild(keyHeader);
 
-                // Create header row
-                const headerRow = document.createElement('div');
-                headerRow.className = 'chord-test';
-                headerRow.innerHTML = `
-                    <div class="degree"><strong>Degree</strong></div>
-                    <div class="chord-name"><strong>Chord Name</strong></div>
-                    <div class="spelling"><strong>Expected Spelling</strong></div>
-                    <div class="expected"><strong>Notes</strong></div>
-                    <div class="status"><strong>Status</strong></div>
-                `;
-                keySection.appendChild(headerRow);
-
                 keyResult.results.forEach(test => {
-                    const testRow = document.createElement('div');
-                    testRow.className = 'chord-test';
-                    
-                    const statusClass = test.passed ? 'pass' : 'fail';
-                    const statusText = test.passed ? 'PASS' : 'FAIL';
-                    
-                    testRow.innerHTML = `
-                        <div class="degree">${test.degreeName} (${test.degree})</div>
-                        <div class="chord-name">${test.chordName}</div>
-                        <div class="spelling">${test.expectedSpelling}</div>
-                        <div class="expected">${test.spellingArray.join(', ')}</div>
-                        <div class="status ${statusClass}">${statusText}</div>
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result ' + (test.passed ? 'pass' : 'fail');
+                    resultDiv.innerHTML = `
+                        <strong>${test.degreeName} (${test.chordName})</strong><br>
+                        Expected Spelling: ${test.expectedSpelling}<br>
+                        Status: ${test.passed ? '✅ PASS' : `❌ FAIL ${test.error ? `(${test.error})` : ''}`}
                     `;
-                    
-                    if (!test.passed) {
-                        testRow.title = test.error || 'Test failed';
-                    }
-                    
-                    keySection.appendChild(testRow);
+                    keySection.appendChild(resultDiv);
                 });
 
                 container.appendChild(keySection);
             });
         }
 
-        // Run tests when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            const testResults = runSeventhChordTests();
-            displayResults(testResults);
-        });
+        // document.addEventListener('DOMContentLoaded', runTests);
     </script>
 </body>
 </html> 
