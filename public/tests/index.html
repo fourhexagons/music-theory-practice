@@ -56,14 +56,14 @@
             <p>Essential functionality that must work for the app to function</p>
             <div class="test-grid">
                 <div class="test-card">
-                    <h3>Learning Path Progression <span id="status-learning-path" class="status-icon" title="Test status"></span></h3>
+                    <h3>Learning Path <span id="status-learning-path" class="status-icon" title="Test status"></span></h3>
                     <p>Simulates complete learning path to verify progression logic, level advancement, and question cycling.</p>
                     <a href="test_learning_path.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
-                    <h3>Core Application Logic <span id="status-app-logic" class="status-icon" title="Test status"></span></h3>
+                    <h3>Core Logic <span id="status-app-logic" class="status-icon" title="Test status"></span></h3>
                     <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
                     <a href="test_app_logic.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
@@ -90,7 +90,7 @@
                 </div>
                 
                 <div class="test-card">
-                    <h3>Validation & Edge Cases <span id="status-validation-errors" class="status-icon" title="Test status"></span></h3>
+                    <h3>Validation &amp; Edges <span id="status-validation-errors" class="status-icon" title="Test status"></span></h3>
                     <p>Comprehensive validation suite testing error handling, edge cases, and user input scenarios (56 tests).</p>
                     <a href="test_validation_errors.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
@@ -123,7 +123,7 @@
             <p>Interactive debugging and development aids</p>
             <div class="test-grid">
                 <div class="test-card">
-                    <h3>Debug Normalization <span id="status-debug-normalization" class="status-icon" title="Tool status"></span></h3>
+                    <h3>Debug Normalize <span id="status-debug-normalization" class="status-icon" title="Tool status"></span></h3>
                     <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
                     <a href="debug_normalization.html" class="test-link">Open Tool</a>
                     <span class="test-status status-dev">Development Tool</span>
@@ -142,12 +142,12 @@
         // Test Status Dashboard System
         const TEST_SUITES = {
             'test_learning_path.html': {
-                name: 'Learning Path Progression',
+                name: 'Learning Path',
                 category: 'Core Application',
                 description: 'Simulates complete learning path progression'
             },
             'test_app_logic.html': {
-                name: 'Core Application Logic',
+                name: 'Core Logic',
                 category: 'Core Application',
                 description: 'Tests state management and core logic'
             },
@@ -162,7 +162,7 @@
                 description: 'Tests seventh chord validation'
             },
             'test_validation_errors.html': {
-                name: 'Validation & Edge Cases',
+                name: 'Validation & Edges',
                 category: 'Music Theory',
                 description: 'Comprehensive validation suite'
             },
@@ -177,7 +177,7 @@
                 description: 'Tests error handling and edge cases'
             },
             'debug_normalization.html': {
-                name: 'Debug Normalization',
+                name: 'Debug Normalize',
                 category: 'Development Tools',
                 description: 'Interactive debugging tool'
             }
