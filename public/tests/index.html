@@ -137,6 +137,7 @@
         </div>
     </div>
     
+    <script src="js/test-dashboard.js"></script>
     <script>
         // Test Status Dashboard System
         const TEST_SUITES = {
@@ -182,29 +183,8 @@
             }
         };
 
-        // Test result storage
-        function saveTestResult(testFile, result) {
-            const testHistory = JSON.parse(localStorage.getItem('testHistory') || '{}');
-            testHistory[testFile] = {
-                ...result,
-                timestamp: new Date().toISOString(),
-                lastRun: new Date().toLocaleString()
-            };
-            localStorage.setItem('testHistory', JSON.stringify(testHistory));
-            updateDashboard();
-        }
-
-        function getTestResults() {
-            return JSON.parse(localStorage.getItem('testHistory') || '{}');
-        }
-
-        function clearTestHistory() {
-            localStorage.removeItem('testHistory');
-            updateDashboard();
-        }
-
         function updateDashboard() {
-            const testHistory = getTestResults();
+            const testHistory = window.TestDashboard.getTestResults();
             const statusGrid = document.getElementById('test-status-grid');
             
             // Clear existing status cards
@@ -329,13 +309,6 @@
                 });
             });
         });
-
-        // Expose functions for test pages to call
-        window.TestDashboard = {
-            saveTestResult,
-            getTestResults,
-            updateDashboard
-        };
     </script>
 </body>
 </html> 
