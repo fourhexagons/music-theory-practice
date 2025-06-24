@@ -63,6 +63,9 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   padding: var(--spacing-2xl);
   max-width: var(--max-width-container);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .app-header {
@@ -90,6 +93,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 }
 
 .main-content {
+  flex: 1 0 auto;
   padding-top: 10vh;
   display: flex;
   flex-direction: column;
@@ -181,6 +185,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  min-height: 0;
 }
 
 .advanced-practice {

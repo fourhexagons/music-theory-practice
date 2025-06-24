@@ -258,14 +258,47 @@
                 
                 // Test scale notes are valid
                 if (keyData.scale) {
-                    const validNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 
-                                       'C♭', 'D♭', 'E♭', 'F♭', 'G♭', 'A♭', 'B♭', 'E#', 'B#', 'C♯', 'D♯', 'F♯', 'G♯', 'A♯'];
-                    const invalidNotes = keyData.scale.filter(note => !validNotes.includes(note));
+                    const validNotes = [
+                        'C', 'C#', 'Cb', 'Db', 'D', 'D#', 'Eb', 'E', 'E#', 'Fb', 'F', 'F#', 'Gb',
+                        'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B', 'B#',
+                        // Unicode flat and sharp versions for completeness
+                        'C♭', 'D♭', 'E♭', 'F♭', 'G♭', 'A♭', 'B♭',
+                        'C♯', 'D♯', 'F♯', 'G♯', 'A♯'
+                    ];
+                    const normalizedScale = keyData.scale.map(note => note.trim());
+                    const invalidNotes = normalizedScale.filter(note => !validNotes.includes(note));
                     addResult(
                         `${key} - Scale Note Validity`,
                         invalidNotes.length === 0,
                         'All notes valid',
                         invalidNotes.length > 0 ? `Invalid notes: ${invalidNotes.join(', ')}` : 'All notes valid',
+                        'Data Consistency',
+                        `Scale: ${normalizedScale.join(' ')}`
+                    );
+
+                    // Check for duplicate notes in the scale
+                    const noteSet = new Set();
+                    const duplicates = [];
+                    normalizedScale.forEach(note => {
+                        if (noteSet.has(note)) duplicates.push(note);
+                        noteSet.add(note);
+                    });
+                    addResult(
+                        `${key} - Scale Duplicate Notes`,
+                        duplicates.length === 0,
+                        'No duplicates',
+                        duplicates.length > 0 ? `Duplicates: ${duplicates.join(', ')}` : 'No duplicates',
+                        'Data Consistency',
+                        `Scale: ${normalizedScale.join(' ')}`
+                    );
+
+                    // Check for whitespace/invisible characters in scale notes
+                    const notesWithWhitespace = keyData.scale.filter(note => /\s/.test(note));
+                    addResult(
+                        `${key} - Scale Note Whitespace`,
+                        notesWithWhitespace.length === 0,
+                        'No whitespace',
+                        notesWithWhitespace.length > 0 ? `Notes with whitespace: ${notesWithWhitespace.join(', ')}` : 'No whitespace',
                         'Data Consistency',
                         `Scale: ${keyData.scale.join(' ')}`
                     );

@@ -57,9 +57,9 @@ window.ErrorHandler = {
     console.error('App Error:', errorInfo);
 
     // In a production environment, you might want to send this to a logging service
-    if (process.env.NODE_ENV === 'production') {
-      // sendToLoggingService(errorInfo);
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //   // sendToLoggingService(errorInfo);
+    // }
   },
 
   /**
@@ -172,4 +172,7 @@ window.ErrorHandler = {
       this.handleError(error);
     });
   }
-}; 
+};
+
+// Expose handleError globally
+window.handleError = window.ErrorHandler.handleError.bind(window.ErrorHandler); 

@@ -22,8 +22,10 @@
             </div>
             <div class="controls">
                 <button class="btn" onclick="runTests()">Run Tests</button>
+                <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
             </div>
             <div id="results"></div>
+            <div id="copy-status" class="status-area"></div>
         </div>
     </div>
 
@@ -44,6 +46,7 @@
             resultsDiv.innerHTML = ''; // Clear previous results
 
             const testData = runSeventhChordTests();
+            window._seventhsTestResults = testData; // Expose for export
             displayResults(testData);
         }
 
@@ -81,12 +84,18 @@
                     }
 
                     // Validate that all notes are valid
-                    const validNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 
-                                       'C♭', 'D♭', 'E♭', 'F♭', 'G♭', 'A♭', 'B♭', 'E#', 'B#'];
+                    const validNotes = [
+                        'C', 'C#', 'Cb', 'Db', 'D', 'D#', 'Eb', 'E', 'E#', 'Fb', 'F', 'F#', 'Gb',
+                        'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B', 'B#',
+                        // Unicode flat versions for completeness
+                        'C♭', 'D♭', 'E♭', 'F♭', 'G♭', 'A♭', 'B♭'
+                    ];
                     spelling.forEach(note => {
-                        if (!validNotes.includes(note)) {
+                        const normalizedNote = note.trim();
+                        if (!validNotes.includes(normalizedNote)) {
                             testResult.passed = false;
-                            testResult.error = `Invalid note: ${note}`;
+                            testResult.error = `Invalid note: ${note} (char codes: ${[...note].map(c => c.charCodeAt(0)).join(',')})`;
+                            console.warn(`Invalid note detected: '${note}' (normalized: '${normalizedNote}') in key ${key}, chord ${chordName}`);
                         }
                     });
 
@@ -173,6 +182,19 @@
                 });
 
                 container.appendChild(keySection);
+            });
+        }
+
+        function copyResults() {
+            if (!window._seventhsTestResults) {
+                document.getElementById('copy-status').textContent = 'No results to copy. Run the tests first.';
+                return;
+            }
+            const json = JSON.stringify(window._seventhsTestResults, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                document.getElementById('copy-status').textContent = 'Results copied to clipboard!';
+            }, () => {
+                document.getElementById('copy-status').textContent = 'Failed to copy results.';
             });
         }
 

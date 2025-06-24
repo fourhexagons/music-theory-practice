@@ -77,32 +77,29 @@ function normalizeQuality(quality) {
  * @returns {string} - The normalized chord symbol
  */
 function normalizeChord(chord) {
+  if (typeof chord !== 'string') return '';
   if (!chord) return '';
-  
   // Stage 1: Basic cleanup - remove outer and inner whitespace
   const cleanedChord = chord.trim().replace(/\s+/g, '');
-  
   // Stage 2: Handle single note case
   if (/^[a-g](?:bb|b|##|#|x)?$/i.test(cleanedChord)) {
     return normalizeRootNote(cleanedChord);
   }
-  
   // Stage 3: Split into root and quality (case-insensitive)
   const rootMatch = cleanedChord.match(/^([a-g](?:bb|b|##|#|x)*)(.*)/i);
   if (!rootMatch) return cleanedChord;
-  
   const [, root, quality] = rootMatch;
-  
   // Stage 4: Normalize root note
   const normalizedRoot = normalizeRootNote(root);
-  
   // Stage 5: Handle empty quality
   if (!quality) return normalizedRoot;
-  
   // Stage 6: Transform quality
-  const normalizedQuality = normalizeQuality(quality);
-  
-  // Stage 7: Combine and handle special cases
+  let normalizedQuality = normalizeQuality(quality);
+  // Stage 7: Replace all b5, b9, #5, #9, etc. with Unicode accidentals
+  normalizedQuality = normalizedQuality
+    .replace(/b(5|9|13)/g, '♭$1')
+    .replace(/#(5|9|13)/g, '♯$1');
+  // Stage 8: Combine and handle special cases
   return normalizedRoot + normalizedQuality;
 }
 

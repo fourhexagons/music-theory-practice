@@ -14,6 +14,8 @@
             padding: 12px;
             border-radius: 6px;
             border-left: 4px solid;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
         
         .test-result.pass {
@@ -79,8 +81,9 @@
     <script src="../js/data/quizData.js"></script>
     <script src="../js/utils/normalization.js"></script>
     <script src="../js/utils/helpers.js"></script>
+    <script src="../js/utils/validation.js"></script>
+    <script src="../js/state/learningState.js"></script>
     <script src="../js/utils/errorHandler.js"></script>
-    <script src="../js/main.js"></script>
     <script src="js/test-dashboard.js"></script>
     
     <script>
@@ -176,25 +179,30 @@
         // State Management Tests
         function testStateManagement() {
             // Test learning state initialization
-            const initialState = {
-                currentLevelIndex: 0,
-                currentChapterIndex: 0,
-                currentKeyIndex: 0,
-                correctAnswerStreak: 0,
-                usedDegrees: [],
-                correctChordAnswersForCurrentKey: 0
-            };
-            
+            const requiredProps = [
+                'currentGroup', 'currentKeyIndex', 'currentChapterIndex',
+                'usedDegrees', 'correctAnswersInChapter', 'requiredAnswersPerChapter',
+                'lastAnswerIncorrect', 'currentLevelIndex', 'correctAnswerStreak', 'correctChordAnswersForCurrentKey', 'accidentalsPairState'
+            ];
+            let initPass = true;
+            for (const prop of requiredProps) {
+                if (!(prop in learningState)) {
+                    initPass = false;
+                    break;
+                }
+            }
+            // Check initial values for a subset of properties
+            initPass = initPass && learningState.currentGroup === 0 && learningState.currentKeyIndex === 0 && learningState.currentChapterIndex === 0;
             addResult(
                 'Learning State Initialization',
-                JSON.stringify(learningState) === JSON.stringify(initialState),
-                'Initial state should match expected structure',
-                `Current state: ${JSON.stringify(learningState)}`,
+                initPass,
+                'State has required properties and correct initial indices',
+                'State initialized with required properties.',
                 'State Management'
             );
-            
+
             // Test getCurrentLevel function
-            const currentLevel = getCurrentLevel();
+            const currentLevel = getCurrentLevel ? getCurrentLevel() : window.getCurrentGroup();
             const expectedLevel = learningPath[0];
             addResult(
                 'Get Current Level',
@@ -203,22 +211,26 @@
                 currentLevel ? currentLevel.name : 'undefined',
                 'State Management'
             );
-            
-            // Test level advancement
-            const originalLevelIndex = learningState.currentLevelIndex;
-            advanceLevel();
-            const newLevelIndex = learningState.currentLevelIndex;
+
+            // Test level advancement (using currentGroup for progression)
+            const originalGroup = learningState.currentGroup;
+            if (typeof advanceLevel === 'function') {
+                advanceLevel();
+            } else if (typeof window.advanceLearningPath === 'function') {
+                window.advanceLearningPath();
+            }
+            const newGroup = learningState.currentGroup;
             addResult(
                 'Level Advancement',
-                newLevelIndex === originalLevelIndex + 1,
-                originalLevelIndex + 1,
-                newLevelIndex,
+                newGroup === originalGroup + 1,
+                originalGroup + 1,
+                newGroup,
                 'State Management',
-                `Advanced from level ${originalLevelIndex} to ${newLevelIndex}`
+                `Advanced from group ${originalGroup} to ${newGroup}`
             );
-            
+
             // Reset for other tests
-            learningState.currentLevelIndex = 0;
+            learningState.currentGroup = 0;
         }
         
         // Question Generation Tests
@@ -288,20 +300,23 @@
             // Test chord normalization in validation context
             const chordTests = [
                 { input: 'CM7', expected: 'Cmaj7', key: 'C', degree: 1, type: 'SEVENTHS' },
-                { input: 'Cm', expected: 'Cm', key: 'F', degree: 2, type: 'TRIADS' },
+                { input: 'Gm', expected: 'Gm', key: 'F', degree: 2, type: 'TRIADS' },
                 { input: 'G7', expected: 'G7', key: 'C', degree: 5, type: 'SEVENTHS' }
             ];
             
             chordTests.forEach(test => {
-                const normalized = normalizeChord(test.input);
-                const isValid = checkAnswer(normalized, test.type, test.key, test.degree);
+                const expected = quizData[test.key][test.type.toLowerCase()][test.degree.toString()];
+                const normalizedInput = window.normalizeChord ? window.normalizeChord(test.input) : test.input;
+                const normalizedExpected = window.normalizeChord ? window.normalizeChord(expected) : expected;
+                const isValid = checkAnswer(test.input, test.type, test.key, test.degree, quizData);
+                console.log(`[DEBUG] Chord Test: input='${test.input}', normalizedInput='${normalizedInput}', expected='${expected}', normalizedExpected='${normalizedExpected}', result=${isValid}`);
                 addResult(
                     `Chord Validation (${test.input})`,
                     isValid === true,
                     true,
                     isValid,
                     'Answer Validation',
-                    `Normalized: ${normalized}, Key: ${test.key}, Degree: ${test.degree}`
+                    `Input: ${test.input}, Key: ${test.key}, Degree: ${test.degree}`
                 );
             });
             
@@ -313,7 +328,11 @@
             ];
             
             scaleTests.forEach(test => {
-                const isValid = checkAnswer(test.input, 'SCALE_SPELLING', test.key);
+                const expected = quizData[test.key].scale;
+                const normalizedInput = test.input.split(' ').map(note => window.accidentalToUnicode(note.trim())).join(' ');
+                const normalizedExpected = expected.map(note => window.accidentalToUnicode(note)).join(' ');
+                const isValid = checkAnswer(test.input, 'SCALE_SPELLING', test.key, null, quizData);
+                console.log(`[DEBUG] Scale Test: input='${test.input}', normalizedInput='${normalizedInput}', expected='${expected}', normalizedExpected='${normalizedExpected}', result=${isValid}`);
                 addResult(
                     `Scale Spelling (${test.key})`,
                     isValid === test.expected,
@@ -333,7 +352,9 @@
             ];
             
             accidentalsTests.forEach(test => {
-                const isValid = checkAnswer(test.input, 'ACCIDENTALS_COUNT', test.key);
+                const expected = quizData[test.key].accidentals;
+                const isValid = checkAnswer(test.input, 'ACCIDENTALS_COUNT', test.key, null, quizData);
+                console.log(`[DEBUG] Accidentals Test: input='${test.input}', expected='${expected}', result=${isValid}`);
                 addResult(
                     `Accidentals Count (${test.key})`,
                     isValid === test.expected,
