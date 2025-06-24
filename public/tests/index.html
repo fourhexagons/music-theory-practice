@@ -88,11 +88,10 @@
                     <a href="test_sevenths.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
-                
                 <div class="test-card">
-                    <h3>Validation &amp; Edges <span id="status-validation-edges" class="status-icon" title="Test status"></span></h3>
-                    <p>Comprehensive validation suite testing error handling, edge cases, and user input scenarios (56 tests).</p>
-                    <a href="test_validation_errors.html" class="test-link">Run Test</a>
+                    <h3>Validation, Errors & Edges <span id="status-validation-edges" class="status-icon" title="Test status"></span></h3>
+                    <p>Unified suite for normalization, answer validation, error handling, and edge cases. All tests use the real app logic.</p>
+                    <a href="test_validation_and_errors.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
@@ -106,13 +105,6 @@
                     <h3>Data Integrity <span id="status-data-integrity" class="status-icon" title="Test status"></span></h3>
                     <p>Tests for quiz data completeness, consistency, and relationship validation across all keys and degrees.</p>
                     <a href="test_data_integrity.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
-                </div>
-                
-                <div class="test-card">
-                    <h3>Error Handling <span id="status-error-handling" class="status-icon" title="Test status"></span></h3>
-                    <p>Tests for invalid input handling, data corruption recovery, and edge cases to ensure system robustness.</p>
-                    <a href="test_error_handling.html" class="test-link">Run Test</a>
                     <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
@@ -161,20 +153,15 @@
                 category: 'Music Theory',
                 description: 'Tests seventh chord validation'
             },
-            'test_validation_errors.html': {
-                name: 'Validation & Edges',
+            'test_validation_and_errors.html': {
+                name: 'Validation, Errors & Edges',
                 category: 'Music Theory',
-                description: 'Comprehensive validation suite'
+                description: 'Unified suite for normalization, answer validation, error handling, and edge cases'
             },
             'test_data_integrity.html': {
                 name: 'Data Integrity',
                 category: 'Data & Integrity',
                 description: 'Tests data completeness and consistency'
-            },
-            'test_error_handling.html': {
-                name: 'Error Handling',
-                category: 'Data & Integrity',
-                description: 'Tests error handling and edge cases'
             },
             'debug_normalization.html': {
                 name: 'Debug Normalize',
@@ -268,9 +255,8 @@
                 'test_app_logic.html': 'status-core-logic',
                 'test_chords.html': 'status-chord-normalization',
                 'test_sevenths.html': 'status-seventh-chords',
-                'test_validation_errors.html': 'status-validation-edges',
+                'test_validation_and_errors.html': 'status-validation-edges',
                 'test_data_integrity.html': 'status-data-integrity',
-                'test_error_handling.html': 'status-error-handling',
                 'debug_normalization.html': 'status-debug-normalize'
             };
 
