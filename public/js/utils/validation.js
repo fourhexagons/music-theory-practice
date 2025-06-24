@@ -38,7 +38,7 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
   };
   const normalizedType = typeof questionType === 'string' ? (typeMap[questionType.toLowerCase().replace(/[^a-z]/g, '')] || questionType.toLowerCase()) : '';
   // Only allow supported types
-  const allowedTypes = ['sevenths', 'triads', 'scale', 'accCount', 'seventhSpelling', 'triadSpelling'];
+  const allowedTypes = ['sevenths', 'triads', 'scale', 'accCount', 'accNotes', 'seventhSpelling', 'triadSpelling'];
   if (!allowedTypes.includes(normalizedType)) {
     console.log('checkAnswer: invalid type', {questionType, normalizedType});
     return false;
@@ -74,6 +74,9 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
       case 'acccount':
       case 'accCount':
         result = checkAccidentalsCount(userAnswer, key, quizData);
+        break;
+      case 'accNotes':
+        result = checkAccidentalsNames(userAnswer, key, quizData);
         break;
       case 'seventhSpelling':
         console.log('checkAnswer: entering checkChordSpelling for seventhSpelling');
@@ -140,9 +143,14 @@ function checkScaleSpelling(userAnswer, key, quizData) {
     return false;
   }
   if (typeof userAnswer !== 'string') return false;
-  // Normalize both user input and correct notes to Unicode accidentals
-  const userNotes = userAnswer.split(' ').map(note => window.accidentalToUnicode(note.trim())).filter(note => note);
-  const correctNotes = quizData[key].scale.map(note => window.accidentalToUnicode(note));
+  // Normalize both user input and correct notes to Unicode accidentals and uppercase root
+  const normalizeAndUpper = note => {
+    const n = window.accidentalToUnicode(note.trim());
+    return n ? n[0].toUpperCase() + n.slice(1) : '';
+  };
+  const userNotes = userAnswer.split(' ').map(normalizeAndUpper).filter(note => note);
+  const correctNotes = quizData[key].scale.map(normalizeAndUpper);
+  console.log('[checkScaleSpelling] userNotes:', userNotes, 'correctNotes:', correctNotes);
   if (!Array.isArray(userNotes) || !Array.isArray(correctNotes)) return false;
   if (userNotes.length !== correctNotes.length) {
     return false;
@@ -210,6 +218,45 @@ function checkChordSpelling(userAnswer, key, degree, quizData, spellingType) {
       console.log('checkChordSpelling: note mismatch', { i, userNote: userNotes[i], correctNote: correctNotes[i] });
       return false;
     }
+  }
+  return true;
+}
+
+/**
+ * Checks if an accidentals names answer is correct
+ * @param {string|array} userAnswer - The user's accidentals names (e.g., 'F# C#' or ['F#','C#'])
+ * @param {string} key - The key being tested
+ * @param {Object} quizData - The quiz data object
+ * @returns {boolean} - Whether the accidentals names are correct (order-insensitive)
+ */
+function checkAccidentalsNames(userAnswer, key, quizData) {
+  if (!quizData || typeof quizData !== 'object' || !quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+    return false;
+  }
+  if (!quizData[key].hasOwnProperty('notes') || !Array.isArray(quizData[key].notes)) return false;
+  // Accept string or array
+  let userNotes;
+  if (typeof userAnswer === 'string') {
+    userNotes = userAnswer.trim() === '' ? [] : userAnswer.split(/\s+/);
+  } else if (Array.isArray(userAnswer)) {
+    userNotes = userAnswer;
+  } else {
+    return false;
+  }
+  // Normalize to Unicode and uppercase root
+  const normalizeAndUpper = note => {
+    const n = window.accidentalToUnicode(note.trim());
+    return n ? n[0].toUpperCase() + n.slice(1) : '';
+  };
+  const userNorm = userNotes.map(normalizeAndUpper).filter(Boolean).sort();
+  const correctNorm = quizData[key].notes.map(normalizeAndUpper).filter(Boolean).sort();
+  console.log('[checkAccidentalsNames] userNorm:', userNorm, 'correctNorm:', correctNorm);
+  // Accept empty string/array for keys with no accidentals
+  if (correctNorm.length === 0 && userNorm.length === 0) return true;
+  if (userNorm.length !== correctNorm.length) return false;
+  // Order-insensitive comparison
+  for (let i = 0; i < correctNorm.length; i++) {
+    if (userNorm[i] !== correctNorm[i]) return false;
   }
   return true;
 }

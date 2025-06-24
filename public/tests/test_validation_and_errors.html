@@ -65,6 +65,7 @@
         </div>
     </div>
     <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/helpers.js"></script>
     <script src="../js/utils/normalization.js"></script>
     <script src="../js/utils/validation.js"></script>
     <script src="js/test-dashboard.js"></script>
@@ -84,6 +85,10 @@
             testNormalizeInputs();
             testCheckAnswerInvalidParams();
             testSeventhSpelling();
+            testScaleSpelling();
+            testAccidentalsCount();
+            testAccidentalsNames();
+            testDataCorruption();
             displayResults();
         }
 
@@ -157,6 +162,76 @@
             });
         }
 
+        // Scale spelling tests (type 'scale')
+        function testScaleSpelling() {
+            const cases = [
+                { name: 'C Major Scale Correct', answer: 'C D E F G A B', key: 'C', expected: true },
+                { name: 'C Major Scale Wrong Order', answer: 'C E D F G A B', key: 'C', expected: false },
+                { name: 'C Major Scale Missing Note', answer: 'C D E F G A', key: 'C', expected: false },
+                { name: 'C Major Scale Extra Note', answer: 'C D E F G A B C', key: 'C', expected: false },
+                { name: 'C Major Scale Wrong Note', answer: 'C D E F G A Bb', key: 'C', expected: false },
+                { name: 'G Major Scale Correct', answer: 'G A B C D E F#', key: 'G', expected: true },
+                { name: 'G Major Scale Unicode Sharp', answer: 'G A B C D E F♯', key: 'G', expected: true },
+                { name: 'G Major Scale Lowercase', answer: 'g a b c d e f#', key: 'G', expected: true }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'scale', tc.key, null, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Scale Spelling', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'scale', ${tc.key}) =>`, actual);
+            });
+        }
+
+        // Accidentals count tests (type 'accCount')
+        function testAccidentalsCount() {
+            const cases = [
+                { name: 'C Major Accidentals Count Correct', answer: 0, key: 'C', expected: true },
+                { name: 'C Major Accidentals Count String', answer: '0', key: 'C', expected: true },
+                { name: 'G Major Accidentals Count Correct', answer: 1, key: 'G', expected: true },
+                { name: 'G Major Accidentals Count Wrong', answer: 2, key: 'G', expected: false },
+                { name: 'F Major Accidentals Count Correct', answer: 1, key: 'F', expected: true },
+                { name: 'F Major Accidentals Count Wrong', answer: 0, key: 'F', expected: false }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'accCount', tc.key, null, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Accidentals Count', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'accCount', ${tc.key}) =>`, actual);
+            });
+        }
+
+        // Accidentals names tests (type 'accNotes')
+        function testAccidentalsNames() {
+            const cases = [
+                { name: 'C Major Accidentals Names Correct', answer: '', key: 'C', expected: true },
+                { name: 'G Major Accidentals Names Correct', answer: 'F#', key: 'G', expected: true },
+                { name: 'G Major Accidentals Names Unicode', answer: 'F♯', key: 'G', expected: true },
+                { name: 'G Major Accidentals Names Wrong', answer: 'C#', key: 'G', expected: false },
+                { name: 'F Major Accidentals Names Correct', answer: 'Bb', key: 'F', expected: true },
+                { name: 'F Major Accidentals Names Wrong', answer: 'Eb', key: 'F', expected: false }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'accNotes', tc.key, null, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Accidentals Names', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'accNotes', ${tc.key}) =>`, actual);
+            });
+        }
+
+        // Data corruption/integrity tests
+        function testDataCorruption() {
+            // Simulate missing/corrupted quizData
+            const missingKey = 'NON_EXISTENT_KEY';
+            const corruptedQuizData = { ...window.quizData };
+            corruptedQuizData['C'] = null;
+            // Missing key
+            let result = window.checkAnswer ? window.checkAnswer('C', 'TRIADS', missingKey, 1, window.quizData) : false;
+            testResults.push({ name: 'Missing Key Data Handling', passed: result === false, expected: false, actual: result, category: 'Data Corruption', details: 'Deleted key from quizData' });
+            // Corrupted key structure
+            result = window.checkAnswer ? window.checkAnswer('C', 'TRIADS', 'C', 1, corruptedQuizData) : false;
+            testResults.push({ name: 'Corrupted Key Structure Handling', passed: result === false, expected: false, actual: result, category: 'Data Corruption', details: 'Corrupted C major data structure' });
+        }
+
         // Step 5: Simple result display
         function displayResults() {
             const resultsDiv = document.getElementById('results');
@@ -167,6 +242,18 @@
                 div.innerHTML = `<strong>${r.name}</strong> <span>${r.passed ? '✅' : '❌'}</span><br>Expected: ${r.expected}, Actual: ${r.actual}<br>${r.details}`;
                 resultsDiv.appendChild(div);
             });
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                const passCount = testResults.filter(r => r.passed).length;
+                const failCount = testResults.length - passCount;
+                const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
+                window.TestDashboard.saveTestResult('test_validation_and_errors.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: successRate
+                });
+            }
         }
 
         // Copy results helpers
