@@ -65,12 +65,13 @@ self.addEventListener('fetch', event => {
       })
     );
   } else {
-    // For all other assets (CSS, JS, images), use a "cache-first" strategy.
-  event.respondWith(
+    // For all other assets (CSS, JS, images), use a "cache-first" strategy with error handling.
+    event.respondWith(
       caches.match(request).then(response => {
-        // Return from cache if available, otherwise fetch from network.
-        return response || fetch(request);
-    })
-  );
+        return response || fetch(request).catch(() =>
+          new Response('Network error', { status: 408, statusText: 'Network error' })
+        );
+      })
+    );
   }
 }); 
