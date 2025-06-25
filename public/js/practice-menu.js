@@ -4,13 +4,22 @@
 class PracticeMenu {
   constructor() {
     this.isOpen = false;
-    this.currentSection = 'keys';
+    this.currentSection = null;
     this.menuButton = document.getElementById('practice-menu-button');
+    this.menuBar = document.getElementById('practice-menu-bar');
     this.overlay = document.getElementById('practice-menu-overlay');
+    this.menuNav = document.querySelector('.practice-menu-nav');
+    this.optionsArea = document.querySelector('.practice-menu-options-area');
     this.menuLinks = document.querySelectorAll('.practice-menu-link');
-    this.menuSections = document.querySelectorAll('.practice-menu-section');
+    this.optionsAreas = document.querySelectorAll('.practice-menu-options');
     this.menuOptions = document.querySelectorAll('.practice-menu-option');
-    
+    this.body = document.body;
+    this.isMobile = window.innerWidth <= 893;
+    this.sectionNames = {
+      'difficulty': 'Difficulty',
+      'keys': 'Keys',
+      // Add more if needed
+    };
     this.init();
   }
 
@@ -21,27 +30,48 @@ class PracticeMenu {
   }
 
   bindEvents() {
-    // Menu button toggle
-    this.menuButton.addEventListener('click', () => this.toggleMenu());
-    
-    // Menu navigation
+    // Make entire menu bar clickable (desktop only)
+    this.menuBar.addEventListener('click', (e) => {
+      if (!this.isMobile) {
+        this.toggleMenu();
+      }
+    });
+
+    // Hamburger icon always clickable
+    this.menuButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMenu();
+    });
+
+    // Section navigation
     this.menuLinks.forEach(link => {
       link.addEventListener('click', (e) => {
+        e.stopPropagation();
         const section = e.target.dataset.section;
-        this.switchSection(section);
+        this.handleSectionClick(section);
       });
     });
 
     // Menu options
     this.menuOptions.forEach(option => {
       option.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.handleMenuOption(e.target);
       });
     });
 
-    // Close menu when clicking on menu bar (left section)
+    // Back nav for nested menus (mobile)
+    this.optionsArea.addEventListener('click', (e) => {
+      if (e.target.classList.contains('practice-menu-back-nav')) {
+        this.currentSection = null;
+        this.saveMenuState();
+        this.updateMenuDisplay();
+      }
+    });
+
+    // Close menu when clicking outside overlay (not on bar)
     this.overlay.addEventListener('click', (e) => {
-      if (e.target === this.overlay || e.target.closest('.practice-menu-bar')) {
+      if (e.target === this.overlay) {
         this.closeMenu();
       }
     });
@@ -52,6 +82,29 @@ class PracticeMenu {
         this.closeMenu();
       }
     });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      this.isMobile = window.innerWidth <= 893;
+      this.updateMenuDisplay();
+    });
+  }
+
+  handleSectionClick(section) {
+    if (section === 'start-over') {
+      this.handleStartOver();
+      return;
+    }
+    this.currentSection = section;
+    this.saveMenuState();
+    this.updateMenuDisplay();
+  }
+
+  handleStartOver() {
+    if (window.resetQuiz) {
+      window.resetQuiz();
+    }
+    this.closeMenu();
   }
 
   toggleMenu() {
@@ -64,7 +117,7 @@ class PracticeMenu {
 
   openMenu() {
     this.isOpen = true;
-    document.body.classList.add('practice-menu-open');
+    this.body.classList.add('practice-menu-open');
     this.overlay.classList.add('open');
     this.saveMenuState();
     this.updateMenuDisplay();
@@ -72,107 +125,22 @@ class PracticeMenu {
 
   closeMenu() {
     this.isOpen = false;
-    document.body.classList.remove('practice-menu-open');
+    this.currentSection = null;
+    this.body.classList.remove('practice-menu-open');
     this.overlay.classList.remove('open');
     this.saveMenuState();
     this.updateMenuDisplay();
   }
 
-  switchSection(section) {
-    this.currentSection = section;
-    
-    // Update active states
-    this.menuLinks.forEach(link => {
-      link.classList.toggle('active', link.dataset.section === section);
-    });
-    
-    this.menuSections.forEach(sectionEl => {
-      sectionEl.classList.toggle('active', sectionEl.id === `${section}-section`);
-    });
-    
-    this.saveMenuState();
-  }
-
   handleMenuOption(option) {
     const key = option.dataset.key;
     const difficulty = option.dataset.difficulty;
-    
     if (key) {
-      this.selectKey(key);
+      // TODO: Implement key selection logic
     } else if (difficulty) {
-      this.selectDifficulty(difficulty);
+      // TODO: Implement difficulty selection logic
     }
-    
     this.closeMenu();
-  }
-
-  selectKey(key) {
-    console.log('Selected key:', key);
-    // TODO: Implement key selection logic
-    // This will integrate with the existing app logic
-    this.setPracticeMode('single-key', { key });
-  }
-
-  selectDifficulty(difficulty) {
-    console.log('Selected difficulty:', difficulty);
-    
-    switch (difficulty) {
-      case 'start-over':
-        this.resetToBeginning();
-        break;
-      case 'C':
-        this.setPracticeMode('single-key', { key: 'C' });
-        break;
-      case 'G-D-A':
-        this.setPracticeMode('key-group', { keys: ['G', 'D', 'A'] });
-        break;
-      case 'F-Bb-Eb':
-        this.setPracticeMode('key-group', { keys: ['F', 'Bb', 'Eb'] });
-        break;
-      case 'E-B-F#':
-        this.setPracticeMode('key-group', { keys: ['E', 'B', 'F#'] });
-        break;
-      case 'Ab-Db-Gb':
-        this.setPracticeMode('key-group', { keys: ['Ab', 'Db', 'Gb'] });
-        break;
-      case 'full-random':
-        this.setPracticeMode('full-random');
-        break;
-      case 'spelling-random-sevenths':
-        this.setPracticeMode('sevenths-spelling');
-        break;
-      default:
-        console.warn('Unknown difficulty:', difficulty);
-    }
-  }
-
-  setPracticeMode(mode, options = {}) {
-    // Store the practice mode in localStorage for persistence
-    const practiceConfig = {
-      mode,
-      options,
-      timestamp: Date.now()
-    };
-    
-    localStorage.setItem('practiceMode', JSON.stringify(practiceConfig));
-    
-    // TODO: Integrate with existing app logic
-    // This will need to communicate with the main app to change the practice mode
-    console.log('Practice mode set:', practiceConfig);
-    
-    // For now, just reload the page to apply changes
-    // In the future, this should update the app state without reloading
-    window.location.reload();
-  }
-
-  resetToBeginning() {
-    // Clear any stored practice mode and reset to beginning
-    localStorage.removeItem('practiceMode');
-    localStorage.removeItem('learningState');
-    
-    // TODO: Reset the app to the beginning of the learning path
-    console.log('Reset to beginning');
-    window.location.reload();
   }
 
   saveMenuState() {
@@ -189,7 +157,7 @@ class PracticeMenu {
       try {
         const state = JSON.parse(savedState);
         this.isOpen = state.isOpen || false;
-        this.currentSection = state.currentSection || 'keys';
+        this.currentSection = state.currentSection || null;
       } catch (e) {
         console.warn('Failed to load menu state:', e);
       }
@@ -197,24 +165,64 @@ class PracticeMenu {
   }
 
   updateMenuDisplay() {
-    // Update button state
-    this.menuButton.classList.toggle('active', this.isOpen);
-    
-    // Update section visibility
-    this.menuSections.forEach(section => {
-      section.classList.toggle('active', section.id === `${this.currentSection}-section`);
-    });
-    
-    // Update link active states
+    // Highlight active section link
     this.menuLinks.forEach(link => {
       link.classList.toggle('active', link.dataset.section === this.currentSection);
     });
+    // Show only the current options area
+    this.optionsAreas.forEach(area => {
+      if (this.currentSection) {
+        area.classList.toggle('active', area.id === `${this.currentSection}-section`);
+      } else {
+        area.classList.remove('active');
+      }
+    });
+    // Handle mobile menu behavior
+    if (this.isMobile) {
+      // Only hamburger is clickable
+      this.menuBar.style.pointerEvents = 'none';
+      this.menuButton.style.pointerEvents = 'auto';
+      if (this.currentSection) {
+        // Show nested menu (hide top level)
+        this.menuNav.classList.add('mobile-nested');
+        this.optionsArea.classList.add('mobile-nested');
+        // Show back nav text
+        this.showBackNav(true);
+      } else {
+        // Show top level menu
+        this.menuNav.classList.remove('mobile-nested');
+        this.optionsArea.classList.remove('mobile-nested');
+        this.showBackNav(false);
+      }
+    } else {
+      // Desktop: bar is fully clickable
+      this.menuBar.style.pointerEvents = 'auto';
+      this.menuButton.style.pointerEvents = 'auto';
+      this.menuNav.classList.remove('mobile-nested');
+      this.optionsArea.classList.remove('mobile-nested');
+      this.showBackNav(false);
+    }
+  }
+
+  showBackNav(show) {
+    let backNav = this.optionsArea.querySelector('.practice-menu-back-nav');
+    if (!backNav) {
+      backNav = document.createElement('div');
+      backNav.className = 'practice-menu-back-nav';
+      this.optionsArea.prepend(backNav);
+    }
+    if (show && this.currentSection && this.sectionNames[this.currentSection]) {
+      backNav.textContent = ` ${this.sectionNames[this.currentSection]}`.replace('\u001c', '‹');
+      this.optionsArea.classList.add('show-back-nav');
+      backNav.style.display = 'block';
+    } else {
+      this.optionsArea.classList.remove('show-back-nav');
+      backNav.style.display = 'none';
+    }
   }
 }
 
-// Initialize the practice menu when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Only initialize on the practice page
   if (window.location.pathname === '/practice' || window.location.pathname === '/practice.html') {
     window.practiceMenu = new PracticeMenu();
   }
