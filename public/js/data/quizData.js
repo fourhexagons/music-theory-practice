@@ -97,16 +97,16 @@ window.orderedKeys = ['F♯', 'B', 'E', 'A', 'D', 'G', 'C', 'F', 'B♭', 'E♭',
 window.allKeys = Object.keys(window.quizData);
 
 window.QUESTION_TYPES = {
-    ACCIDENTALS_COUNT: 'accCount',
-    ACCIDENTALS_NAMES: 'accNotes',
-    SCALE_SPELLING: 'scale',
-    TRIADS: 'triads',
-    SEVENTHS: 'sevenths',
-    SEVENTH_SPELLING: 'seventhSpelling'
+  ACCIDENTALS_COUNT: 'accCount',
+  ACCIDENTALS_NAMES: 'accNotes',
+  SCALE_SPELLING: 'scale',
+  TRIADS: 'triads',
+  SEVENTHS: 'sevenths',
+  SEVENTH_SPELLING: 'seventhSpelling'
 };
 
 window.MODES = {
-    LINEAR: 'linear',
+  LINEAR: 'linear',
     RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
     RANDOM_ALL: 'random_all',
     COMPLETE: 'complete'

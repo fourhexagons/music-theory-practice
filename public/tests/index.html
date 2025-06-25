@@ -16,119 +16,38 @@
         <a href="../index.html" class="back-link">← Back to Main App</a>
         
         <!-- Test Status Dashboard -->
-        <div class="test-category">
-            <h2>📊 Test Status Dashboard</h2>
-            <p>Overview of last test run results across all test suites</p>
-            <div id="test-dashboard" class="dashboard-container">
-                <div class="dashboard-summary">
-                    <div class="summary-stats">
-                        <div class="stat-item">
-                            <span class="stat-number" id="total-tests">-</span>
-                            <span class="stat-label">Total Tests</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="passed-tests">-</span>
-                            <span class="stat-label">Passed</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="failed-tests">-</span>
-                            <span class="stat-label">Failed</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="success-rate">-</span>
-                            <span class="stat-label">Success Rate</span>
-                        </div>
+        <div id="test-dashboard" class="dashboard-container">
+            <div class="dashboard-summary">
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-tests">-</span>
+                        <span class="stat-label">Total Tests</span>
                     </div>
-                    <div class="dashboard-actions">
-                        <button onclick="runAllTests()" class="btn">Run All Tests</button>
-                        <button onclick="clearTestHistory()" class="btn btn-secondary">Clear History</button>
-                        <span id="last-updated-status" class="last-updated"></span>
+                    <div class="stat-item">
+                        <span class="stat-number" id="passed-tests">-</span>
+                        <span class="stat-label">Passed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="failed-tests">-</span>
+                        <span class="stat-label">Failed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="success-rate">-</span>
+                        <span class="stat-label">Success Rate</span>
                     </div>
                 </div>
-                <div id="test-status-grid" class="test-status-grid">
-                    <!-- Test status cards will be populated here -->
+                <div class="dashboard-actions">
+                    <button onclick="runAllTests()" class="btn">Run All Tests</button>
+                    <button onclick="clearTestHistory()" class="btn btn-secondary">Clear History</button>
+                    <span id="last-updated-status" class="last-updated"></span>
                 </div>
+            </div>
+            <div id="test-status-grid" class="test-status-grid">
+                <!-- Test status cards will be populated here -->
             </div>
         </div>
         
-        <div class="test-category">
-            <h2>🎯 Core Application Tests</h2>
-            <p>Essential functionality that must work for the app to function</p>
-            <div class="test-grid">
-                <div class="test-card">
-                    <h3>Learning Path <span id="status-learning-path" class="status-icon" title="Test status"></span></h3>
-                    <p>Simulates complete learning path to verify progression logic, level advancement, and question cycling.</p>
-                    <a href="test_learning_path.html" class="test-link">Run Test</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>Core Logic <span id="status-core-logic" class="status-icon" title="Test status"></span></h3>
-                    <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
-                    <a href="test_app_logic.html" class="test-link">Run Test</a>
-                </div>
-                
-                <div class="test-card">
-                    <h3>Chord Normalization <span id="status-chord-normalization" class="status-icon" title="Test status"></span></h3>
-                    <p>Tests chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
-                    <a href="test_chords.html" class="test-link">Run Test</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="test-category">
-            <h2>🎵 Music Theory Validation</h2>
-            <p>Domain-specific tests for music theory accuracy and data integrity</p>
-            <div class="test-grid">
-                <div class="test-card">
-                    <h3>Seventh Chords <span id="status-seventh-chords" class="status-icon" title="Test status"></span></h3>
-                    <p>Tests seventh chord identification, spelling, and validation across different keys and chord types.</p>
-                    <a href="test_sevenths.html" class="test-link">Run Test</a>
-                </div>
-                <div class="test-card">
-                    <h3>Validation, Errors & Edges <span id="status-validation-edges" class="status-icon" title="Test status"></span></h3>
-                    <p>Unified suite for normalization, answer validation, error handling, and edge cases. All tests use the real app logic.</p>
-                    <a href="test_validation_and_errors.html" class="test-link">Run Test</a>
-                </div>
-            </div>
-                </div>
-                
-        <div class="test-category">
-            <h2>🔍 Data & Integrity Tests</h2>
-            <p>Ensures data quality, consistency, and system reliability</p>
-            <div class="test-grid">
-                <div class="test-card">
-                    <h3>Data Integrity <span id="status-data-integrity" class="status-icon" title="Test status"></span></h3>
-                    <p>Tests for quiz data completeness, consistency, and relationship validation across all keys and degrees.</p>
-                    <a href="test_data_integrity.html" class="test-link">Run Test</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="test-category">
-            <h2>🛠️ Development Tools</h2>
-            <p>Interactive debugging and development aids</p>
-            <div class="test-grid">
-                <div class="test-card">
-                    <h3>Debug Normalize <span id="status-debug-normalize" class="status-icon" title="Tool status"></span></h3>
-                    <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
-                    <a href="debug_normalization.html" class="test-link">Open Tool</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal for suite details (placeholder) -->
-        <div id="suite-modal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeSuiteModal()">&times;</span>
-                <h3 id="modal-suite-name"></h3>
-                <p id="modal-suite-description"></p>
-                <button id="modal-run-test" class="btn">Run Test</button>
-                <span id="modal-suite-badge" class="test-status"></span>
-                <div id="modal-recent-results"></div>
-            </div>
-        </div>
         <div class="footer">
-            <p><strong>Test Coverage:</strong> 8 test suites covering core functionality, music theory validation, data integrity, and development tools.</p>
             <p><strong>Last updated:</strong> <span id="last-updated"></span></p>
         </div>
     </div>

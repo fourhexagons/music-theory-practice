@@ -25,18 +25,18 @@
                 <button onclick="runTest()" class="btn">Run Learning Path Test</button>
                 <button onclick="clearOutput()" class="btn">Clear Output</button>
                 <button onclick="copyJSON()" class="btn">Copy JSON</button>
-            </div>
-            
-            <div id="copy-status" class="status-area"></div>
-            
-            <div class="output-container">
-                <h3>Test Results:</h3>
-                <pre id="output">Click "Run Learning Path Test" to start...</pre>
-            </div>
-            
-            <div class="output-container">
-                <h3>JSON Output:</h3>
-                <pre id="json-output">JSON output will appear here...</pre>
+        </div>
+        
+        <div id="copy-status" class="status-area"></div>
+        
+        <div class="output-container">
+            <h3>Test Results:</h3>
+            <pre id="output">Click "Run Learning Path Test" to start...</pre>
+        </div>
+        
+        <div class="output-container">
+            <h3>JSON Output:</h3>
+            <pre id="json-output">JSON output will appear here...</pre>
             </div>
         </div>
     </div>
@@ -244,7 +244,7 @@
             
             output.textContent = 'Running test...';
             jsonOutput.textContent = 'Running test...';
-
+            
             // Use a timeout to allow the UI to update before the heavy lifting
             setTimeout(() => {
                 const results = simulateLearningPath();
@@ -276,7 +276,7 @@
                 <p><strong>Errors Encountered:</strong> ${errorsEncountered} ${errorsEncountered === 0 ? '✅' : '❌'}</p>
             `;
             summaryDiv.style.display = 'block';
-            
+                
             // Save results to dashboard
             if (window.TestDashboard) {
                 window.TestDashboard.saveTestResult('test_learning_path.html', {

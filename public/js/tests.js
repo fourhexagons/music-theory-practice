@@ -360,12 +360,12 @@ function displayTestResults(results, totalPassed, totalFailed, totalTests) {
   const percentage = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
   const overallStatus = totalFailed === 0 ? 'All tests passed!' : `${totalFailed} test(s) failed.`;
   const headerColor = totalFailed === 0 ? 'background-color: #4CAF50;' : 'background-color: #F44336;';
-
+  
   let resultsHtml = `
     <html>
-      <head>
+    <head>
         <title>Test Results</title>
-        <style>
+      <style>
           body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; }
           .header { padding: 20px; color: white; text-align: center; }
           .header h1, .header p { margin: 0; }
@@ -393,9 +393,9 @@ function displayTestResults(results, totalPassed, totalFailed, totalTests) {
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
           }
           .copy-button:hover { background-color: #0056b3; }
-        </style>
-      </head>
-      <body>
+      </style>
+    </head>
+    <body>
         <div class="header" style="${headerColor}">
           <h1>${overallStatus}</h1>
           <p>${totalPassed}/${totalTests} passed (${percentage}%)</p>
@@ -433,8 +433,8 @@ function displayTestResults(results, totalPassed, totalFailed, totalTests) {
   }
 
   resultsHtml += `
-        </div>
-      </body>
+      </div>
+    </body>
     </html>
   `;
 

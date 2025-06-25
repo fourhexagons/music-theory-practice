@@ -22,7 +22,7 @@ function renderAppLayout() {
   appContainer.innerHTML = `
     <header class="app-header">
       <a href="/" class="logo-link">
-        <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+      <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
       </a>
     </header>
     <div class="main-content">
@@ -58,15 +58,15 @@ function renderAppLayout() {
 function attachEventListeners() {
   const form = document.getElementById('answer-form');
   form?.addEventListener('submit', handleAnswerSubmit);
-
+  
   const answerInput = document.getElementById('answer-input');
   answerInput?.addEventListener('click', () => {
     const state = window.getLearningState();
     if (state.lastAnswerIncorrect) {
-      answerInput.value = '';
+        answerInput.value = '';
       window.recordLastAnswerCorrected(); 
-    }
-  });
+      }
+    });
   
   const randomBtn = document.getElementById('advanced-random-btn');
   randomBtn?.addEventListener('click', () => startAdvancedPractice('RANDOM_ALL'));
@@ -79,19 +79,19 @@ function updateQuestionUI(question) {
   const questionDisplay = document.getElementById('question-display');
   const answerInput = document.getElementById('answer-input');
   const feedback = document.getElementById('feedback');
-
+  
   if (!question) {
       questionDisplay.textContent = 'Congratulations! You have completed all levels.';
       document.getElementById('answer-form').style.display = 'none';
       return;
   }
   
-  document.getElementById('answer-form').style.display = 'flex';
+      document.getElementById('answer-form').style.display = 'flex';
   questionDisplay.textContent = question.questionText;
-  answerInput.value = '';
-  feedback.textContent = '';
-  feedback.className = 'feedback';
-  answerInput.focus();
+      answerInput.value = '';
+      feedback.textContent = '';
+      feedback.className = 'feedback';
+      answerInput.focus();
 }
 
 
@@ -123,7 +123,7 @@ function handleAnswerSubmit(e) {
     feedback.className = 'feedback correct';
     window.recordCorrectAnswer();
     setTimeout(() => {
-        askQuestion();
+      askQuestion();
     }, 500);
   } else {
     feedback.textContent = 'Incorrect. Try again.';
@@ -142,7 +142,7 @@ function startAdvancedPractice(mode) {
 
 // --- 7. Initializer ---
 function initializeApp() {
-    renderAppLayout();
+  renderAppLayout();
     window.resetLearningState();
     window.saveLearningState();
     window.initLearningState();
