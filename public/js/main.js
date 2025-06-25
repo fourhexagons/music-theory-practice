@@ -98,7 +98,9 @@ function updateQuestionUI(question) {
 // --- 5. Question and Answer Logic ---
 
 function askQuestion() {
+  console.log('askQuestion called');
   const question = window.generateQuestion();
+  console.log('Generated question:', question);
   updateQuestionUI(question);
 }
 
