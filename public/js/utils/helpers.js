@@ -159,13 +159,13 @@ function setQuestion(question) {
 window.setQuestion = setQuestion;
 
 function generateQuestion() {
-    const state = getLearningState();
+    const state = window.getLearningState();
     const currentGroup = window.getCurrentGroup();
     if (!currentGroup || !currentGroup.chapters || !currentGroup.keys || currentGroup.chapters.length === 0 || currentGroup.keys.length === 0) {
         handleError("No more groups or chapters. All levels complete.", { state, currentGroup });
         return null;
     }
-    const currentChapter = getCurrentChapter();
+    const currentChapter = window.getCurrentChapter();
     if (!currentChapter) {
         handleError("Chapter not found!", { state });
         return null;
