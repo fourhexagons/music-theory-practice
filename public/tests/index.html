@@ -59,21 +59,18 @@
                     <h3>Learning Path <span id="status-learning-path" class="status-icon" title="Test status"></span></h3>
                     <p>Simulates complete learning path to verify progression logic, level advancement, and question cycling.</p>
                     <a href="test_learning_path.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Core Logic <span id="status-core-logic" class="status-icon" title="Test status"></span></h3>
                     <p>Tests state management, question generation, answer validation, and learning progression logic.</p>
                     <a href="test_app_logic.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 
                 <div class="test-card">
                     <h3>Chord Normalization <span id="status-chord-normalization" class="status-icon" title="Test status"></span></h3>
                     <p>Tests chord normalization logic for various input formats including M7 notation, halfdim text, and double accidentals.</p>
                     <a href="test_chords.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
         </div>
@@ -86,17 +83,15 @@
                     <h3>Seventh Chords <span id="status-seventh-chords" class="status-icon" title="Test status"></span></h3>
                     <p>Tests seventh chord identification, spelling, and validation across different keys and chord types.</p>
                     <a href="test_sevenths.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
                 </div>
                 <div class="test-card">
                     <h3>Validation, Errors & Edges <span id="status-validation-edges" class="status-icon" title="Test status"></span></h3>
                     <p>Unified suite for normalization, answer validation, error handling, and edge cases. All tests use the real app logic.</p>
                     <a href="test_validation_and_errors.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
-        </div>
-        
+                </div>
+                
         <div class="test-category">
             <h2>🔍 Data & Integrity Tests</h2>
             <p>Ensures data quality, consistency, and system reliability</p>
@@ -105,7 +100,6 @@
                     <h3>Data Integrity <span id="status-data-integrity" class="status-icon" title="Test status"></span></h3>
                     <p>Tests for quiz data completeness, consistency, and relationship validation across all keys and degrees.</p>
                     <a href="test_data_integrity.html" class="test-link">Run Test</a>
-                    <span class="test-status status-production">Production Ready</span>
                 </div>
             </div>
         </div>
@@ -118,11 +112,21 @@
                     <h3>Debug Normalize <span id="status-debug-normalize" class="status-icon" title="Tool status"></span></h3>
                     <p>Interactive testing of chord normalization function with live input/output for development and troubleshooting.</p>
                     <a href="debug_normalization.html" class="test-link">Open Tool</a>
-                    <span class="test-status status-dev">Development Tool</span>
                 </div>
             </div>
         </div>
         
+        <!-- Modal for suite details (placeholder) -->
+        <div id="suite-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeSuiteModal()">&times;</span>
+                <h3 id="modal-suite-name"></h3>
+                <p id="modal-suite-description"></p>
+                <button id="modal-run-test" class="btn">Run Test</button>
+                <span id="modal-suite-badge" class="test-status"></span>
+                <div id="modal-recent-results"></div>
+            </div>
+        </div>
         <div class="footer">
             <p><strong>Test Coverage:</strong> 8 test suites covering core functionality, music theory validation, data integrity, and development tools.</p>
             <p><strong>Last updated:</strong> <span id="last-updated"></span></p>
@@ -286,26 +290,47 @@
         
         function createStatusCard(testFile, testInfo, result) {
             const card = document.createElement('div');
-            card.className = 'test-status-card';
-            
+            card.className = 'test-status-card unified';
+
             const status = result ? (result.failed === 0 ? 'passed' : 'failed') : 'not-run';
             const statusText = result ? `${result.passed}/${result.total} passed` : 'Not run';
             const lastRun = result ? result.lastRun : 'Never';
-            
+
             card.innerHTML = `
-                <div class="status-indicator ${status}"></div>
-                <h4>${testInfo.name}</h4>
-                <div class="test-stats">${statusText}</div>
-                <div class="last-run">Last run: ${lastRun}</div>
+                <div class="card-header">
+                    <h4 class="suite-title">${testInfo.name}</h4>
+                    <div class="status-indicator ${status}"></div>
+                </div>
+                <div class="suite-stats">${statusText}</div>
+                <div class="suite-last-run">Last run: ${lastRun}</div>
+                <button class="btn run-btn" onclick="window.open('${testFile}', '_blank'); event.stopPropagation();">Run Test</button>
             `;
-            
-            // Add click handler to run the test
-            card.addEventListener('click', () => {
-                window.open(testFile, '_blank');
-            });
-            card.style.cursor = 'pointer';
-            
+            card.style.cursor = 'default';
             return card;
+        }
+
+        // Modal logic
+        function openSuiteModal(testFile, testInfo, result) {
+            console.log('openSuiteModal called for', testFile);
+            document.getElementById('modal-suite-name').textContent = testInfo.name;
+            document.getElementById('modal-suite-description').textContent = testInfo.description;
+            const badge = document.getElementById('modal-suite-badge');
+            badge.textContent = (testInfo.category === 'Development Tools') ? 'Development Tool' : 'Production Ready';
+            badge.className = 'test-status ' + ((testInfo.category === 'Development Tools') ? 'status-dev' : 'status-production');
+            // Run Test button
+            const runBtn = document.getElementById('modal-run-test');
+            runBtn.onclick = () => window.open(testFile, '_blank');
+            // Recent results (placeholder)
+            const recentDiv = document.getElementById('modal-recent-results');
+            if (result) {
+                recentDiv.innerHTML = `<p><strong>Last Run:</strong> ${result.lastRun}<br><strong>Passed:</strong> ${result.passed}/${result.total}<br><strong>Success Rate:</strong> ${result.successRate || '-'}%</p>`;
+            } else {
+                recentDiv.innerHTML = '<p>No recent results.</p>';
+            }
+            document.getElementById('suite-modal').classList.add('show');
+        }
+        function closeSuiteModal() {
+            document.getElementById('suite-modal').classList.remove('show');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
