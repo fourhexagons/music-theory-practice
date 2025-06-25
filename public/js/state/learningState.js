@@ -323,4 +323,46 @@ function advanceQuestionPointer() {
 // Expose functions globally for backward compatibility
 window.getCurrentLevel = getCurrentLevel;
 window.advanceLevel = advanceLevel;
-window.advanceQuestionPointer = advanceQuestionPointer; 
+window.advanceQuestionPointer = advanceQuestionPointer;
+
+/**
+ * Records a correct answer and advances the learning path
+ */
+function recordCorrectAnswer() {
+  learningState.correctAnswersInChapter++;
+  learningState.correctAnswerStreak++;
+  learningState.lastAnswerIncorrect = false;
+  
+  // Check if we've met the required streak for this chapter
+  const group = getCurrentGroup();
+  if (learningState.correctAnswersInChapter >= group.requiredStreak) {
+    // Advance to next question/chapter
+    const result = window.advanceLearningPath(window.quizData);
+    if (result === 'advanced') {
+      // All levels complete, move to advanced practice
+      learningState.mode = window.MODES.RANDOM_ALL;
+    }
+  }
+  
+  saveLearningState();
+}
+window.recordCorrectAnswer = recordCorrectAnswer;
+
+/**
+ * Records an incorrect answer
+ */
+function recordIncorrectAnswer() {
+  learningState.correctAnswerStreak = 0;
+  learningState.lastAnswerIncorrect = true;
+  saveLearningState();
+}
+window.recordIncorrectAnswer = recordIncorrectAnswer;
+
+/**
+ * Records that the last incorrect answer was corrected
+ */
+function recordLastAnswerCorrected() {
+  learningState.lastAnswerIncorrect = false;
+  saveLearningState();
+}
+window.recordLastAnswerCorrected = recordLastAnswerCorrected; 
