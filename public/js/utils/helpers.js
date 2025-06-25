@@ -165,7 +165,7 @@ function generateQuestion() {
         handleError("No more groups or chapters. All levels complete.", { state, currentGroup });
         return null;
     }
-    const currentChapter = window.getCurrentChapter();
+    const currentChapter = window.getCurrentChapter(state.mode, window.quizData);
     if (!currentChapter) {
         handleError("Chapter not found!", { state });
         return null;
