@@ -323,4 +323,62 @@ function advanceQuestionPointer() {
 // Expose functions globally for backward compatibility
 window.getCurrentLevel = getCurrentLevel;
 window.advanceLevel = advanceLevel;
-window.advanceQuestionPointer = advanceQuestionPointer; 
+window.advanceQuestionPointer = advanceQuestionPointer;
+
+/**
+ * Records a correct answer and advances the learning path
+ */
+function recordCorrectAnswer() {
+  console.log('recordCorrectAnswer called');
+  learningState.correctAnswersInChapter++;
+  learningState.correctAnswerStreak++;
+  learningState.lastAnswerIncorrect = false;
+  
+  console.log('Current state after increment:', {
+    correctAnswersInChapter: learningState.correctAnswersInChapter,
+    correctAnswerStreak: learningState.correctAnswerStreak,
+    currentGroup: learningState.currentGroup,
+    currentKeyIndex: learningState.currentKeyIndex,
+    currentChapterIndex: learningState.currentChapterIndex
+  });
+  
+  // Check if we've met the required streak for this chapter
+  const group = getCurrentGroup();
+  console.log('Current group:', group);
+  console.log('Required streak:', group.requiredStreak);
+  
+  if (learningState.correctAnswersInChapter >= group.requiredStreak) {
+    console.log('Streak requirement met, advancing learning path');
+    // Advance to next question/chapter
+    const result = window.advanceLearningPath(window.quizData);
+    console.log('advanceLearningPath result:', result);
+    if (result === 'advanced') {
+      // All levels complete, move to advanced practice
+      learningState.mode = window.MODES.RANDOM_ALL;
+    }
+  } else {
+    console.log('Streak requirement not met yet');
+  }
+  
+  saveLearningState();
+}
+window.recordCorrectAnswer = recordCorrectAnswer;
+
+/**
+ * Records an incorrect answer
+ */
+function recordIncorrectAnswer() {
+  learningState.correctAnswerStreak = 0;
+  learningState.lastAnswerIncorrect = true;
+  saveLearningState();
+}
+window.recordIncorrectAnswer = recordIncorrectAnswer;
+
+/**
+ * Records that the last incorrect answer was corrected
+ */
+function recordLastAnswerCorrected() {
+  learningState.lastAnswerIncorrect = false;
+  saveLearningState();
+}
+window.recordLastAnswerCorrected = recordLastAnswerCorrected; 

@@ -66,11 +66,11 @@ self.addEventListener('fetch', event => {
     );
   } else {
     // For all other assets (CSS, JS, images), use a "cache-first" strategy.
-    event.respondWith(
+  event.respondWith(
       caches.match(request).then(response => {
         // Return from cache if available, otherwise fetch from network.
         return response || fetch(request);
-      })
-    );
+    })
+  );
   }
 }); 

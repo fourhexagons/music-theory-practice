@@ -73,7 +73,7 @@
             } else {
                 failedCount++;
             }
-
+            
             div.className = 'debug-item' + (isCorrect ? ' correct' : ' incorrect');
 
             div.innerHTML += `<div class="result"><strong>Input:</strong> "${input}"</div>`;
@@ -82,9 +82,9 @@
                 div.innerHTML += `<div class="result"><strong>Expected:</strong> "${expected}"</div>`;
             }
             
-            return div;
-        }
-
+                return div;
+            }
+            
         function runTests(category, testCases) {
             const categoryHeader = document.createElement('h2');
             categoryHeader.textContent = category;
@@ -167,7 +167,7 @@
                 { input: "Fbb", expected: "F𝄫" },
                 { input: "G", expected: "G" }
             ]);
-        }
+                }
 
         function exportJSON() {
             const exportData = {

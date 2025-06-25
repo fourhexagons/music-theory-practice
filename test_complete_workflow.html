@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Workflow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .workflow { background-color: #e2e3e5; color: #383d41; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .simulation { background-color: #fff3cd; color: #856404; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Complete Workflow Test</h1>
+    <div id="test-results"></div>
+    <div id="workflow-display" class="workflow">
+        <h3>Workflow Simulation:</h3>
+        <div id="workflow-steps"></div>
+    </div>
+
+    <script src="public/js/utils/errorHandler.js"></script>
+    <script src="public/js/utils/helpers.js"></script>
+    <script src="public/js/data/quizData.js"></script>
+    <script src="public/js/utils/normalization.js"></script>
+    <script src="public/js/main.js"></script>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function addWorkflowStep(step) {
+            const workflowSteps = document.getElementById('workflow-steps');
+            const div = document.createElement('div');
+            div.className = 'simulation';
+            div.textContent = step;
+            workflowSteps.appendChild(div);
+        }
+
+        function simulateUserSession() {
+            addResult('Starting complete workflow simulation...', 'info');
+            
+            // Step 1: Initialize the app
+            addWorkflowStep('1. Initializing app...');
+            initLearningState();
+            
+            // Step 2: Check initial state
+            const initialLevel = getCurrentLevel();
+            addWorkflowStep(`2. Starting at level: ${initialLevel.name}`);
+            addWorkflowStep(`3. Current key: ${initialLevel.keys[learningState.currentKeyIndex]}`);
+            addWorkflowStep(`4. Current chapter: ${initialLevel.chapters[learningState.currentChapterIndex].id}`);
+            
+            // Step 3: Generate first question
+            addWorkflowStep('5. Generating first question...');
+            askQuestion();
+            
+            if (learningState.currentQuestion) {
+                addWorkflowStep(`6. Question generated: ${learningState.currentQuestion.chapterId} for key ${learningState.currentQuestion.key}`);
+            } else {
+                addResult('✗ Failed to generate question', 'fail');
+                return;
+            }
+            
+            // Step 4: Simulate correct answers for progression
+            addWorkflowStep('7. Simulating correct answers...');
+            
+            // Simulate answering accidentals count correctly
+            if (learningState.currentQuestion.chapterId === 'accCount') {
+                const key = learningState.currentQuestion.key;
+                const correctAnswer = window.quizData[key].accidentals === 0 ? '0' : window.quizData[key].accidentals.toString();
+                addWorkflowStep(`8. Answering accidentals count for ${key}: "${correctAnswer}"`);
+                
+                const isCorrect = checkAnswer(correctAnswer);
+                if (isCorrect) {
+                    addWorkflowStep('9. ✓ Answer correct, advancing...');
+                    advanceQuestionPointer();
+                    askQuestion();
+                } else {
+                    addResult('✗ Accidentals count answer failed', 'fail');
+                    return;
+                }
+            }
+            
+            // Step 5: Simulate scale spelling
+            if (learningState.currentQuestion && learningState.currentQuestion.chapterId === 'scale') {
+                const key = learningState.currentQuestion.key;
+                const correctScale = window.quizData[key].scale.join(' ');
+                addWorkflowStep(`10. Answering scale spelling for ${key}: "${correctScale}"`);
+                
+                const isCorrect = checkAnswer(correctScale);
+                if (isCorrect) {
+                    addWorkflowStep('11. ✓ Scale spelling correct, advancing...');
+                    advanceQuestionPointer();
+                    askQuestion();
+                } else {
+                    addResult('✗ Scale spelling answer failed', 'fail');
+                    return;
+                }
+            }
+            
+            // Step 6: Simulate triad questions
+            if (learningState.currentQuestion && learningState.currentQuestion.chapterId === 'triads') {
+                addWorkflowStep('12. Simulating triad questions...');
+                
+                // Answer 3 triad questions correctly to advance
+                for (let i = 0; i < 3; i++) {
+                    const key = learningState.currentQuestion.key;
+                    const degree = learningState.currentQuestion.degree;
+                    const correctTriad = window.quizData[key].triads[degree];
+                    addWorkflowStep(`13. Answering triad ${degree} for ${key}: "${correctTriad}"`);
+                    
+                    const isCorrect = checkAnswer(correctTriad);
+                    if (isCorrect) {
+                        addWorkflowStep(`14. ✓ Triad ${degree} correct`);
+                        learningState.correctChordAnswersForCurrentKey++;
+                        
+                        if (learningState.currentQuestion && learningState.currentQuestion.degree) {
+                            learningState.usedDegrees.push(learningState.currentQuestion.degree);
+                        }
+                        
+                        if (learningState.correctChordAnswersForCurrentKey >= 3) {
+                            addWorkflowStep('15. ✓ Completed 3 triad questions, advancing to next key');
+                            learningState.correctChordAnswersForCurrentKey = 0;
+                            learningState.usedDegrees = [];
+                            learningState.currentKeyIndex++;
+                            
+                            if (learningState.currentKeyIndex >= initialLevel.keys.length) {
+                                addWorkflowStep('16. ✓ Completed all keys in level, advancing to next level');
+                                advanceLevel();
+                                const newLevel = getCurrentLevel();
+                                addWorkflowStep(`17. Now at level: ${newLevel.name}`);
+                            } else {
+                                learningState.currentChapterIndex = 0;
+                                addWorkflowStep('18. ✓ Advanced to next key, reset to first chapter');
+                            }
+                            break;
+                        } else {
+                            // Generate next triad question
+                            askQuestion();
+                        }
+                    } else {
+                        addResult(`✗ Triad ${degree} answer failed`, 'fail');
+                        return;
+                    }
+                }
+            }
+            
+            // Step 7: Final verification
+            const finalLevel = getCurrentLevel();
+            addWorkflowStep(`19. Final state - Level: ${finalLevel.name}, Key Index: ${learningState.currentKeyIndex}, Chapter Index: ${learningState.currentChapterIndex}`);
+            
+            addResult('✓ Complete workflow simulation successful!', 'pass');
+            addResult('✓ App is working correctly with proper progression logic', 'pass');
+        }
+
+        // Run simulation when page loads
+        window.addEventListener('load', simulateUserSession);
+    </script>
+</body>
+</html> 

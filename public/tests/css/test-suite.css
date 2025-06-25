@@ -11,7 +11,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: #333;
-    background-color: #f5f5f5;
+    background-color: #f0f0f0;
 }
 
 .container {
@@ -400,5 +400,120 @@ pre {
     
     .test-status-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* --- Modal Styles --- */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background: rgba(0,0,0,0.35);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    margin: auto;
+    padding: 30px 24px 24px 24px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    position: relative;
+    animation: modalFadeIn 0.2s;
+}
+
+@keyframes modalFadeIn {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal .close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 1.5em;
+    color: #888;
+    cursor: pointer;
+    font-weight: bold;
+    background: none;
+    border: none;
+}
+
+/* --- Unified Dashboard Card Styles --- */
+.test-status-card.unified {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 18px;
+}
+.test-status-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    position: relative;
+    min-height: 1.5em;
+}
+.suite-title {
+    font-size: 1.25em;
+    font-weight: bold;
+    color: #222;
+    margin: 0;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+}
+.status-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-left: 12px;
+    flex-shrink: 0;
+    align-self: center;
+}
+.suite-description {
+    font-size: 0.98em;
+    color: #666;
+    margin-bottom: 10px;
+    margin-top: 2px;
+}
+.suite-stats {
+    font-size: 0.98em;
+    color: #888;
+    font-weight: 400;
+    margin-bottom: 2px;
+}
+.suite-last-run {
+    font-size: 0.92em;
+    color: #999;
+    margin-bottom: 10px;
+}
+.run-btn {
+    margin-top: 8px;
+    width: 100%;
+    font-size: 1em;
+    padding: 10px 0;
+    margin-bottom: 0;
+}
+@media (max-width: 600px) {
+    .test-status-card.unified {
+        min-height: 0;
+        padding-bottom: 10px;
+    }
+    .run-btn {
+        font-size: 0.95em;
+        padding: 8px 0;
     }
 } 

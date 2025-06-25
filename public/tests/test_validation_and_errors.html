@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Validation, Errors & Edges</title>
+    <link rel="stylesheet" href="css/test-suite.css">
+    <style>
+        .test-result {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        .test-result.pass {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .test-result.fail {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .test-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .test-details {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>🛡️ Validation, Errors & Edges</h1>
+            <p>Unified suite for normalization, answer validation, error handling, and edge cases. All tests use the real app logic.</p>
+        </div>
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" onclick="runAllTests()">Run All Tests</button>
+                <button class="btn" onclick="copyResults('json')">Copy JSON</button>
+                <button class="btn" onclick="copyResults('summary')">Copy Summary</button>
+            </div>
+            <div id="copy-status" class="status-area"></div>
+            <div id="results"></div>
+        </div>
+    </div>
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/helpers.js"></script>
+    <script src="../js/utils/normalization.js"></script>
+    <script src="../js/utils/validation.js"></script>
+    <script src="js/test-dashboard.js"></script>
+    <script>
+        // Step 1: Simple console log
+        console.log('Test file JS is running!');
+
+        // Step 2: DOMContentLoaded listener
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded event fired');
+        });
+
+        // Step 3: Minimal runAllTests function
+        function runAllTests() {
+            console.log('runAllTests called');
+            testResults = [];
+            testNormalizeInputs();
+            testCheckAnswerInvalidParams();
+            testSeventhSpelling();
+            testScaleSpelling();
+            testAccidentalsCount();
+            testAccidentalsNames();
+            testDataCorruption();
+            displayResults();
+        }
+
+        // Full normalization input tests
+        function testNormalizeInputs() {
+            const cases = [
+                { input: null, expected: '' },
+                { input: undefined, expected: '' },
+                { input: 123, expected: '' },
+                { input: {}, expected: '' },
+                { input: [], expected: '' },
+                { input: '', expected: '' },
+                { input: '   ', expected: '' },
+                { input: 'XYZ', expected: 'XYZ' },
+                { input: 'C@m', expected: 'C@m' },
+                { input: 'C##m7', expected: 'C𝄪m7' },
+                { input: 'Cbbm7', expected: 'C𝄫m7' },
+                { input: 'C#m7', expected: 'C♯m7' }
+            ];
+            cases.forEach(tc => {
+                const actual = window.normalizeChord ? window.normalizeChord(tc.input) : 'no normalizeChord';
+                const passed = actual === tc.expected;
+                testResults.push({ name: `Normalize Input (${tc.input})`, passed, expected: tc.expected, actual, category: 'Normalization', details: `Input: ${tc.input}, Type: ${typeof tc.input}` });
+                console.log(`normalizeChord(${JSON.stringify(tc.input)}) =>`, actual);
+            });
+        }
+
+        // Validation tests: checkAnswer with invalid params
+        function testCheckAnswerInvalidParams() {
+            const cases = [
+                { answer: null, type: 'TRIADS', key: 'C', degree: 1, expected: false },
+                { answer: undefined, type: 'TRIADS', key: 'C', degree: 1, expected: false },
+                { answer: '', type: 'TRIADS', key: 'C', degree: 1, expected: false },
+                { answer: 'Cm', type: 'INVALID_TYPE', key: 'C', degree: 1, expected: false },
+                { answer: 'Cm', type: 'TRIADS', key: 'INVALID_KEY', degree: 1, expected: false },
+                { answer: 'Cm', type: 'TRIADS', key: 'C', degree: 99, expected: false }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, tc.type, tc.key, tc.degree, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: `CheckAnswer Invalid Params (${tc.answer}, ${tc.type}, ${tc.key}, ${tc.degree})`, passed, expected: tc.expected, actual, category: 'Invalid Input', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, ${tc.type}, ${tc.key}, ${tc.degree}) =>`, actual);
+            });
+        }
+
+        // Seventh chord spelling tests using 'seventhSpelling' type
+        function testSeventhSpelling() {
+            const cases = [
+                { name: 'A Major V7 Spelling (Sharp)', answer: 'E G# B D', key: 'A', degree: 5, expected: true },
+                { name: 'G Major V7 Spelling (Sharp)', answer: 'D F# A C', key: 'G', degree: 5, expected: true },
+                { name: 'F Major V7 Spelling (Flat)', answer: 'C E G Bb', key: 'F', degree: 5, expected: true },
+                { name: 'Bb Major V7 Spelling (Flat)', answer: 'F A C Eb', key: 'Bb', degree: 5, expected: true },
+                { name: 'C Major I7 Spelling', answer: 'C E G B', key: 'C', degree: 1, expected: true },
+                { name: 'D Major ii7 Spelling', answer: 'E G B D', key: 'D', degree: 2, expected: true },
+                { name: 'E Major vii7 Spelling', answer: 'D# F# A C#', key: 'E', degree: 7, expected: true },
+                { name: 'Extra Spaces', answer: 'E  G#  B  D', key: 'A', degree: 5, expected: true },
+                { name: 'Mixed Case', answer: 'e g# b d', key: 'A', degree: 5, expected: true },
+                { name: 'Mixed Notation', answer: 'E G♯ B D', key: 'A', degree: 5, expected: true },
+                { name: 'Unicode Sharp', answer: 'E G♯ B D', key: 'A', degree: 5, expected: true },
+                { name: 'Unicode Flat', answer: 'C E G B♭', key: 'F', degree: 5, expected: true },
+                { name: 'Wrong Note Order', answer: 'G# E B D', key: 'A', degree: 5, expected: false },
+                { name: 'Missing Note', answer: 'E G# B', key: 'A', degree: 5, expected: false },
+                { name: 'Extra Note', answer: 'E G# B D F', key: 'A', degree: 5, expected: false },
+                { name: 'Wrong Note', answer: 'E G# B C', key: 'A', degree: 5, expected: false }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'seventhSpelling', tc.key, tc.degree, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Symbol Mismatches', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'seventhSpelling', ${tc.key}, ${tc.degree}) =>`, actual);
+            });
+        }
+
+        // Scale spelling tests (type 'scale')
+        function testScaleSpelling() {
+            const cases = [
+                { name: 'C Major Scale Correct', answer: 'C D E F G A B', key: 'C', expected: true },
+                { name: 'C Major Scale Wrong Order', answer: 'C E D F G A B', key: 'C', expected: false },
+                { name: 'C Major Scale Missing Note', answer: 'C D E F G A', key: 'C', expected: false },
+                { name: 'C Major Scale Extra Note', answer: 'C D E F G A B C', key: 'C', expected: false },
+                { name: 'C Major Scale Wrong Note', answer: 'C D E F G A Bb', key: 'C', expected: false },
+                { name: 'G Major Scale Correct', answer: 'G A B C D E F#', key: 'G', expected: true },
+                { name: 'G Major Scale Unicode Sharp', answer: 'G A B C D E F♯', key: 'G', expected: true },
+                { name: 'G Major Scale Lowercase', answer: 'g a b c d e f#', key: 'G', expected: true }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'scale', tc.key, null, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Scale Spelling', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'scale', ${tc.key}) =>`, actual);
+            });
+        }
+
+        // Accidentals count tests (type 'accCount')
+        function testAccidentalsCount() {
+            const cases = [
+                { name: 'C Major Accidentals Count Correct', answer: 0, key: 'C', expected: true },
+                { name: 'C Major Accidentals Count String', answer: '0', key: 'C', expected: true },
+                { name: 'G Major Accidentals Count Correct', answer: 1, key: 'G', expected: true },
+                { name: 'G Major Accidentals Count Wrong', answer: 2, key: 'G', expected: false },
+                { name: 'F Major Accidentals Count Correct', answer: 1, key: 'F', expected: true },
+                { name: 'F Major Accidentals Count Wrong', answer: 0, key: 'F', expected: false }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'accCount', tc.key, null, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Accidentals Count', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'accCount', ${tc.key}) =>`, actual);
+            });
+        }
+
+        // Accidentals names tests (type 'accNotes')
+        function testAccidentalsNames() {
+            const cases = [
+                { name: 'C Major Accidentals Names Correct', answer: '', key: 'C', expected: true },
+                { name: 'G Major Accidentals Names Correct', answer: 'F#', key: 'G', expected: true },
+                { name: 'G Major Accidentals Names Unicode', answer: 'F♯', key: 'G', expected: true },
+                { name: 'G Major Accidentals Names Wrong', answer: 'C#', key: 'G', expected: false },
+                { name: 'F Major Accidentals Names Correct', answer: 'Bb', key: 'F', expected: true },
+                { name: 'F Major Accidentals Names Wrong', answer: 'Eb', key: 'F', expected: false }
+            ];
+            cases.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'accNotes', tc.key, null, window.quizData) : 'no checkAnswer';
+                const passed = actual === tc.expected;
+                testResults.push({ name: tc.name, passed, expected: tc.expected, actual, category: 'Accidentals Names', details: '' });
+                console.log(`checkAnswer(${JSON.stringify(tc.answer)}, 'accNotes', ${tc.key}) =>`, actual);
+            });
+        }
+
+        // Data corruption/integrity tests
+        function testDataCorruption() {
+            // Simulate missing/corrupted quizData
+            const missingKey = 'NON_EXISTENT_KEY';
+            const corruptedQuizData = { ...window.quizData };
+            corruptedQuizData['C'] = null;
+            // Missing key
+            let result = window.checkAnswer ? window.checkAnswer('C', 'TRIADS', missingKey, 1, window.quizData) : false;
+            testResults.push({ name: 'Missing Key Data Handling', passed: result === false, expected: false, actual: result, category: 'Data Corruption', details: 'Deleted key from quizData' });
+            // Corrupted key structure
+            result = window.checkAnswer ? window.checkAnswer('C', 'TRIADS', 'C', 1, corruptedQuizData) : false;
+            testResults.push({ name: 'Corrupted Key Structure Handling', passed: result === false, expected: false, actual: result, category: 'Data Corruption', details: 'Corrupted C major data structure' });
+        }
+
+        // Step 5: Simple result display
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            testResults.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'test-result ' + (r.passed ? 'pass' : 'fail');
+                div.innerHTML = `<strong>${r.name}</strong> <span>${r.passed ? '✅' : '❌'}</span><br>Expected: ${r.expected}, Actual: ${r.actual}<br>${r.details}`;
+                resultsDiv.appendChild(div);
+            });
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                const passCount = testResults.filter(r => r.passed).length;
+                const failCount = testResults.length - passCount;
+                const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
+                window.TestDashboard.saveTestResult('test_validation_and_errors.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: successRate
+                });
+            }
+        }
+
+        // Copy results helpers
+        function copyResults(type) {
+            let text = '';
+            if (type === 'json') {
+                text = JSON.stringify({ summary: {
+                    total: testResults.length,
+                    passed: testResults.filter(r => r.passed).length,
+                    failed: testResults.filter(r => !r.passed).length
+                }, results: testResults }, null, 2);
+            } else {
+                text = testResults.map(r => `${r.passed ? '✅' : '❌'} ${r.name}: expected ${r.expected}, got ${r.actual} [${r.category}]`).join('\n');
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('copy-status').textContent = '✅ Results copied!';
+                setTimeout(() => { document.getElementById('copy-status').textContent = ''; }, 2000);
+            }).catch(() => {
+                document.getElementById('copy-status').textContent = '❌ Copy failed!';
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Progression Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .question { background-color: #fff3cd; color: #856404; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Quiz Progression Test</h1>
+    <div id="test-results"></div>
+    <div id="question-display" class="question" style="display: none;">
+        <h3>Current Question:</h3>
+        <div id="question-text"></div>
+        <input type="text" id="answer-input" placeholder="Your answer...">
+        <button onclick="submitAnswer()">Submit</button>
+        <div id="feedback"></div>
+    </div>
+
+    <script src="public/js/utils/errorHandler.js"></script>
+    <script src="public/js/utils/helpers.js"></script>
+    <script src="public/js/data/quizData.js"></script>
+    <script src="public/js/utils/normalization.js"></script>
+    <script src="public/js/main.js"></script>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function displayQuestion() {
+            const questionDisplay = document.getElementById('question-display');
+            const questionText = document.getElementById('question-text');
+            
+            // Get current question
+            const level = getCurrentLevel();
+            const key = level.keys[learningState.currentKeyIndex];
+            const chapter = level.chapters[learningState.currentChapterIndex];
+            
+            let text = '';
+            switch (chapter.id) {
+                case 'accCount':
+                    text = `How many accidentals are in ${key} major?`;
+                    break;
+                case 'accNotes':
+                    text = `Name the accidentals in ${key} major.`;
+                    break;
+                case 'scale':
+                    text = `Spell the ${key} major scale.`;
+                    break;
+                case 'triads':
+                case 'sevenths':
+                    const degree = learningState.currentQuestion ? learningState.currentQuestion.degree : 2;
+                    const chordType = chapter.id === 'triads' ? 'triad' : 'seventh chord';
+                    text = `Name the ${ordinal(degree)} ${chordType} in ${key} major.`;
+                    break;
+            }
+            
+            questionText.textContent = text;
+            questionDisplay.style.display = 'block';
+            
+            addResult(`Generated question: ${text}`, 'info');
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('answer-input').value;
+            const feedback = document.getElementById('feedback');
+            
+            // Simulate the answer submission
+            const isCorrect = checkAnswer(answer);
+            
+            if (isCorrect) {
+                feedback.textContent = 'Correct!';
+                feedback.style.color = 'green';
+                
+                // Simulate progression logic
+                const level = getCurrentLevel();
+                const currentChapter = level.chapters[learningState.currentChapterIndex];
+                
+                if (currentChapter.id === 'triads') {
+                    learningState.correctChordAnswersForCurrentKey++;
+                    
+                    if (learningState.currentQuestion && learningState.currentQuestion.degree) {
+                        learningState.usedDegrees.push(learningState.currentQuestion.degree);
+                    }
+                    
+                    if (learningState.correctChordAnswersForCurrentKey >= 3) {
+                        learningState.correctChordAnswersForCurrentKey = 0;
+                        learningState.usedDegrees = [];
+                        learningState.currentKeyIndex++;
+                        
+                        if (learningState.currentKeyIndex >= level.keys.length) {
+                            advanceLevel();
+                            addResult('✓ Advanced to next level!', 'pass');
+                        } else {
+                            learningState.currentChapterIndex = 0;
+                            addResult('✓ Advanced to next key!', 'pass');
+                        }
+                    } else {
+                        addResult('✓ Stayed in triads chapter for more questions', 'pass');
+                    }
+                } else {
+                    advanceQuestionPointer();
+                    addResult('✓ Advanced to next question!', 'pass');
+                }
+                
+                // Generate next question
+                setTimeout(() => {
+                    askQuestion();
+                    displayQuestion();
+                    document.getElementById('answer-input').value = '';
+                    feedback.textContent = '';
+                }, 1000);
+                
+            } else {
+                feedback.textContent = 'Incorrect. Try again.';
+                feedback.style.color = 'red';
+                addResult('✗ Incorrect answer', 'fail');
+            }
+        }
+
+        function runProgressionTest() {
+            addResult('Starting quiz progression test...', 'info');
+            
+            // Initialize the app
+            initLearningState();
+            
+            // Display initial state
+            const level = getCurrentLevel();
+            addResult(`Initial level: ${level.name}`, 'info');
+            addResult(`Initial key: ${level.keys[learningState.currentKeyIndex]}`, 'info');
+            addResult(`Initial chapter: ${level.chapters[learningState.currentChapterIndex].id}`, 'info');
+            
+            // Generate first question
+            askQuestion();
+            displayQuestion();
+        }
+
+        // Run test when page loads
+        window.addEventListener('load', runProgressionTest);
+    </script>
+</body>
+</html> 

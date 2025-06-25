@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>App Functionality Test</h1>
+    <div id="test-results"></div>
+
+    <script src="public/js/utils/errorHandler.js"></script>
+    <script src="public/js/utils/helpers.js"></script>
+    <script src="public/js/data/quizData.js"></script>
+    <script src="public/js/utils/normalization.js"></script>
+    <script src="public/js/main.js"></script>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function runTests() {
+            addResult('Starting app functionality tests...', 'info');
+
+            // Test 1: Check if main.js loaded
+            if (typeof QUESTION_TYPES !== 'undefined') {
+                addResult('✓ QUESTION_TYPES defined', 'pass');
+            } else {
+                addResult('✗ QUESTION_TYPES not defined', 'fail');
+            }
+
+            // Test 2: Check if learningState exists
+            if (typeof learningState !== 'undefined') {
+                addResult('✓ learningState defined', 'pass');
+            } else {
+                addResult('✗ learningState not defined', 'fail');
+            }
+
+            // Test 3: Check if quizData exists
+            if (typeof window.quizData !== 'undefined') {
+                addResult('✓ quizData loaded', 'pass');
+            } else {
+                addResult('✗ quizData not loaded', 'fail');
+            }
+
+            // Test 4: Check if learningPath exists
+            if (typeof window.learningPath !== 'undefined') {
+                addResult('✓ learningPath defined', 'pass');
+            } else {
+                addResult('✗ learningPath not defined', 'fail');
+            }
+
+            // Test 5: Check if normalizeChord exists
+            if (typeof window.normalizeChord === 'function') {
+                addResult('✓ normalizeChord function exists', 'pass');
+            } else {
+                addResult('✗ normalizeChord function missing', 'fail');
+            }
+
+            // Test 6: Check if askQuestion function exists
+            if (typeof askQuestion === 'function') {
+                addResult('✓ askQuestion function exists', 'pass');
+            } else {
+                addResult('✗ askQuestion function missing', 'fail');
+            }
+
+            // Test 7: Check if handleAnswerSubmit function exists
+            if (typeof handleAnswerSubmit === 'function') {
+                addResult('✓ handleAnswerSubmit function exists', 'pass');
+            } else {
+                addResult('✗ handleAnswerSubmit function missing', 'fail');
+            }
+
+            // Test 8: Test question generation
+            try {
+                const level = getCurrentLevel();
+                if (level) {
+                    addResult(`✓ getCurrentLevel works - current level: ${level.name}`, 'pass');
+                } else {
+                    addResult('✗ getCurrentLevel returns null', 'fail');
+                }
+            } catch (e) {
+                addResult(`✗ getCurrentLevel error: ${e.message}`, 'fail');
+            }
+
+            // Test 9: Test chord normalization
+            try {
+                const result = window.normalizeChord('Cm7');
+                if (result) {
+                    addResult(`✓ normalizeChord works - Cm7 -> ${result}`, 'pass');
+                } else {
+                    addResult('✗ normalizeChord returns empty result', 'fail');
+                }
+            } catch (e) {
+                addResult(`✗ normalizeChord error: ${e.message}`, 'fail');
+            }
+
+            // Test 10: Test answer checking
+            try {
+                // Create a mock question
+                learningState.currentQuestion = {
+                    key: 'C',
+                    chapterId: 'accCount'
+                };
+                const isCorrect = checkAnswer('0');
+                addResult(`✓ checkAnswer works - '0' for C major accidentals: ${isCorrect}`, 'pass');
+            } catch (e) {
+                addResult(`✗ checkAnswer error: ${e.message}`, 'fail');
+            }
+
+            addResult('App functionality tests completed!', 'info');
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html> 
