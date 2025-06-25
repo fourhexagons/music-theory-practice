@@ -15,6 +15,97 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
   </head>
   <body>
+    <!-- Practice Menu Button -->
+    <button id="practice-menu-button" class="practice-menu-button" aria-label="Open practice menu">
+      <span class="menu-icon">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </span>
+      <span class="menu-icon-x">
+        <span class="x-line"></span>
+        <span class="x-line"></span>
+      </span>
+    </button>
+
+    <!-- Practice Menu Overlay -->
+    <div id="practice-menu-overlay" class="practice-menu-overlay">
+      <div class="practice-menu-container">
+        <!-- Menu Bar (Left Section) -->
+        <div class="practice-menu-bar">
+          <h1 class="practice-menu-title">Practice</h1>
+          
+          <!-- Top Level Navigation -->
+          <nav class="practice-menu-nav">
+            <ul class="practice-menu-list">
+              <li class="practice-menu-item">
+                <button class="practice-menu-link" data-section="keys">
+                  Keys
+                </button>
+              </li>
+              <li class="practice-menu-item">
+                <button class="practice-menu-link" data-section="difficulty">
+                  Difficulty
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <!-- Menu Content (Right Section) -->
+        <div class="practice-menu-content">
+          <!-- Keys Section -->
+          <div class="practice-menu-section" id="keys-section">
+            <h2 class="practice-menu-section-title">Keys</h2>
+            
+            <!-- Sharps -->
+            <div class="practice-menu-group">
+              <h3 class="practice-menu-group-title">Sharps</h3>
+              <ul class="practice-menu-group-list">
+                <li><button class="practice-menu-option" data-key="C">C</button></li>
+                <li><button class="practice-menu-option" data-key="G">G</button></li>
+                <li><button class="practice-menu-option" data-key="D">D</button></li>
+                <li><button class="practice-menu-option" data-key="A">A</button></li>
+                <li><button class="practice-menu-option" data-key="E">E</button></li>
+                <li><button class="practice-menu-option" data-key="B">B</button></li>
+                <li><button class="practice-menu-option" data-key="F#">F♯</button></li>
+              </ul>
+            </div>
+
+            <!-- Flats -->
+            <div class="practice-menu-group">
+              <h3 class="practice-menu-group-title">Flats</h3>
+              <ul class="practice-menu-group-list">
+                <li><button class="practice-menu-option" data-key="C">C</button></li>
+                <li><button class="practice-menu-option" data-key="F">F</button></li>
+                <li><button class="practice-menu-option" data-key="Bb">B♭</button></li>
+                <li><button class="practice-menu-option" data-key="Eb">E♭</button></li>
+                <li><button class="practice-menu-option" data-key="Ab">A♭</button></li>
+                <li><button class="practice-menu-option" data-key="Db">D♭</button></li>
+                <li><button class="practice-menu-option" data-key="Gb">G♭</button></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Difficulty Section -->
+          <div class="practice-menu-section" id="difficulty-section">
+            <h2 class="practice-menu-section-title">Difficulty</h2>
+            
+            <ul class="practice-menu-group-list">
+              <li><button class="practice-menu-option" data-difficulty="start-over">Start Over</button></li>
+              <li><button class="practice-menu-option" data-difficulty="C">C</button></li>
+              <li><button class="practice-menu-option" data-difficulty="G-D-A">G, D, A</button></li>
+              <li><button class="practice-menu-option" data-difficulty="F-Bb-Eb">F, B♭, E♭</button></li>
+              <li><button class="practice-menu-option" data-difficulty="E-B-F#">E, B, F♯</button></li>
+              <li><button class="practice-menu-option" data-difficulty="Ab-Db-Gb">A♭, D♭, G♭</button></li>
+              <li><button class="practice-menu-option" data-difficulty="full-random">Full Random</button></li>
+              <li><button class="practice-menu-option" data-difficulty="spelling-random-sevenths">Spelling Random Sevenths</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="app-container">
       <!-- New Learning Path UI will be rendered here -->
     </div>
@@ -33,6 +124,9 @@
     <script src="js/utils/helpers.js"></script>
     <script src="/js/data/quizData.js"></script>
     <script src="/js/utils/normalization.js"></script>
+
+    <!-- Practice Menu Component -->
+    <script src="/js/practice-menu.js"></script>
 
     <!-- Main Application Logic -->
     <script src="/js/main.js?v=13"></script>

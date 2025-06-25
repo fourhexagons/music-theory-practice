@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Menu Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #555;
+            color: white;
+        }
+        .test-info {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #4caf50; }
+        .error { background-color: #f44336; }
+        .info { background-color: #2196f3; }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>Practice Menu Test</h1>
+        <p>This test verifies that the practice menu overlay is working correctly.</p>
+        <p><strong>Server URL:</strong> <a href="http://localhost:5002/practice" target="_blank" rel="noopener">http://localhost:5002/practice</a></p>
+    </div>
+
+    <div id="test-results">
+        <div class="test-status info">Running tests...</div>
+    </div>
+
+    <script>
+        const testResults = document.getElementById('test-results');
+        
+        function addTestResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-status ${type}`;
+            div.textContent = message;
+            testResults.appendChild(div);
+        }
+
+        // Test 1: Check if practice page loads
+        fetch('http://localhost:5002/practice')
+            .then(response => {
+                if (response.ok) {
+                    addTestResult('✅ Practice page loads successfully', 'success');
+                    return response.text();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            })
+            .then(html => {
+                // Test 2: Check if menu HTML is present
+                if (html.includes('practice-menu-button')) {
+                    addTestResult('✅ Practice menu HTML is present', 'success');
+                } else {
+                    addTestResult('❌ Practice menu HTML is missing', 'error');
+                }
+
+                // Test 3: Check if CSS is linked
+                if (html.includes('style.css')) {
+                    addTestResult('✅ CSS file is linked', 'success');
+                } else {
+                    addTestResult('❌ CSS file is not linked', 'error');
+                }
+
+                // Test 4: Check if JavaScript is linked
+                if (html.includes('practice-menu.js')) {
+                    addTestResult('✅ Practice menu JavaScript is linked', 'success');
+                } else {
+                    addTestResult('❌ Practice menu JavaScript is not linked', 'error');
+                }
+            })
+            .catch(error => {
+                addTestResult(`❌ Failed to load practice page: ${error.message}`, 'error');
+            });
+
+        // Test 5: Check if CSS file loads
+        fetch('http://localhost:5002/css/style.css')
+            .then(response => {
+                if (response.ok) {
+                    addTestResult('✅ CSS file loads successfully', 'success');
+                    return response.text();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            })
+            .then(css => {
+                if (css.includes('.practice-menu-button')) {
+                    addTestResult('✅ Practice menu CSS styles are present', 'success');
+                } else {
+                    addTestResult('❌ Practice menu CSS styles are missing', 'error');
+                }
+            })
+            .catch(error => {
+                addTestResult(`❌ Failed to load CSS: ${error.message}`, 'error');
+            });
+
+        // Test 6: Check if JavaScript file loads
+        fetch('http://localhost:5002/js/practice-menu.js')
+            .then(response => {
+                if (response.ok) {
+                    addTestResult('✅ Practice menu JavaScript loads successfully', 'success');
+                    return response.text();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            })
+            .then(js => {
+                if (js.includes('class PracticeMenu')) {
+                    addTestResult('✅ PracticeMenu class is defined', 'success');
+                } else {
+                    addTestResult('❌ PracticeMenu class is missing', 'error');
+                }
+            })
+            .catch(error => {
+                addTestResult(`❌ Failed to load JavaScript: ${error.message}`, 'error');
+            });
+
+        // Final instructions
+        setTimeout(() => {
+            addTestResult('📋 Next steps: Open the practice page in your browser to test the menu functionality', 'info');
+        }, 2000);
+    </script>
+</body>
+</html> 
