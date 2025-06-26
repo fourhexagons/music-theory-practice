@@ -110,9 +110,6 @@ window.initLearningState = initLearningState;
  * Resets the learning state to initial values
  */
 function resetLearningState() {
-  console.log('resetLearningState called');
-  console.log('Before reset:', JSON.stringify(learningState, null, 2));
-  
   Object.assign(learningState, {
     currentGroup: 0,
     currentKeyIndex: 0,
@@ -135,9 +132,6 @@ function resetLearningState() {
       countAnswered: false
     }
   });
-  
-  console.log('After reset:', JSON.stringify(learningState, null, 2));
-  console.log('resetLearningState completed');
 }
 window.resetLearningState = resetLearningState;
 
