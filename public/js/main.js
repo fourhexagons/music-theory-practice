@@ -78,16 +78,19 @@ function advanceQuestionPointer() {
             window.learningState.currentChapterIndex++; // Skip ahead
         }
         
-        if (window.learningState.currentChapterIndex >= group.chapters.length) {
-            // Special handling for single-key custom groups
-            if (window.learningState.customGroup && group.keys.length === 1) {
-                // For single-key groups, stay in triads chapter for continuous practice
+        // Special handling for single-key custom groups (like No Accidentals)
+        if (window.learningState.customGroup && group.keys.length === 1) {
+            // After completing the scale question (index 1), move to triads for continuous practice
+            if (window.learningState.currentChapterIndex >= 1) {
                 window.learningState.currentChapterIndex = 2; // Triads chapter
                 window.learningState.usedDegrees = []; // Reset for new chord questions
-            } else {
-                window.learningState.currentChapterIndex = 0;
-                window.learningState.usedDegrees = []; // Reset for triad questions in next chapter
+                return; // Don't continue with normal progression
             }
+        }
+        
+        if (window.learningState.currentChapterIndex >= group.chapters.length) {
+            window.learningState.currentChapterIndex = 0;
+            window.learningState.usedDegrees = []; // Reset for triad questions in next chapter
         }
     } else {
         // For random modes, advance chapter normally
@@ -368,9 +371,10 @@ function handleAnswerSubmit(e) {
       
       // Special handling for single-key custom groups (like No Accidentals)
       if (window.learningState.customGroup && group.keys.length === 1) {
-        // If we've completed the first two questions (accidentals count and scale), 
+        // For single-key groups, after completing the first two questions (accidentals count and scale), 
         // stay in triads chapter for continuous chord practice
-        if (window.learningState.currentChapterIndex >= 2) {
+        // Note: For C major, accidentals naming is skipped, so scale is at index 1
+        if (window.learningState.currentChapterIndex >= 1) {
           window.learningState.currentChapterIndex = 2; // Stay in triads chapter
           window.learningState.usedDegrees = []; // Reset used degrees for new chord questions
         }
