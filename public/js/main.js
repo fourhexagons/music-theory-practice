@@ -65,31 +65,31 @@ function getCurrentLevel() {
 }
 
 function advanceQuestionPointer() {
-    const level = getCurrentLevel();
+    const group = window.getCurrentGroup();
     
-    if (level.mode === MODES.LINEAR) {
+    if (group.mode === MODES.LINEAR) {
         // For linear mode, advance chapter normally
         window.learningState.currentChapterIndex++;
         
         // If the key is C and we would now ask to NAME the accidentals, skip it.
-        const key = level.keys[window.learningState.currentKeyIndex];
-        const nextChapter = level.chapters[window.learningState.currentChapterIndex];
-        if (key === 'C' && nextChapter && nextChapter.id === window.CHAPTERS.ACCIDENTALS_NAMES.id) {
+        const key = group.keys[window.learningState.currentKeyIndex];
+        const nextChapter = group.chapters[window.learningState.currentChapterIndex];
+        if (key === 'C' && nextChapter && nextChapter.id === QUESTION_TYPES.ACCIDENTALS_NAMES) {
             window.learningState.currentChapterIndex++; // Skip ahead
         }
         
-        if (window.learningState.currentChapterIndex >= level.chapters.length) {
+        if (window.learningState.currentChapterIndex >= group.chapters.length) {
             window.learningState.currentChapterIndex = 0;
-            // This should not happen in linear mode as we handle key advancement in handleAnswerSubmit
+            window.learningState.usedDegrees = []; // Reset for triad questions in next chapter
         }
     } else {
-        // For non-linear modes, advance chapter normally
-        window.learningState.usedDegrees = []; // Reset for triad questions in next chapter
+        // For random modes, advance chapter normally
         window.learningState.currentChapterIndex++;
         
-        if (window.learningState.currentChapterIndex >= level.chapters.length) {
+        if (window.learningState.currentChapterIndex >= group.chapters.length) {
             window.learningState.currentChapterIndex = 0;
-            // For random modes, a new key is picked on each question automatically.
+            window.learningState.currentKeyIndex = 0;
+            window.learningState.correctAnswerStreak = 0;
         }
     }
 }
@@ -205,8 +205,8 @@ function updateQuestionUI(text) {
 // --- 5. Question and Answer Logic ---
 
 function askQuestion() {
-  const level = getCurrentLevel();
-  if (level.mode === MODES.COMPLETE) {
+  const group = window.getCurrentGroup();
+  if (!group || group.mode === MODES.COMPLETE) {
       updateQuestionUI('');
     return;
   }
@@ -214,17 +214,17 @@ function askQuestion() {
   let key, chapter;
   
   // Determine the key for the question
-  if (level.mode === MODES.LINEAR) {
-      key = level.keys[window.learningState.currentKeyIndex];
-  } else { // All other modes use random keys from the level's key list
-      key = level.keys[Math.floor(Math.random() * level.keys.length)];
+  if (group.mode === MODES.LINEAR) {
+      key = group.keys[window.learningState.currentKeyIndex];
+  } else { // All other modes use random keys from the group's key list
+      key = group.keys[Math.floor(Math.random() * group.keys.length)];
   }
   
   // Determine the chapter for the question
-  if (level.mode === MODES.RANDOM_ALL) {
-      chapter = level.chapters[Math.floor(Math.random() * level.chapters.length)];
+  if (group.mode === MODES.RANDOM_ALL) {
+      chapter = group.chapters[Math.floor(Math.random() * group.chapters.length)];
   } else { // Linear and Random_Keys_Linear_Chapters use the linear chapter progression
-      chapter = level.chapters[window.learningState.currentChapterIndex];
+      chapter = group.chapters[window.learningState.currentChapterIndex];
   }
 
   window.learningState.currentQuestion = { key, chapterId: chapter.id };
@@ -252,8 +252,7 @@ function askQuestion() {
         // All degrees have been used for this key
         // For linear mode, this should not happen as we handle progression in handleAnswerSubmit
         // For non-linear modes, reset and continue
-        const level = getCurrentLevel();
-        if (level.mode !== MODES.LINEAR) {
+        if (group.mode !== MODES.LINEAR) {
           window.learningState.usedDegrees = [];
           availableDegrees = allDegrees;
         }
@@ -298,11 +297,11 @@ function handleAnswerSubmit(e) {
         startAdvancedPractice(window.learningState.advancedModeType);
       }
     } else {
-      const level = getCurrentLevel();
+      const group = window.getCurrentGroup();
       
-      if (level.mode === MODES.LINEAR) {
+      if (group.mode === MODES.LINEAR) {
         // For linear mode, handle progression based on question type
-        const currentChapter = level.chapters[window.learningState.currentChapterIndex];
+        const currentChapter = group.chapters[window.learningState.currentChapterIndex];
         
         if (currentChapter.id === QUESTION_TYPES.TRIADS) {
           // This is a chord question - increment counter
@@ -320,9 +319,15 @@ function handleAnswerSubmit(e) {
             window.learningState.usedDegrees = [];
             window.learningState.currentKeyIndex++;
             
-            // Check if we've completed all keys in this level
-            if (window.learningState.currentKeyIndex >= level.keys.length) {
-              advanceLevel();
+            // Check if we've completed all keys in this group
+            if (window.learningState.currentKeyIndex >= group.keys.length) {
+              // For custom groups, loop back to the beginning
+              if (window.learningState.customGroup) {
+                window.learningState.currentKeyIndex = 0;
+                window.learningState.currentChapterIndex = 0;
+              } else {
+                advanceLevel();
+              }
             } else {
               // Reset to first chapter for the new key
               window.learningState.currentChapterIndex = 0;
@@ -339,9 +344,16 @@ function handleAnswerSubmit(e) {
         // For non-linear modes, use the streak-based progression
         window.learningState.correctAnswerStreak++;
 
-        // Check if the streak completes the LEVEL
-        if (window.learningState.correctAnswerStreak >= level.requiredStreak) {
-          advanceLevel();
+        // Check if the streak completes the GROUP
+        if (window.learningState.correctAnswerStreak >= group.requiredStreak) {
+          // For custom groups, just reset and continue
+          if (window.learningState.customGroup) {
+            window.learningState.correctAnswerStreak = 0;
+            window.learningState.currentKeyIndex = 0;
+            window.learningState.currentChapterIndex = 0;
+          } else {
+            advanceLevel();
+          }
         } else {
           advanceQuestionPointer();
         }
