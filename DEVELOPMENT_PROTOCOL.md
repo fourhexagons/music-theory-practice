@@ -114,6 +114,44 @@ open http://localhost:5000/tests/index.html
 3. **State management issues** - Ensure learning state is properly initialized
 4. **Script loading order** - Verify dependencies load before main logic
 
+## 🕵️ UI/UX Debugging Protocol & Checklist
+
+When debugging UI/UX or state issues, always use a systematic, broad-to-narrow approach to avoid tunnel vision and ensure all possible causes are considered:
+
+### 1. Start with a Broad Hypothesis
+- Restate the problem in plain language.
+- List all possible layers involved: HTML, CSS, JS, browser behavior, event order, etc.
+- Ask: Could this be a CSS issue? A JS logic issue? A browser default? A markup/semantics issue?
+
+### 2. Use a Systematic Debugging Checklist
+- **HTML/markup:** Is the structure and semantics correct?
+- **CSS:** Are there conflicting rules, pseudo-classes, or specificity issues?
+- **JS:** Is the state being set and updated as expected? Are events firing in the right order?
+- **Browser behavior:** Are there default actions (focus, navigation, etc.) interfering?
+- **Event order:** Are there race conditions or timing issues?
+
+### 3. Reproduce and Isolate
+- Try to reproduce the bug in the simplest way possible.
+- Isolate the problem: Remove or comment out unrelated code to see if the bug persists.
+
+### 4. Audit for Interconnectivity
+- Check for side effects: Could a change in one area (e.g., JS) be undone by another (e.g., CSS)?
+- Look for resets or global styles that might override local rules.
+
+### 5. Use the "Last Mile" Principle
+- If a fix doesn't work, don't just try another similar fix—step back and re-audit the entire stack.
+- Ask: What am I assuming that might not be true?
+
+### 6. Communicate and Summarize
+- Summarize findings and next steps at each stage.
+- Ask for user input if a decision point is reached or if the bug is ambiguous.
+
+### 7. Confirm with Evidence
+- After each fix, confirm with a clear test or evidence that the bug is resolved.
+- If not, return to step 1 and broaden the scope again.
+
+**Protocol Reminder:** If you notice the debugging process is getting too focused or missing the big picture, do a "protocol check" and step back to re-audit all layers.
+
 ## 🚀 Future Development Guidelines
 
 ### Before Making Changes
