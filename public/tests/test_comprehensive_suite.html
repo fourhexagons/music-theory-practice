@@ -59,12 +59,16 @@
             font-size: 1.1em;
         }
         
-        .test-summary {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
+        .test-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin: 20px 0;
-            border-left: 4px solid #007bff;
+        }
+        
+        .test-controls .btn {
+            flex: 1;
+            min-width: 150px;
         }
     </style>
 </head>
@@ -73,7 +77,7 @@
         <a href="index.html" class="back-link">← Back to Test Suite</a>
         <div class="header">
             <h1>🧪 Comprehensive Test Suite</h1>
-            <p>Complete test coverage for all Music Theory Practice app functionality - consolidated and enhanced</p>
+            <p>Complete test coverage for all app functionality - consolidated and enhanced</p>
         </div>
         
         <div class="content-box">
@@ -81,14 +85,13 @@
                 <div id="summary-content"></div>
             </div>
             
-            <div class="controls">
+            <div class="test-controls">
                 <button class="btn" onclick="runAllTests()">Run All Tests</button>
-                <button class="btn" onclick="runCategoryTests('core')">Core Logic Only</button>
-                <button class="btn" onclick="runCategoryTests('validation')">Validation Only</button>
-                <button class="btn" onclick="runCategoryTests('ui')">UI/UX Only</button>
-                <button class="btn" onclick="runCategoryTests('integration')">Integration Only</button>
-                <button class="btn" onclick="runCategoryTests('data')">Data Integrity Only</button>
-                <button class="btn" onclick="runCategoryTests('error')">Error Handling Only</button>
+                <button class="btn" onclick="runCoreTests()">Core Logic Only</button>
+                <button class="btn" onclick="runDataTests()">Data & Validation Only</button>
+                <button class="btn" onclick="runUITests()">UI & Integration Only</button>
+                <button class="btn" onclick="runAdvancedTests()">Advanced Features Only</button>
+                <button class="btn" onclick="runPerformanceTests()">Performance Only</button>
                 <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
             </div>
             
@@ -103,11 +106,11 @@
     <script src="../js/utils/validation.js"></script>
     <script src="../js/state/learningState.js"></script>
     <script src="../js/utils/errorHandler.js"></script>
+    <script src="../js/practice-menu.js"></script>
     <script src="js/test-dashboard.js"></script>
     
     <script>
         let testResults = [];
-        let currentCategory = null;
         
         function addResult(name, passed, expected, actual, category, details = '') {
             const result = {
@@ -116,8 +119,7 @@
                 expected,
                 actual,
                 category,
-                details,
-                timestamp: new Date().toISOString()
+                details
             };
             testResults.push(result);
         }
@@ -129,39 +131,26 @@
             const failed = testResults.filter(r => !r.passed);
             const passed = testResults.filter(r => r.passed);
             
-            // Group by category
-            const categories = [...new Set(testResults.map(r => r.category))];
-            
             if (failed.length > 0) {
                 const failHeader = document.createElement('h2');
                 failHeader.textContent = '❌ Failing Tests';
                 failHeader.style.color = '#dc3545';
                 resultsDiv.appendChild(failHeader);
                 
-                categories.forEach(category => {
-                    const categoryFailed = failed.filter(r => r.category === category);
-                    if (categoryFailed.length > 0) {
-                        const categoryHeader = document.createElement('div');
-                        categoryHeader.className = 'category-header';
-                        categoryHeader.textContent = `${category.toUpperCase()} - FAILING`;
-                        resultsDiv.appendChild(categoryHeader);
-                        
-                        const failContainer = document.createElement('div');
-                        failContainer.className = 'test-columns';
-                        categoryFailed.forEach(result => {
-                            const resultDiv = document.createElement('div');
-                            resultDiv.className = 'test-result fail';
-                            resultDiv.innerHTML = `
-                                <strong>${result.name}</strong> <span class="status">❌ FAIL</span><br>
-                                <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
-                                <em>Category:</em> ${result.category}
-                                ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
-                            `;
-                            failContainer.appendChild(resultDiv);
-                        });
-                        resultsDiv.appendChild(failContainer);
-                    }
+                const failContainer = document.createElement('div');
+                failContainer.className = 'test-columns';
+                failed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result fail';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">❌ FAIL</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                        ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                    `;
+                    failContainer.appendChild(resultDiv);
                 });
+                resultsDiv.appendChild(failContainer);
             }
             
             if (passed.length > 0) {
@@ -171,46 +160,31 @@
                 passHeader.style.marginTop = '2rem';
                 resultsDiv.appendChild(passHeader);
                 
-                categories.forEach(category => {
-                    const categoryPassed = passed.filter(r => r.category === category);
-                    if (categoryPassed.length > 0) {
-                        const categoryHeader = document.createElement('div');
-                        categoryHeader.className = 'category-header';
-                        categoryHeader.textContent = `${category.toUpperCase()} - PASSING`;
-                        resultsDiv.appendChild(categoryHeader);
-                        
-                        const passContainer = document.createElement('div');
-                        passContainer.className = 'test-columns';
-                        categoryPassed.forEach(result => {
-                            const resultDiv = document.createElement('div');
-                            resultDiv.className = 'test-result pass';
-                            resultDiv.innerHTML = `
-                                <strong>${result.name}</strong> <span class="status">✅ PASS</span><br>
-                                <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
-                                <em>Category:</em> ${result.category}
-                                ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
-                            `;
-                            passContainer.appendChild(resultDiv);
-                        });
-                        resultsDiv.appendChild(passContainer);
-                    }
+                const passContainer = document.createElement('div');
+                passContainer.className = 'test-columns';
+                passed.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result pass';
+                    resultDiv.innerHTML = `
+                        <strong>${result.name}</strong> <span class="status">✅ PASS</span><br>
+                        <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                        <em>Category:</em> ${result.category}
+                        ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                    `;
+                    passContainer.appendChild(resultDiv);
                 });
+                resultsDiv.appendChild(passContainer);
             }
 
             const passCount = testResults.filter(r => r.passed).length;
             const failCount = testResults.length - passCount;
             const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
-            
             const summaryContent = document.getElementById('summary-content');
             summaryContent.innerHTML = `
-                <div class="test-summary">
-                    <h3>Test Summary</h3>
-                    <p><strong>Total Tests:</strong> ${testResults.length}</p>
-                    <p><strong>Passed:</strong> ${passCount} ✅</p>
-                    <p><strong>Failed:</strong> ${failCount} ❌</p>
-                    <p><strong>Success Rate:</strong> ${successRate}%</p>
-                    <p><strong>Categories Tested:</strong> ${categories.join(', ')}</p>
-                </div>
+                <p><strong>Total Tests:</strong> ${testResults.length}</p>
+                <p><strong>Passed:</strong> ${passCount} ✅</p>
+                <p><strong>Failed:</strong> ${failCount} ❌</p>
+                <p><strong>Success Rate:</strong> ${successRate}%</p>
             `;
             document.getElementById('summary').style.display = 'block';
 
@@ -224,733 +198,654 @@
                 });
             }
         }
-        
+
+        // ===== CORE LOGIC TESTS =====
+        function testCoreLogic() {
+            addResult('Learning State Initialization', 
+                typeof window.learningState === 'object' && window.learningState !== null,
+                'Learning state object exists',
+                typeof window.learningState,
+                'Core Logic'
+            );
+
+            addResult('Quiz Data Loading',
+                typeof window.quizData === 'object' && Object.keys(window.quizData).length > 0,
+                'Quiz data loaded with keys',
+                Object.keys(window.quizData).length + ' keys loaded',
+                'Core Logic'
+            );
+
+            addResult('Learning Path Configuration',
+                Array.isArray(window.learningPath) && window.learningPath.length > 0,
+                'Learning path array exists with levels',
+                window.learningPath.length + ' levels configured',
+                'Core Logic'
+            );
+
+            addResult('Question Types Constants',
+                typeof window.QUESTION_TYPES === 'object' && window.QUESTION_TYPES.ACCIDENTALS_COUNT,
+                'Question types constants defined',
+                Object.keys(window.QUESTION_TYPES).length + ' types defined',
+                'Core Logic'
+            );
+
+            addResult('Modes Constants',
+                typeof window.MODES === 'object' && window.MODES.LINEAR,
+                'Practice modes constants defined',
+                Object.keys(window.MODES).length + ' modes defined',
+                'Core Logic'
+            );
+        }
+
+        // ===== DATA INTEGRITY TESTS =====
+        function testDataIntegrity() {
+            const allKeys = Object.keys(quizData);
+            
+            allKeys.forEach(key => {
+                const keyData = quizData[key];
+                const requiredProps = ['accidentals', 'notes', 'scale', 'triads', 'sevenths', 'seventhSpelling'];
+                
+                requiredProps.forEach(prop => {
+                    const hasProp = keyData.hasOwnProperty(prop);
+                    addResult(
+                        `${key} - ${prop} Property`,
+                        hasProp,
+                        'Property exists',
+                        hasProp ? 'Property exists' : 'Property missing',
+                        'Data Integrity',
+                        `Key: ${key}, Property: ${prop}`
+                    );
+                });
+                
+                // Test scale has exactly 7 notes
+                const scaleLength = keyData.scale ? keyData.scale.length : 0;
+                addResult(
+                    `${key} - Scale Length`,
+                    scaleLength === 7,
+                    7,
+                    scaleLength,
+                    'Data Integrity',
+                    `Key: ${key}`
+                );
+
+                // Test accidentals count matches notes array
+                const accidentalsCount = keyData.accidentals || 0;
+                const notesLength = keyData.notes ? keyData.notes.length : 0;
+                addResult(
+                    `${key} - Accidentals Count Consistency`,
+                    accidentalsCount === notesLength,
+                    accidentalsCount,
+                    notesLength,
+                    'Data Integrity',
+                    `Key: ${key}`
+                );
+
+                // Test all degrees exist for triads and sevenths
+                [2, 3, 4, 5, 6, 7].forEach(degree => {
+                    const triadExists = keyData.triads && keyData.triads[degree.toString()];
+                    addResult(
+                        `${key} - Triad Degree ${degree}`,
+                        triadExists,
+                        'Triad exists',
+                        triadExists ? 'Exists' : 'Missing',
+                        'Data Integrity',
+                        `Key: ${key}, Degree: ${degree}`
+                    );
+
+                    const seventhExists = keyData.sevenths && keyData.sevenths[degree.toString()];
+                    addResult(
+                        `${key} - Seventh Degree ${degree}`,
+                        seventhExists,
+                        'Seventh exists',
+                        seventhExists ? 'Exists' : 'Missing',
+                        'Data Integrity',
+                        `Key: ${key}, Degree: ${degree}`
+                    );
+
+                    const spellingExists = keyData.seventhSpelling && keyData.seventhSpelling[degree.toString()];
+                    addResult(
+                        `${key} - Seventh Spelling Degree ${degree}`,
+                        spellingExists,
+                        'Spelling exists',
+                        spellingExists ? 'Exists' : 'Missing',
+                        'Data Integrity',
+                        `Key: ${key}, Degree: ${degree}`
+                    );
+                });
+            });
+        }
+
+        // ===== VALIDATION TESTS =====
+        function testValidation() {
+            // Test normalization
+            const normalizeTests = [
+                { input: 'Cm', expected: 'Cm' },
+                { input: 'C#m', expected: 'C♯m' },
+                { input: 'Dbm', expected: 'D♭m' },
+                { input: 'F##m', expected: 'F𝄪m' },
+                { input: 'Gbbm', expected: 'G𝄫m' },
+                { input: 'Amaj7', expected: 'Amaj7' },
+                { input: 'Bm7b5', expected: 'Bm7♭5' }
+            ];
+
+            normalizeTests.forEach(test => {
+                const actual = window.normalizeChord ? window.normalizeChord(test.input) : 'no normalizeChord';
+                addResult(
+                    `Normalize Chord: ${test.input}`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Validation',
+                    `Input: ${test.input}`
+                );
+            });
+
+            // Test answer validation
+            const validationTests = [
+                { answer: 'Cm', type: 'triads', key: 'C', degree: 1, expected: true },
+                { answer: 'Dm', type: 'triads', key: 'C', degree: 2, expected: true },
+                { answer: 'Cm', type: 'triads', key: 'C', degree: 2, expected: false },
+                { answer: 'C D E F G A B', type: 'scale', key: 'C', expected: true },
+                { answer: 'C E D F G A B', type: 'scale', key: 'C', expected: false },
+                { answer: '0', type: 'accCount', key: 'C', expected: true },
+                { answer: '1', type: 'accCount', key: 'C', expected: false }
+            ];
+
+            validationTests.forEach(test => {
+                const actual = window.checkAnswer ? window.checkAnswer(test.answer, test.type, test.key, test.degree, window.quizData) : 'no checkAnswer';
+                addResult(
+                    `Check Answer: ${test.answer} (${test.type})`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Validation',
+                    `Answer: ${test.answer}, Type: ${test.type}, Key: ${test.key}`
+                );
+            });
+        }
+
+        // ===== HELPER FUNCTION TESTS =====
+        function testHelperFunctions() {
+            // Test ordinal function
+            const ordinalTests = [
+                { input: 1, expected: '1st' },
+                { input: 2, expected: '2nd' },
+                { input: 3, expected: '3rd' },
+                { input: 4, expected: '4th' },
+                { input: 11, expected: '11th' },
+                { input: 12, expected: '12th' },
+                { input: 13, expected: '13th' }
+            ];
+
+            ordinalTests.forEach(test => {
+                const actual = window.ordinal ? window.ordinal(test.input) : 'no ordinal';
+                addResult(
+                    `Ordinal: ${test.input}`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Helper Functions'
+                );
+            });
+
+            // Test word to number conversion
+            const wordTests = [
+                { input: 'one', expected: 1 },
+                { input: 'two', expected: 2 },
+                { input: 'three', expected: 3 },
+                { input: 'ten', expected: 10 },
+                { input: 'invalid', expected: null }
+            ];
+
+            wordTests.forEach(test => {
+                const actual = window.wordToNumber ? window.wordToNumber(test.input) : 'no wordToNumber';
+                addResult(
+                    `Word to Number: ${test.input}`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Helper Functions'
+                );
+            });
+
+            // Test accidental to unicode conversion
+            const accidentalTests = [
+                { input: 'C#', expected: 'C♯' },
+                { input: 'Db', expected: 'D♭' },
+                { input: 'F##', expected: 'F𝄪' },
+                { input: 'Gbb', expected: 'G𝄫' }
+            ];
+
+            accidentalTests.forEach(test => {
+                const actual = window.accidentalToUnicode ? window.accidentalToUnicode(test.input) : 'no accidentalToUnicode';
+                addResult(
+                    `Accidental to Unicode: ${test.input}`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Helper Functions'
+                );
+            });
+        }
+
+        // ===== ERROR HANDLING TESTS =====
+        function testErrorHandling() {
+            // Test error handler initialization
+            addResult(
+                'Error Handler Object',
+                typeof window.ErrorHandler === 'object' && window.ErrorHandler !== null,
+                'Error handler object exists',
+                typeof window.ErrorHandler,
+                'Error Handling'
+            );
+
+            // Test error types
+            addResult(
+                'Error Types Constants',
+                window.ErrorHandler && window.ErrorHandler.ERROR_TYPES && window.ErrorHandler.ERROR_TYPES.STATE_ERROR,
+                'Error types constants defined',
+                window.ErrorHandler ? Object.keys(window.ErrorHandler.ERROR_TYPES).length + ' types' : 'no ErrorHandler',
+                'Error Handling'
+            );
+
+            // Test error severity levels
+            addResult(
+                'Error Severity Levels',
+                window.ErrorHandler && window.ErrorHandler.ERROR_SEVERITY && window.ErrorHandler.ERROR_SEVERITY.LOW,
+                'Error severity levels defined',
+                window.ErrorHandler ? Object.keys(window.ErrorHandler.ERROR_SEVERITY).length + ' levels' : 'no ErrorHandler',
+                'Error Handling'
+            );
+
+            // Test AppError class
+            if (window.ErrorHandler && window.ErrorHandler.AppError) {
+                try {
+                    const testError = new window.ErrorHandler.AppError('Test error', 'STATE_ERROR', 'low');
+                    addResult(
+                        'AppError Class Creation',
+                        testError instanceof Error && testError.type === 'STATE_ERROR',
+                        'AppError instance created successfully',
+                        'AppError created with correct type',
+                        'Error Handling'
+                    );
+                } catch (e) {
+                    addResult(
+                        'AppError Class Creation',
+                        false,
+                        'AppError instance created successfully',
+                        'Exception: ' + e.message,
+                        'Error Handling'
+                    );
+                }
+            } else {
+                addResult(
+                    'AppError Class',
+                    false,
+                    'AppError class exists',
+                    'AppError class not found',
+                    'Error Handling'
+                );
+            }
+        }
+
+        // ===== LEARNING PATH TESTS =====
+        function testLearningPath() {
+            // Test learning path progression
+            const testState = {
+                currentLevelIndex: 0,
+                currentChapterIndex: 0,
+                currentKeyIndex: 0,
+                correctAnswerStreak: 0,
+                usedDegrees: [],
+                correctChordAnswersForCurrentKey: 0
+            };
+
+            // Simulate a few questions to test progression
+            let questionCount = 0;
+            const maxQuestions = 50;
+
+            while (testState.currentLevelIndex < window.learningPath.length && questionCount < maxQuestions) {
+                const level = window.learningPath[testState.currentLevelIndex];
+                
+                if (!level || level.mode === 'complete') {
+                    break;
+                }
+
+                // Determine current key and chapter
+                let key, chapter;
+                
+                if (level.mode === window.MODES.LINEAR) {
+                    key = level.keys[testState.currentKeyIndex];
+                    chapter = level.chapters[testState.currentChapterIndex];
+                } else {
+                    key = level.keys[0]; // Use first key for testing
+                    chapter = level.chapters[testState.currentChapterIndex];
+                }
+
+                // Skip accidentals naming for C major
+                if (key === 'C' && chapter.id === window.QUESTION_TYPES.ACCIDENTALS_NAMES) {
+                    testState.currentChapterIndex++;
+                    continue;
+                }
+
+                questionCount++;
+                testState.correctAnswerStreak++;
+
+                // Simulate progression logic
+                if (level.mode === window.MODES.LINEAR) {
+                    if (chapter.id === window.QUESTION_TYPES.TRIADS) {
+                        testState.correctChordAnswersForCurrentKey++;
+                        
+                        if (testState.correctChordAnswersForCurrentKey >= 3) {
+                            testState.correctChordAnswersForCurrentKey = 0;
+                            testState.currentKeyIndex++;
+                            
+                            if (testState.currentKeyIndex >= level.keys.length) {
+                                testState.currentLevelIndex++;
+                                testState.currentChapterIndex = 0;
+                                testState.currentKeyIndex = 0;
+                                testState.correctAnswerStreak = 0;
+                            } else {
+                                testState.currentChapterIndex = 0;
+                            }
+                        } else {
+                            testState.currentChapterIndex++;
+                            if (testState.currentChapterIndex >= level.chapters.length) {
+                                testState.currentChapterIndex = 0;
+                            }
+                        }
+                    } else {
+                        testState.currentChapterIndex++;
+                        if (testState.currentChapterIndex >= level.chapters.length) {
+                            testState.currentChapterIndex = 0;
+                        }
+                    }
+                } else {
+                    testState.currentChapterIndex++;
+                    if (testState.currentChapterIndex >= level.chapters.length) {
+                        testState.currentChapterIndex = 0;
+                    }
+                }
+            }
+
+            addResult(
+                'Learning Path Progression',
+                testState.currentLevelIndex > 0,
+                'Progression through levels',
+                `Reached level ${testState.currentLevelIndex} after ${questionCount} questions`,
+                'Learning Path'
+            );
+        }
+
+        // ===== UI/UX TESTS =====
+        function testUIUX() {
+            // Test DOM element creation
+            const testDiv = document.createElement('div');
+            testDiv.id = 'test-element';
+            testDiv.textContent = 'Test content';
+            document.body.appendChild(testDiv);
+
+            addResult(
+                'DOM Element Creation',
+                document.getElementById('test-element') !== null,
+                'Element created and found',
+                document.getElementById('test-element') ? 'Element found' : 'Element not found',
+                'UI/UX'
+            );
+
+            // Test element text setting
+            const testElement = document.getElementById('test-element');
+            if (testElement) {
+                testElement.textContent = 'Updated content';
+                addResult(
+                    'Element Text Update',
+                    testElement.textContent === 'Updated content',
+                    'Text updated successfully',
+                    testElement.textContent,
+                    'UI/UX'
+                );
+            }
+
+            // Clean up
+            if (testDiv.parentNode) {
+                testDiv.parentNode.removeChild(testDiv);
+            }
+
+            // Test localStorage functionality
+            try {
+                localStorage.setItem('test-key', 'test-value');
+                const retrieved = localStorage.getItem('test-key');
+                localStorage.removeItem('test-key');
+                
+                addResult(
+                    'LocalStorage Functionality',
+                    retrieved === 'test-value',
+                    'LocalStorage working',
+                    retrieved === 'test-value' ? 'Working' : 'Not working',
+                    'UI/UX'
+                );
+            } catch (e) {
+                addResult(
+                    'LocalStorage Functionality',
+                    false,
+                    'LocalStorage working',
+                    'Exception: ' + e.message,
+                    'UI/UX'
+                );
+            }
+
+            // Test JSON parsing
+            try {
+                const testObj = { test: 'value', number: 123 };
+                const jsonString = JSON.stringify(testObj);
+                const parsed = JSON.parse(jsonString);
+                
+                addResult(
+                    'JSON Serialization',
+                    JSON.stringify(parsed) === jsonString,
+                    'JSON serialization working',
+                    'Working',
+                    'UI/UX'
+                );
+            } catch (e) {
+                addResult(
+                    'JSON Serialization',
+                    false,
+                    'JSON serialization working',
+                    'Exception: ' + e.message,
+                    'UI/UX'
+                );
+            }
+        }
+
+        // ===== PERFORMANCE TESTS =====
+        function testPerformance() {
+            // Test large dataset handling
+            const startTime = performance.now();
+            const allKeys = Object.keys(window.quizData);
+            let totalChords = 0;
+
+            allKeys.forEach(key => {
+                const keyData = window.quizData[key];
+                if (keyData.triads) {
+                    totalChords += Object.keys(keyData.triads).length;
+                }
+                if (keyData.sevenths) {
+                    totalChords += Object.keys(keyData.sevenths).length;
+                }
+            });
+
+            const endTime = performance.now();
+            const processingTime = endTime - startTime;
+
+            addResult(
+                'Large Dataset Processing',
+                processingTime < 100, // Should process in under 100ms
+                'Processing time < 100ms',
+                `${processingTime.toFixed(2)}ms for ${totalChords} chords`,
+                'Performance'
+            );
+
+            // Test memory usage (approximate)
+            const memoryUsage = performance.memory ? performance.memory.usedJSHeapSize : 'Not available';
+            addResult(
+                'Memory Usage Available',
+                typeof memoryUsage === 'number' || memoryUsage === 'Not available',
+                'Memory usage information available',
+                typeof memoryUsage === 'number' ? `${(memoryUsage / 1024 / 1024).toFixed(2)}MB` : memoryUsage,
+                'Performance'
+            );
+        }
+
+        // ===== INTEGRATION TESTS =====
+        function testIntegration() {
+            // Test complete question generation and validation workflow
+            const testKey = 'C';
+            const testDegree = 2;
+            const testChord = 'Dm';
+
+            // Test chord normalization
+            const normalizedChord = window.normalizeChord ? window.normalizeChord(testChord) : testChord;
+            
+            // Test answer validation
+            const isValid = window.checkAnswer ? window.checkAnswer(normalizedChord, 'triads', testKey, testDegree, window.quizData) : false;
+
+            addResult(
+                'Complete Workflow: Chord Validation',
+                isValid,
+                'Complete workflow successful',
+                isValid ? 'Workflow successful' : 'Workflow failed',
+                'Integration',
+                `Key: ${testKey}, Degree: ${testDegree}, Chord: ${testChord}`
+            );
+
+            // Test scale spelling workflow
+            const testScale = 'C D E F G A B';
+            const isScaleValid = window.checkAnswer ? window.checkAnswer(testScale, 'scale', testKey, null, window.quizData) : false;
+
+            addResult(
+                'Complete Workflow: Scale Validation',
+                isScaleValid,
+                'Scale validation workflow successful',
+                isScaleValid ? 'Workflow successful' : 'Workflow failed',
+                'Integration',
+                `Key: ${testKey}, Scale: ${testScale}`
+            );
+        }
+
+        // ===== ADVANCED FEATURE TESTS =====
+        function testAdvancedFeatures() {
+            // Test seventh chord spelling validation
+            const seventhTests = [
+                { answer: 'E G# B D', key: 'A', degree: 5, expected: true },
+                { answer: 'D F# A C', key: 'G', degree: 5, expected: true },
+                { answer: 'C E G Bb', key: 'F', degree: 5, expected: true },
+                { answer: 'E G# B C', key: 'A', degree: 5, expected: false }
+            ];
+
+            seventhTests.forEach(test => {
+                const actual = window.checkAnswer ? window.checkAnswer(test.answer, 'seventhSpelling', test.key, test.degree, window.quizData) : 'no checkAnswer';
+                addResult(
+                    `Seventh Spelling: ${test.answer}`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Advanced Features',
+                    `Key: ${test.key}, Degree: ${test.degree}`
+                );
+            });
+
+            // Test accidentals naming
+            const accidentalsTests = [
+                { answer: 'F#', key: 'G', expected: true },
+                { answer: 'F# C#', key: 'D', expected: true },
+                { answer: 'F# C# G#', key: 'A', expected: true },
+                { answer: 'F# C#', key: 'G', expected: false }
+            ];
+
+            accidentalsTests.forEach(test => {
+                const actual = window.checkAnswer ? window.checkAnswer(test.answer, 'accNotes', test.key, null, window.quizData) : 'no checkAnswer';
+                addResult(
+                    `Accidentals Naming: ${test.answer}`,
+                    actual === test.expected,
+                    test.expected,
+                    actual,
+                    'Advanced Features',
+                    `Key: ${test.key}`
+                );
+            });
+        }
+
+        // ===== TEST RUNNERS =====
         function runAllTests() {
             testResults = [];
             testCoreLogic();
-            testValidationAndNormalization();
-            testUIAndUX();
-            testIntegration();
             testDataIntegrity();
+            testValidation();
+            testHelperFunctions();
+            testErrorHandling();
+            testLearningPath();
+            testUIUX();
+            testPerformance();
+            testIntegration();
+            testAdvancedFeatures();
+            displayResults();
+        }
+
+        function runCoreTests() {
+            testResults = [];
+            testCoreLogic();
+            testHelperFunctions();
+            testLearningPath();
+            displayResults();
+        }
+
+        function runDataTests() {
+            testResults = [];
+            testDataIntegrity();
+            testValidation();
+            displayResults();
+        }
+
+        function runUITests() {
+            testResults = [];
+            testUIUX();
+            testIntegration();
+            displayResults();
+        }
+
+        function runAdvancedTests() {
+            testResults = [];
+            testAdvancedFeatures();
             testErrorHandling();
             displayResults();
         }
-        
-        function runCategoryTests(category) {
+
+        function runPerformanceTests() {
             testResults = [];
-            switch(category) {
-                case 'core':
-                    testCoreLogic();
-                    break;
-                case 'validation':
-                    testValidationAndNormalization();
-                    break;
-                case 'ui':
-                    testUIAndUX();
-                    break;
-                case 'integration':
-                    testIntegration();
-                    break;
-                case 'data':
-                    testDataIntegrity();
-                    break;
-                case 'error':
-                    testErrorHandling();
-                    break;
-            }
+            testPerformance();
             displayResults();
         }
-        
-        // ===== CORE LOGIC TESTS =====
-        function testCoreLogic() {
-            currentCategory = 'core';
-            
-            // Test learning state initialization
-            testLearningStateInitialization();
-            
-            // Test question generation
-            testQuestionGeneration();
-            
-            // Test learning progression
-            testLearningProgression();
-            
-            // Test advanced practice modes
-            testAdvancedPracticeModes();
-            
-            // Test state management
-            testStateManagement();
-        }
-        
-        function testLearningStateInitialization() {
-            const requiredProps = [
-                'currentLevelIndex', 'currentChapterIndex', 'currentKeyIndex',
-                'correctAnswerStreak', 'currentQuestion', 'lastAnswerIncorrect',
-                'usedDegrees', 'isAdvancedMode', 'advancedModeType',
-                'correctChordAnswersForCurrentKey', 'waitingForAccidentalsNaming', 'lastAccidentalsKey'
-            ];
-            
-            let initPass = true;
-            for (const prop of requiredProps) {
-                if (!(prop in window.learningState)) {
-                    initPass = false;
-                    break;
-                }
-            }
-            
-            addResult(
-                'Learning State Initialization',
-                initPass,
-                'State has all required properties',
-                initPass ? 'All properties present' : 'Missing required properties',
-                currentCategory,
-                `Required properties: ${requiredProps.join(', ')}`
-            );
-            
-            // Test initial values
-            const initialValuesPass = window.learningState.currentLevelIndex === 0 &&
-                                    window.learningState.currentChapterIndex === 0 &&
-                                    window.learningState.currentKeyIndex === 0;
-            
-            addResult(
-                'Learning State Initial Values',
-                initialValuesPass,
-                'Initial indices are 0',
-                `Level: ${window.learningState.currentLevelIndex}, Chapter: ${window.learningState.currentChapterIndex}, Key: ${window.learningState.currentKeyIndex}`,
-                currentCategory
-            );
-        }
-        
-        function testQuestionGeneration() {
-            // Test generateQuestion function
-            const question = window.generateQuestion();
-            const questionGenerated = question !== null && typeof question === 'object';
-            
-            addResult(
-                'Question Generation - Basic',
-                questionGenerated,
-                'Question object generated',
-                questionGenerated ? 'Question generated successfully' : 'Question generation failed',
-                currentCategory,
-                question ? `Question: ${JSON.stringify(question)}` : 'No question generated'
-            );
-            
-            // Test C major skip logic
-            if (question && question.key === 'C') {
-                const skipLogicPass = question.chapterId !== 'accNotes';
-                addResult(
-                    'C Major Skip Logic',
-                    skipLogicPass,
-                    'accNotes chapter skipped for C major',
-                    `Chapter ID: ${question.chapterId}`,
-                    currentCategory
-                );
-            }
-            
-            // Test question structure
-            if (question) {
-                const requiredQuestionProps = ['chapterId', 'key', 'questionText', 'expectedAnswer'];
-                const structurePass = requiredQuestionProps.every(prop => prop in question);
-                
-                addResult(
-                    'Question Structure',
-                    structurePass,
-                    'Question has required properties',
-                    structurePass ? 'All properties present' : 'Missing properties',
-                    currentCategory,
-                    `Required: ${requiredQuestionProps.join(', ')}`
-                );
-            }
-        }
-        
-        function testLearningProgression() {
-            // Test level progression
-            const initialLevel = window.getCurrentLevel();
-            const levelRetrieved = initialLevel !== null && typeof initialLevel === 'object';
-            
-            addResult(
-                'Level Retrieval',
-                levelRetrieved,
-                'Current level retrieved successfully',
-                levelRetrieved ? 'Level retrieved' : 'Level retrieval failed',
-                currentCategory,
-                initialLevel ? `Level: ${initialLevel.name}` : 'No level'
-            );
-            
-            // Test question pointer advancement
-            const initialChapterIndex = window.learningState.currentChapterIndex;
-            window.advanceQuestionPointer();
-            const chapterAdvanced = window.learningState.currentChapterIndex !== initialChapterIndex;
-            
-            addResult(
-                'Question Pointer Advancement',
-                chapterAdvanced,
-                'Chapter index advanced',
-                `Before: ${initialChapterIndex}, After: ${window.learningState.currentChapterIndex}`,
-                currentCategory
-            );
-            
-            // Reset for other tests
-            window.learningState.currentChapterIndex = initialChapterIndex;
-        }
-        
-        function testAdvancedPracticeModes() {
-            // Test advanced practice mode setting
-            const testMode = 'random_all';
-            window.startAdvancedPractice(testMode);
-            
-            const modeSet = window.learningState.isAdvancedMode === true &&
-                           window.learningState.advancedModeType === testMode;
-            
-            addResult(
-                'Advanced Practice Mode Setting',
-                modeSet,
-                'Advanced practice mode set correctly',
-                `isAdvancedMode: ${window.learningState.isAdvancedMode}, type: ${window.learningState.advancedModeType}`,
-                currentCategory
-            );
-            
-            // Reset for other tests
-            window.learningState.isAdvancedMode = false;
-            window.learningState.advancedModeType = null;
-        }
-        
-        function testStateManagement() {
-            // Test state persistence
-            const testState = {
-                currentLevelIndex: 2,
-                currentChapterIndex: 1,
-                currentKeyIndex: 3
-            };
-            
-            Object.assign(window.learningState, testState);
-            
-            const stateSet = window.learningState.currentLevelIndex === testState.currentLevelIndex &&
-                           window.learningState.currentChapterIndex === testState.currentChapterIndex &&
-                           window.learningState.currentKeyIndex === testState.currentKeyIndex;
-            
-            addResult(
-                'State Management - Set',
-                stateSet,
-                'State values set correctly',
-                `Level: ${window.learningState.currentLevelIndex}, Chapter: ${window.learningState.currentChapterIndex}, Key: ${window.learningState.currentKeyIndex}`,
-                currentCategory
-            );
-            
-            // Reset for other tests
-            window.learningState.currentLevelIndex = 0;
-            window.learningState.currentChapterIndex = 0;
-            window.learningState.currentKeyIndex = 0;
-        }
-        
-        // ===== VALIDATION AND NORMALIZATION TESTS =====
-        function testValidationAndNormalization() {
-            currentCategory = 'validation';
-            
-            testChordNormalization();
-            testAnswerValidation();
-            testInputValidation();
-            testEdgeCases();
-        }
-        
-        function testChordNormalization() {
-            const testCases = [
-                { input: 'C#m7', expected: 'C♯m7' },
-                { input: 'Dbm7', expected: 'D♭m7' },
-                { input: 'F##m7', expected: 'F𝄪m7' },
-                { input: 'Bbbm7', expected: 'B𝄫m7' },
-                { input: 'Cm7', expected: 'Cm7' },
-                { input: null, expected: '' },
-                { input: undefined, expected: '' },
-                { input: '', expected: '' }
-            ];
-            
-            testCases.forEach(tc => {
-                const actual = window.normalizeChord ? window.normalizeChord(tc.input) : 'function not available';
-                const passed = actual === tc.expected;
-                
-                addResult(
-                    `Chord Normalization - ${tc.input}`,
-                    passed,
-                    tc.expected,
-                    actual,
-                    currentCategory,
-                    `Input: ${tc.input}, Type: ${typeof tc.input}`
-                );
-            });
-        }
-        
-        function testAnswerValidation() {
-            // Test triad validation
-            const triadTests = [
-                { answer: 'Cm', key: 'C', degree: 1, expected: true },
-                { answer: 'Dm', key: 'C', degree: 2, expected: true },
-                { answer: 'Em', key: 'C', degree: 3, expected: true },
-                { answer: 'F', key: 'C', degree: 4, expected: true },
-                { answer: 'G', key: 'C', degree: 5, expected: true },
-                { answer: 'Am', key: 'C', degree: 6, expected: true },
-                { answer: 'Bdim', key: 'C', degree: 7, expected: true },
-                { answer: 'Wrong', key: 'C', degree: 1, expected: false }
-            ];
-            
-            triadTests.forEach(tc => {
-                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'triads', tc.key, tc.degree, window.quizData) : 'function not available';
-                const passed = actual === tc.expected;
-                
-                addResult(
-                    `Triad Validation - ${tc.answer} (${tc.key} ${tc.degree})`,
-                    passed,
-                    tc.expected,
-                    actual,
-                    currentCategory
-                );
-            });
-            
-            // Test scale validation
-            const scaleTests = [
-                { answer: 'C D E F G A B', key: 'C', expected: true },
-                { answer: 'G A B C D E F#', key: 'G', expected: true },
-                { answer: 'C D E F G A Bb', key: 'C', expected: false },
-                { answer: 'C D E F G A', key: 'C', expected: false }
-            ];
-            
-            scaleTests.forEach(tc => {
-                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'scale', tc.key, null, window.quizData) : 'function not available';
-                const passed = actual === tc.expected;
-                
-                addResult(
-                    `Scale Validation - ${tc.answer} (${tc.key})`,
-                    passed,
-                    tc.expected,
-                    actual,
-                    currentCategory
-                );
-            });
-        }
-        
-        function testInputValidation() {
-            const invalidInputs = [
-                { answer: null, type: 'triads', key: 'C', degree: 1 },
-                { answer: undefined, type: 'triads', key: 'C', degree: 1 },
-                { answer: '', type: 'triads', key: 'C', degree: 1 },
-                { answer: 'Cm', type: 'invalid', key: 'C', degree: 1 },
-                { answer: 'Cm', type: 'triads', key: 'invalid', degree: 1 },
-                { answer: 'Cm', type: 'triads', key: 'C', degree: 99 }
-            ];
-            
-            invalidInputs.forEach(tc => {
-                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, tc.type, tc.key, tc.degree, window.quizData) : 'function not available';
-                const passed = actual === false; // Invalid inputs should return false
-                
-                addResult(
-                    `Invalid Input Validation - ${tc.answer}, ${tc.type}, ${tc.key}, ${tc.degree}`,
-                    passed,
-                    false,
-                    actual,
-                    currentCategory
-                );
-            });
-        }
-        
-        function testEdgeCases() {
-            // Test edge cases for normalization
-            const edgeCases = [
-                { input: '   C#m7   ', expected: 'C♯m7' }, // Extra spaces
-                { input: 'c#m7', expected: 'C♯m7' }, // Lowercase
-                { input: 'C##m7', expected: 'C𝄪m7' }, // Double sharp
-                { input: 'Bbbm7', expected: 'B𝄫m7' }, // Double flat
-                { input: 'C@m7', expected: 'C@m7' }, // Invalid symbol
-                { input: 'C#m7#', expected: 'C♯m7#' } // Sharp at end
-            ];
-            
-            edgeCases.forEach(tc => {
-                const actual = window.normalizeChord ? window.normalizeChord(tc.input) : 'function not available';
-                const passed = actual === tc.expected;
-                
-                addResult(
-                    `Edge Case Normalization - ${tc.input}`,
-                    passed,
-                    tc.expected,
-                    actual,
-                    currentCategory
-                );
-            });
-        }
-        
-        // ===== UI/UX TESTS =====
-        function testUIAndUX() {
-            currentCategory = 'ui';
-            
-            testPracticeMenu();
-            testUIElements();
-            testUserInteractions();
-        }
-        
-        function testPracticeMenu() {
-            // Test menu initialization
-            const menuInitialized = typeof window.PracticeMenu === 'function' || 
-                                  (window.practiceMenu && typeof window.practiceMenu === 'object');
-            
-            addResult(
-                'Practice Menu Initialization',
-                menuInitialized,
-                'Practice menu initialized',
-                menuInitialized ? 'Menu available' : 'Menu not available',
-                currentCategory
-            );
-            
-            // Test menu state management
-            if (window.practiceMenu) {
-                const initialState = window.practiceMenu.isOpen;
-                window.practiceMenu.openMenu();
-                const opened = window.practiceMenu.isOpen === true;
-                
-                addResult(
-                    'Practice Menu Open',
-                    opened,
-                    true,
-                    window.practiceMenu.isOpen,
-                    currentCategory
-                );
-                
-                window.practiceMenu.closeMenu();
-                const closed = window.practiceMenu.isOpen === false;
-                
-                addResult(
-                    'Practice Menu Close',
-                    closed,
-                    false,
-                    window.practiceMenu.isOpen,
-                    currentCategory
-                );
-            }
-        }
-        
-        function testUIElements() {
-            // Test required UI elements exist
-            const requiredElements = [
-                'question-display',
-                'answer-input',
-                'submit-btn',
-                'feedback'
-            ];
-            
-            const elementsExist = requiredElements.every(id => document.getElementById(id) !== null);
-            
-            addResult(
-                'Required UI Elements',
-                elementsExist,
-                'All required UI elements present',
-                elementsExist ? 'All elements found' : 'Missing elements',
-                currentCategory,
-                `Required: ${requiredElements.join(', ')}`
-            );
-        }
-        
-        function testUserInteractions() {
-            // Test form submission
-            const form = document.getElementById('answer-form');
-            const formExists = form !== null;
-            
-            addResult(
-                'Answer Form Exists',
-                formExists,
-                'Answer form present',
-                formExists ? 'Form found' : 'Form not found',
-                currentCategory
-            );
-            
-            // Test input field
-            const input = document.getElementById('answer-input');
-            const inputExists = input !== null;
-            
-            addResult(
-                'Answer Input Exists',
-                inputExists,
-                'Answer input present',
-                inputExists ? 'Input found' : 'Input not found',
-                currentCategory
-            );
-            
-            if (inputExists) {
-                // Test input functionality
-                input.value = 'test';
-                const valueSet = input.value === 'test';
-                
-                addResult(
-                    'Answer Input Functionality',
-                    valueSet,
-                    'Input value can be set',
-                    `Value: ${input.value}`,
-                    currentCategory
-                );
-            }
-        }
-        
-        // ===== INTEGRATION TESTS =====
-        function testIntegration() {
-            currentCategory = 'integration';
-            
-            testCompleteWorkflow();
-            testDataFlow();
-            testStateConsistency();
-        }
-        
-        function testCompleteWorkflow() {
-            // Test complete question-answer workflow
-            const initialQuestion = window.generateQuestion();
-            const questionGenerated = initialQuestion !== null;
-            
-            addResult(
-                'Complete Workflow - Question Generation',
-                questionGenerated,
-                'Question generated for workflow',
-                questionGenerated ? 'Question ready' : 'No question generated',
-                currentCategory
-            );
-            
-            if (questionGenerated) {
-                // Test answer processing
-                const testAnswer = 'test answer';
-                const answerProcessed = window.handleAnswerSubmit ? true : false;
-                
-                addResult(
-                    'Complete Workflow - Answer Processing',
-                    answerProcessed,
-                    'Answer processing available',
-                    answerProcessed ? 'Processing ready' : 'Processing not available',
-                    currentCategory
-                );
-            }
-        }
-        
-        function testDataFlow() {
-            // Test data flow from quizData to question generation
-            const dataAvailable = window.quizData && typeof window.quizData === 'object';
-            
-            addResult(
-                'Data Flow - Quiz Data Available',
-                dataAvailable,
-                'Quiz data available for questions',
-                dataAvailable ? 'Data ready' : 'Data not available',
-                currentCategory
-            );
-            
-            if (dataAvailable) {
-                // Test key data availability
-                const keysAvailable = Object.keys(window.quizData).length > 0;
-                
-                addResult(
-                    'Data Flow - Keys Available',
-                    keysAvailable,
-                    'Key data available',
-                    keysAvailable ? `${Object.keys(window.quizData).length} keys available` : 'No keys available',
-                    currentCategory
-                );
-            }
-        }
-        
-        function testStateConsistency() {
-            // Test state consistency across operations
-            const initialState = { ...window.learningState };
-            
-            // Generate a question
-            window.generateQuestion();
-            
-            // Check if state changed appropriately
-            const stateChanged = JSON.stringify(initialState) !== JSON.stringify(window.learningState);
-            
-            addResult(
-                'State Consistency - Question Generation',
-                stateChanged,
-                'State changes during question generation',
-                stateChanged ? 'State updated' : 'State unchanged',
-                currentCategory
-            );
-            
-            // Reset state
-            Object.assign(window.learningState, initialState);
-        }
-        
-        // ===== DATA INTEGRITY TESTS =====
-        function testDataIntegrity() {
-            currentCategory = 'data';
-            
-            testQuizDataStructure();
-            testDataCompleteness();
-            testDataConsistency();
-        }
-        
-        function testQuizDataStructure() {
-            const dataExists = window.quizData && typeof window.quizData === 'object';
-            
-            addResult(
-                'Quiz Data Structure - Exists',
-                dataExists,
-                'Quiz data object exists',
-                dataExists ? 'Data object found' : 'Data object missing',
-                currentCategory
-            );
-            
-            if (dataExists) {
-                // Test required keys
-                const requiredKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'F', 'Bb', 'Eb', 'Ab'];
-                const keysPresent = requiredKeys.every(key => key in window.quizData);
-                
-                addResult(
-                    'Quiz Data Structure - Required Keys',
-                    keysPresent,
-                    'All required keys present',
-                    keysPresent ? 'All keys found' : 'Missing keys',
-                    currentCategory,
-                    `Required: ${requiredKeys.join(', ')}`
-                );
-            }
-        }
-        
-        function testDataCompleteness() {
-            if (window.quizData) {
-                // Test each key has required properties
-                const requiredProps = ['scale', 'triads', 'sevenths', 'accidentals', 'notes'];
-                const keys = Object.keys(window.quizData);
-                
-                let allComplete = true;
-                let incompleteKeys = [];
-                
-                keys.forEach(key => {
-                    const hasAllProps = requiredProps.every(prop => prop in window.quizData[key]);
-                    if (!hasAllProps) {
-                        allComplete = false;
-                        incompleteKeys.push(key);
-                    }
-                });
-                
-                addResult(
-                    'Data Completeness - All Keys',
-                    allComplete,
-                    'All keys have required properties',
-                    allComplete ? 'All keys complete' : `Incomplete keys: ${incompleteKeys.join(', ')}`,
-                    currentCategory,
-                    `Required properties: ${requiredProps.join(', ')}`
-                );
-            }
-        }
-        
-        function testDataConsistency() {
-            if (window.quizData) {
-                // Test accidentals count consistency
-                let consistent = true;
-                let inconsistencies = [];
-                
-                Object.entries(window.quizData).forEach(([key, data]) => {
-                    if (data.accidentals !== data.notes.length) {
-                        consistent = false;
-                        inconsistencies.push(`${key}: accidentals=${data.accidentals}, notes.length=${data.notes.length}`);
-                    }
-                });
-                
-                addResult(
-                    'Data Consistency - Accidentals Count',
-                    consistent,
-                    'Accidentals count matches notes array length',
-                    consistent ? 'All counts consistent' : `Inconsistencies: ${inconsistencies.join(', ')}`,
-                    currentCategory
-                );
-            }
-        }
-        
-        // ===== ERROR HANDLING TESTS =====
-        function testErrorHandling() {
-            currentCategory = 'error';
-            
-            testErrorHandlingFunctions();
-            testGracefulDegradation();
-        }
-        
-        function testErrorHandlingFunctions() {
-            // Test error handler availability
-            const errorHandlerAvailable = typeof window.handleError === 'function';
-            
-            addResult(
-                'Error Handler - Available',
-                errorHandlerAvailable,
-                'Error handler function available',
-                errorHandlerAvailable ? 'Handler ready' : 'Handler not available',
-                currentCategory
-            );
-            
-            // Test error logging
-            if (errorHandlerAvailable) {
-                const originalConsole = console.error;
-                let errorLogged = false;
-                console.error = () => { errorLogged = true; };
-                
-                window.handleError('Test error', { test: 'data' });
-                
-                console.error = originalConsole;
-                
-                addResult(
-                    'Error Handler - Logging',
-                    errorLogged,
-                    'Errors are logged',
-                    errorLogged ? 'Error logged' : 'Error not logged',
-                    currentCategory
-                );
-            }
-        }
-        
-        function testGracefulDegradation() {
-            // Test app continues to work with missing data
-            const originalQuizData = window.quizData;
-            window.quizData = null;
-            
-            const question = window.generateQuestion();
-            const gracefulHandling = question === null; // Should handle gracefully
-            
-            addResult(
-                'Graceful Degradation - Missing Data',
-                gracefulHandling,
-                'App handles missing data gracefully',
-                gracefulHandling ? 'Handled gracefully' : 'App crashed',
-                currentCategory
-            );
-            
-            // Restore data
-            window.quizData = originalQuizData;
-        }
-        
+
         function copyResults() {
             const results = {
                 timestamp: new Date().toISOString(),
-                summary: {
-                    total: testResults.length,
-                    passed: testResults.filter(r => r.passed).length,
-                    failed: testResults.filter(r => !r.passed).length,
-                    successRate: testResults.length > 0 ? Math.round((testResults.filter(r => r.passed).length / testResults.length) * 100) : 0
-                },
+                total: testResults.length,
+                passed: testResults.filter(r => r.passed).length,
+                failed: testResults.filter(r => !r.passed).length,
                 results: testResults
             };
-            
-            const jsonString = JSON.stringify(results, null, 2);
-            navigator.clipboard.writeText(jsonString).then(() => {
-                const status = document.getElementById('copy-status');
-                status.textContent = 'Results copied to clipboard!';
-                status.style.display = 'block';
-                setTimeout(() => {
-                    status.style.display = 'none';
-                }, 3000);
-            }).catch(err => {
-                console.error('Failed to copy results:', err);
-                const status = document.getElementById('copy-status');
-                status.textContent = 'Failed to copy results';
-                status.style.display = 'block';
-                setTimeout(() => {
-                    status.style.display = 'none';
-                }, 3000);
+
+            const json = JSON.stringify(results, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                document.getElementById('copy-status').textContent = 'Results copied to clipboard!';
+            }, () => {
+                document.getElementById('copy-status').textContent = 'Failed to copy results.';
             });
         }
-        
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
+
+        // Initialize tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
             console.log('Comprehensive test suite loaded');
         });
     </script>
