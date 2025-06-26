@@ -3,56 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Theory Practice - Test Suite</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Music Theory Practice – Test Suite</title>
     <link rel="stylesheet" href="css/test-suite.css">
+    <style>
+        .test-result {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .test-result.pass {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .test-result.fail {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .test-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .test-details {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+        .category-header {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin: 20px 0 10px 0;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .test-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .test-controls .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧪 Test Suite</h1>
-            <p>Comprehensive testing tools for the Music Theory Practice application</p>
+            <h1>🧪 Music Theory Practice – Test Suite</h1>
+            <p>Run all tests for the app in one place. This suite covers all logic, data, validation, UI, and integration.</p>
         </div>
-        
-        <a href="../index.html" class="back-link">← Back to Main App</a>
-        
-        <!-- Test Status Dashboard -->
-        <div id="test-dashboard" class="dashboard-container">
-            <div class="dashboard-summary">
-                <div class="summary-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-tests">-</span>
-                        <span class="stat-label">Total Tests</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="passed-tests">-</span>
-                        <span class="stat-label">Passed</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="failed-tests">-</span>
-                        <span class="stat-label">Failed</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="success-rate">-</span>
-                        <span class="stat-label">Success Rate</span>
-                    </div>
-                </div>
-                <div class="dashboard-actions">
-                    <button onclick="runAllTests()" class="btn">Run All Tests</button>
-                    <button onclick="clearTestHistory()" class="btn btn-secondary">Clear History</button>
-                    <span id="last-updated-status" class="last-updated"></span>
-                </div>
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
             </div>
-            <div id="test-status-grid" class="test-status-grid">
-                <!-- Test status cards will be populated here -->
+            <div class="test-controls">
+                <button class="btn" onclick="runAllTests()">Run All Tests</button>
+                <button class="btn" onclick="runCoreTests()">Core Logic Only</button>
+                <button class="btn" onclick="runDataTests()">Data & Validation Only</button>
+                <button class="btn" onclick="runUITests()">UI & Integration Only</button>
+                <button class="btn" onclick="runAdvancedTests()">Advanced Features Only</button>
+                <button class="btn" onclick="runPerformanceTests()">Performance Only</button>
+                <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
             </div>
-        </div>
-        
-        <div class="footer">
-            <p><strong>Last updated:</strong> <span id="last-updated"></span></p>
+            <div id="copy-status" class="status-area"></div>
+            <div id="results"></div>
         </div>
     </div>
-    
-    <script src="js/test-dashboard.js"></script>
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/normalization.js"></script>
+    <script src="../js/utils/helpers.js"></script>
+    <script src="../js/utils/validation.js"></script>
+    <script src="../js/state/learningState.js"></script>
+    <script src="../js/utils/errorHandler.js"></script>
+    <script src="../js/practice-menu.js"></script>
     <script>
         // Test Status Dashboard System
         const TEST_SUITES = {
