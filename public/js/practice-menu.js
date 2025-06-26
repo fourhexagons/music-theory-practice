@@ -155,45 +155,41 @@ class PracticeMenu {
   }
 
   handleKeySelection(key) {
-    console.log(`Attempting to switch to key: ${key}`);
-    
-    // Validate that required functions are available
-    if (!window.getLearningState || !window.getCurrentGroup) {
+    // Lock practice to the selected key only, like a custom group
+    if (!window.resetLearningState || !window.getLearningState || !window.saveLearningState) {
       console.error('Required functions not available for key selection');
       return;
     }
-    
+    window.resetLearningState();
     const state = window.getLearningState();
-    const currentGroup = window.getCurrentGroup();
-    
-    if (!currentGroup || !currentGroup.keys) {
-      console.error('No current group or keys available');
-      return;
-    }
-    
-    const keyIndex = currentGroup.keys.indexOf(key);
-    if (keyIndex === -1) {
-      console.warn(`Key ${key} not found in current group. Available keys: ${currentGroup.keys.join(', ')}`);
-      return;
-    }
-    
-    // Update the learning state
-    state.currentKeyIndex = keyIndex;
-    state.currentChapterIndex = 0; // Reset to first chapter
-    state.usedDegrees = []; // Reset used degrees
-    state.correctAnswersInChapter = 0; // Reset progress
-    
-    // Save the state
-    if (window.saveLearningState) {
-      window.saveLearningState();
-    }
-    
-    // Generate a new question for the selected key
+    // Set up a custom group for the selected key
+    const customGroup = {
+      name: `Key: ${key}`,
+      keys: [key],
+      mode: 'linear',
+      chapters: window.CORE_CHAPTERS || [
+        window.CHAPTERS.ACCIDENTALS_COUNT,
+        window.CHAPTERS.ACCIDENTALS_NAMES,
+        window.CHAPTERS.SCALE_SPELLING,
+        window.CHAPTERS.TRIADS
+      ],
+      requiredStreak: 3
+    };
+    state.customGroup = customGroup;
+    state.mode = 'linear';
+    state.currentKeyIndex = 0;
+    state.currentChapterIndex = 0;
+    state.usedDegrees = [];
+    state.correctAnswersInChapter = 0;
+    state.correctAnswerStreak = 0;
+    window.saveLearningState();
+    // Start the practice for the selected key
     if (window.askQuestion) {
       window.askQuestion();
     }
-    
-    console.log(`Successfully switched to key: ${key}`);
+    // Update menu display to reflect selection
+    this.updateMenuDisplay();
+    console.log(`Locked practice to key: ${key}`);
   }
 
   handleDifficultySelection(difficulty) {
@@ -372,7 +368,6 @@ class PracticeMenu {
     if (window.getLearningState && window.getCurrentGroup) {
       const state = window.getLearningState();
       const currentGroup = window.getCurrentGroup();
-      
       if (currentGroup && currentGroup.keys) {
         const currentKey = currentGroup.keys[state.currentKeyIndex];
         this.menuOptions.forEach(option => {
@@ -382,80 +377,33 @@ class PracticeMenu {
         });
       }
     }
-    
     // Update difficulty selection feedback
     if (window.getLearningState) {
       const state = window.getLearningState();
-      
-      // Determine current difficulty based on custom group
-      let currentDifficulty = null;
-      if (state.customGroup) {
-        const groupName = state.customGroup.name;
-        if (groupName.includes('No Accidentals')) {
-          currentDifficulty = 'no-accidentals';
-        } else if (groupName.includes('1-3 Sharps')) {
-          currentDifficulty = '1-3-sharps';
-        } else if (groupName.includes('1-3 Flats')) {
-          currentDifficulty = '1-3-flats';
-        } else if (groupName.includes('4-6 Sharps')) {
-          currentDifficulty = '4-6-sharps';
-        } else if (groupName.includes('4-6 Flats')) {
-          currentDifficulty = '4-6-flats';
-        } else if (groupName.includes('Full Random')) {
-          currentDifficulty = 'full-random';
-        } else if (groupName.includes('Sevenths Only')) {
-          currentDifficulty = 'spelling-random-sevenths';
+      // Only underline a difficulty if a custom group is active
+      this.menuOptions.forEach(option => {
+        if (option.dataset.difficulty) {
+          option.classList.toggle('current-selection',
+            state.customGroup && option.dataset.difficulty && state.customGroup.name &&
+            state.customGroup.name.toLowerCase().includes(option.dataset.difficulty.replace(/-/g, ' '))
+          );
         }
-      } else {
-        // For standard learning path, determine difficulty from mode
-        const modeToDifficulty = {
-          'linear': 'no-accidentals',
-          'random_keys_linear_chapters': 'no-accidentals',
-          'random_all': 'full-random',
-          'sevenths_only': 'spelling-random-sevenths'
-        };
-        currentDifficulty = modeToDifficulty[state.mode];
-      }
-      
-      if (currentDifficulty) {
-        this.menuOptions.forEach(option => {
-          if (option.dataset.difficulty) {
-            option.classList.toggle('current-selection', option.dataset.difficulty === currentDifficulty);
-          }
-        });
-      }
+      });
     }
-    
-    // Update available keys based on current difficulty
-    this.updateAvailableKeys();
   }
 
   updateAvailableKeys() {
-    if (!window.getLearningState) return;
-    
-    const state = window.getLearningState();
-    const currentMode = state.mode;
-    
-    // If there's a custom group, use its keys
-    if (state.customGroup) {
-      const availableKeys = state.customGroup.keys;
-      
-      // Update key options visibility
-      this.menuOptions.forEach(option => {
-        if (option.dataset.key) {
-          const isAvailable = availableKeys.includes(option.dataset.key);
-          option.style.display = isAvailable ? 'block' : 'none';
-          option.disabled = !isAvailable;
-        }
-      });
-      return;
-    }
-    
-    // For standard learning path, show all keys
+    // Always show all keys in the keys menu, regardless of current group or difficulty
+    const allKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
     this.menuOptions.forEach(option => {
       if (option.dataset.key) {
         option.style.display = 'block';
         option.disabled = false;
+        // Display keys with proper Unicode symbols
+        let displayKey = option.dataset.key
+          .replace('b', '♭')
+          .replace('#', '♯');
+        option.textContent = displayKey;
       }
     });
   }
