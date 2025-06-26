@@ -61,7 +61,7 @@ function initLearningState() {
 }
 
 function getCurrentLevel() {
-  return window.learningPath[window.learningState.currentLevelIndex];
+  return window.learningPath[window.learningState.currentGroup];
 }
 
 function advanceQuestionPointer() {
@@ -76,16 +76,6 @@ function advanceQuestionPointer() {
         const nextChapter = group.chapters[window.learningState.currentChapterIndex];
         if (key === 'C' && nextChapter && nextChapter.id === QUESTION_TYPES.ACCIDENTALS_NAMES) {
             window.learningState.currentChapterIndex++; // Skip ahead
-        }
-        
-        // Special handling for single-key custom groups (like No Accidentals)
-        if (window.learningState.customGroup && group.keys.length === 1) {
-            // After completing the scale question (index 1), move to triads for continuous practice
-            if (window.learningState.currentChapterIndex >= 1) {
-                window.learningState.currentChapterIndex = 2; // Triads chapter
-                window.learningState.usedDegrees = []; // Reset for new chord questions
-                return; // Don't continue with normal progression
-            }
         }
         
         if (window.learningState.currentChapterIndex >= group.chapters.length) {
@@ -105,7 +95,7 @@ function advanceQuestionPointer() {
 }
 
 function advanceLevel() {
-    window.learningState.currentLevelIndex++;
+    window.learningState.currentGroup++;
     window.learningState.currentChapterIndex = 0;
     window.learningState.currentKeyIndex = 0;
     window.learningState.correctAnswerStreak = 0;
@@ -306,86 +296,89 @@ function handleAnswerSubmit(e) {
         // Normal case - start a new random question
         startAdvancedPractice(window.learningState.advancedModeType);
       }
-    } else {
-      const group = window.getCurrentGroup();
-      
-      if (group.mode === MODES.LINEAR) {
-        // For linear mode, handle progression based on question type
-        const currentChapter = group.chapters[window.learningState.currentChapterIndex];
-        
-        if (currentChapter.id === QUESTION_TYPES.TRIADS) {
-          // This is a chord question - increment counter
-          window.learningState.correctChordAnswersForCurrentKey++;
-          
-          // Add the degree to usedDegrees to prevent asking the same chord again
-          if (window.learningState.currentQuestion && window.learningState.currentQuestion.degree) {
-            window.learningState.usedDegrees.push(window.learningState.currentQuestion.degree);
-          }
-          
-          // Check if we've answered 3 chord questions correctly
-          if (window.learningState.correctChordAnswersForCurrentKey >= 3) {
-            // Reset counter and advance to next key
-            window.learningState.correctChordAnswersForCurrentKey = 0;
-            window.learningState.usedDegrees = [];
-            window.learningState.currentKeyIndex++;
-            
-            // Check if we've completed all keys in this group
-            if (window.learningState.currentKeyIndex >= group.keys.length) {
-              // For custom groups, loop back to the beginning
-              if (window.learningState.customGroup) {
-                window.learningState.currentKeyIndex = 0;
-                window.learningState.currentChapterIndex = 0;
-              } else {
-                advanceLevel();
-              }
-            } else {
-              // Reset to first chapter for the new key
+      return;
+    }
+
+    const group = window.getCurrentGroup();
+
+    // --- SINGLE-KEY CUSTOM GROUP LOGIC (e.g. No Accidentals) ---
+    if (window.learningState.customGroup && group.keys.length === 1) {
+      const currentChapter = group.chapters[window.learningState.currentChapterIndex];
+      // If we're in triads, just keep looping triad questions
+      if (currentChapter.id === QUESTION_TYPES.TRIADS) {
+        window.learningState.correctChordAnswersForCurrentKey++;
+        if (window.learningState.currentQuestion && window.learningState.currentQuestion.degree) {
+          window.learningState.usedDegrees.push(window.learningState.currentQuestion.degree);
+        }
+        // After 3, reset for continuous practice
+        if (window.learningState.correctChordAnswersForCurrentKey >= 3) {
+          window.learningState.correctChordAnswersForCurrentKey = 0;
+          window.learningState.usedDegrees = [];
+        }
+        // Always stay in triads chapter
+        window.learningState.currentChapterIndex = group.chapters.findIndex(ch => ch.id === QUESTION_TYPES.TRIADS);
+        askQuestion();
+        return;
+      } else {
+        // Not a triad question: advance chapter
+        advanceQuestionPointer();
+        // After scale (or any non-triad), jump to triads
+        const triadsIdx = group.chapters.findIndex(ch => ch.id === QUESTION_TYPES.TRIADS);
+        if (window.learningState.currentChapterIndex >= triadsIdx) {
+          window.learningState.currentChapterIndex = triadsIdx;
+          window.learningState.usedDegrees = [];
+        }
+        askQuestion();
+        return;
+      }
+    }
+    // --- END SINGLE-KEY CUSTOM GROUP LOGIC ---
+
+    // --- NORMAL PROGRESSION LOGIC ---
+    if (group.mode === MODES.LINEAR) {
+      const currentChapter = group.chapters[window.learningState.currentChapterIndex];
+      if (currentChapter.id === QUESTION_TYPES.TRIADS) {
+        window.learningState.correctChordAnswersForCurrentKey++;
+        if (window.learningState.currentQuestion && window.learningState.currentQuestion.degree) {
+          window.learningState.usedDegrees.push(window.learningState.currentQuestion.degree);
+        }
+        if (window.learningState.correctChordAnswersForCurrentKey >= 3) {
+          window.learningState.correctChordAnswersForCurrentKey = 0;
+          window.learningState.usedDegrees = [];
+          window.learningState.currentKeyIndex++;
+          if (window.learningState.currentKeyIndex >= group.keys.length) {
+            if (window.learningState.customGroup) {
+              window.learningState.currentKeyIndex = 0;
               window.learningState.currentChapterIndex = 0;
+            } else {
+              advanceLevel();
             }
           } else {
-            // Stay in triads chapter for more chord questions
-            // Don't advance chapter index
+            window.learningState.currentChapterIndex = 0;
           }
-        } else {
-          // Not a chord question - advance normally
-          advanceQuestionPointer();
         }
       } else {
-        // For non-linear modes, use the streak-based progression
-        window.learningState.correctAnswerStreak++;
-
-        // Check if the streak completes the GROUP
-        if (window.learningState.correctAnswerStreak >= group.requiredStreak) {
-          // For custom groups, just reset and continue
-          if (window.learningState.customGroup) {
-            window.learningState.correctAnswerStreak = 0;
-            window.learningState.currentKeyIndex = 0;
-            window.learningState.currentChapterIndex = 0;
-          } else {
-            advanceLevel();
-          }
+        advanceQuestionPointer();
+      }
+    } else {
+      window.learningState.correctAnswerStreak++;
+      if (window.learningState.correctAnswerStreak >= group.requiredStreak) {
+        if (window.learningState.customGroup) {
+          window.learningState.correctAnswerStreak = 0;
+          window.learningState.currentKeyIndex = 0;
+          window.learningState.currentChapterIndex = 0;
         } else {
-          advanceQuestionPointer();
+          advanceLevel();
         }
+      } else {
+        advanceQuestionPointer();
       }
-      
-      // Special handling for single-key custom groups (like No Accidentals)
-      if (window.learningState.customGroup && group.keys.length === 1) {
-        // For single-key groups, after completing the first two questions (accidentals count and scale), 
-        // stay in triads chapter for continuous chord practice
-        // Note: For C major, accidentals naming is skipped, so scale is at index 1
-        if (window.learningState.currentChapterIndex >= 1) {
-          window.learningState.currentChapterIndex = 2; // Stay in triads chapter
-          window.learningState.usedDegrees = []; // Reset used degrees for new chord questions
-        }
-      }
-      
-      askQuestion();
     }
+    askQuestion();
   } else {
     feedback.textContent = 'Incorrect. Try again.';
     feedback.className = 'feedback incorrect';
-    window.learningState.correctAnswerStreak = 0; // Reset streak on incorrect answer
+    window.learningState.correctAnswerStreak = 0;
     window.learningState.lastAnswerIncorrect = true;
   }
 }
@@ -516,24 +509,28 @@ window.resetQuiz = function() {
     if (window.resetLearningState) {
         window.resetLearningState();
     }
+    // Explicitly clear any custom group and set mode to default
+    if (window.learningState) {
+        window.learningState.customGroup = null;
+        window.learningState.mode = window.MODES ? window.MODES.LINEAR : 'linear';
+        window.learningState.currentKeyIndex = 0;
+        window.learningState.currentChapterIndex = 0;
+    }
     if (window.saveLearningState) {
         window.saveLearningState();
     }
-    
     // Clear any feedback messages
     const feedback = document.getElementById('feedback');
     if (feedback) {
         feedback.textContent = '';
         feedback.className = 'feedback';
     }
-    
     // Clear the answer input
     const answerInput = document.getElementById('answer-input');
     if (answerInput) {
         answerInput.value = '';
     }
-    
-    // Ask a fresh question
+    // Ask a fresh question from the default learning path
     askQuestion();
 };
 
