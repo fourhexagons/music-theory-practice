@@ -487,5 +487,18 @@ function initializeApp() {
     askQuestion();
 }
 
+// Expose functions globally for menu system access
+window.askQuestion = askQuestion;
+window.startAdvancedPractice = startAdvancedPractice;
+window.resetQuiz = function() {
+    if (window.resetLearningState) {
+        window.resetLearningState();
+    }
+    if (window.saveLearningState) {
+        window.saveLearningState();
+    }
+    askQuestion();
+};
+
 // Kick off the app
 initializeApp(); 

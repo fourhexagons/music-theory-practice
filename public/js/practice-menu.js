@@ -135,12 +135,94 @@ class PracticeMenu {
   handleMenuOption(option) {
     const key = option.dataset.key;
     const difficulty = option.dataset.difficulty;
+    
     if (key) {
-      // TODO: Implement key selection logic
+      this.handleKeySelection(key);
     } else if (difficulty) {
-      // TODO: Implement difficulty selection logic
+      this.handleDifficultySelection(difficulty);
     }
     this.closeMenu();
+  }
+
+  handleKeySelection(key) {
+    // Set the current key in the learning state
+    if (window.getLearningState && window.getCurrentGroup) {
+      const state = window.getLearningState();
+      const currentGroup = window.getCurrentGroup();
+      
+      if (currentGroup && currentGroup.keys) {
+        const keyIndex = currentGroup.keys.indexOf(key);
+        if (keyIndex !== -1) {
+          state.currentKeyIndex = keyIndex;
+          state.currentChapterIndex = 0; // Reset to first chapter
+          state.usedDegrees = []; // Reset used degrees
+          state.correctAnswersInChapter = 0; // Reset progress
+          
+          // Save the state
+          if (window.saveLearningState) {
+            window.saveLearningState();
+          }
+          
+          // Generate a new question for the selected key
+          if (window.askQuestion) {
+            window.askQuestion();
+          }
+          
+          console.log(`Switched to key: ${key}`);
+        } else {
+          console.warn(`Key ${key} not found in current group`);
+        }
+      }
+    }
+  }
+
+  handleDifficultySelection(difficulty) {
+    // Map difficulty options to app modes
+    const difficultyMap = {
+      'no-accidentals': 'no-accidentals',
+      '1-3-sharps': '1-3-sharps', 
+      '1-3-flats': '1-3-flats',
+      '4-6-sharps': '4-6-sharps',
+      '4-6-flats': '4-6-flats',
+      'full-random': 'random_all',
+      'spelling-random-sevenths': 'sevenths_only'
+    };
+    
+    const mode = difficultyMap[difficulty];
+    if (!mode) {
+      console.warn(`Unknown difficulty: ${difficulty}`);
+      return;
+    }
+    
+    // Reset learning state for new difficulty
+    if (window.resetLearningState) {
+      window.resetLearningState();
+    }
+    
+    // Set the mode
+    if (window.getLearningState) {
+      const state = window.getLearningState();
+      state.mode = mode;
+      
+      // Save the state
+      if (window.saveLearningState) {
+        window.saveLearningState();
+      }
+    }
+    
+    // Start advanced practice for random modes
+    if (mode === 'random_all' || mode === 'sevenths_only') {
+      if (window.startAdvancedPractice) {
+        window.startAdvancedPractice(mode);
+      }
+    } else {
+      // For linear modes, just ask a new question
+      if (window.askQuestion) {
+        window.askQuestion();
+      }
+    }
+    
+    console.log(`Switched to difficulty: ${difficulty} (mode: ${mode})`);
   }
 
   saveMenuState() {
