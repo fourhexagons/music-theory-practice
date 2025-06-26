@@ -56,6 +56,11 @@
     <script>
         // Test Status Dashboard System
         const TEST_SUITES = {
+            'test_comprehensive_suite.html': {
+                name: 'Comprehensive Suite',
+                category: 'Core Application',
+                description: 'Complete test coverage for all app functionality - consolidated and enhanced'
+            },
             'test_learning_path.html': {
                 name: 'Learning Path',
                 category: 'Core Application',
@@ -174,6 +179,7 @@
         function updateSimpleStatusIcons(testHistory) {
             // Map test files to their actual HTML element IDs
             const idMapping = {
+                'test_comprehensive_suite.html': 'status-comprehensive-suite',
                 'test_learning_path.html': 'status-learning-path',
                 'test_app_logic.html': 'status-core-logic',
                 'test_chords.html': 'status-chord-normalization',
