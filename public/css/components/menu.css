@@ -302,33 +302,4 @@
     padding: 1.5rem 1rem;
   }
 }
-
-.menu-progress-display {
-  position: absolute;
-  bottom: 2rem;
-  right: 2rem;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 1.5rem;
-  max-width: 300px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.progress-info h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.progress-info p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.progress-info strong {
-  color: #333;
-}
 /* --- End Practice Menu Overlay and Bar Refactor --- */ 

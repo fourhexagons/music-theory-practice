@@ -30,7 +30,8 @@ const learningState = {
   },
   // Reset advanced mode flags
   isAdvancedMode: false,
-  advancedModeType: null
+  advancedModeType: null,
+  customGroup: null
 };
 window.learningState = learningState;
 
@@ -130,7 +131,8 @@ function resetLearningState() {
       inProgress: false,
       currentKey: null,
       countAnswered: false
-    }
+    },
+    customGroup: null
   });
 }
 window.resetLearningState = resetLearningState;
@@ -161,6 +163,12 @@ window.getLearningState = getLearningState;
  * @returns {Object} - The current group configuration
  */
 function getCurrentGroup() {
+  // If there's a custom group (from difficulty selection), use that
+  if (learningState.customGroup) {
+    return learningState.customGroup;
+  }
+  
+  // Otherwise, use the standard learning path
   return window.learningPath[learningState.currentGroup];
 }
 window.getCurrentGroup = getCurrentGroup;
@@ -256,15 +264,23 @@ function advanceLearningPath(quizData = null) {
     // Have all keys in the current group been completed?
     if (learningState.currentKeyIndex >= group.keys.length) {
       learningState.currentKeyIndex = 0;
-      learningState.currentGroup++;
       
-      // Have all groups been completed?
-      if (learningState.currentGroup >= window.learningPath.length) {
-        // Path complete! Move to advanced practice.
-        return 'advanced';
+      // If this is a custom group (difficulty mode), loop back to the beginning
+      if (learningState.customGroup) {
+        // Continue looping within the same difficulty group
+        return 'continue';
       } else {
-        // Start the new group
-        learningState.mode = getCurrentGroup().mode;
+        // Standard learning path - advance to next group
+        learningState.currentGroup++;
+        
+        // Have all groups been completed?
+        if (learningState.currentGroup >= window.learningPath.length) {
+          // Path complete! Move to advanced practice.
+          return 'advanced';
+        } else {
+          // Start the new group
+          learningState.mode = getCurrentGroup().mode;
+        }
       }
     }
   }

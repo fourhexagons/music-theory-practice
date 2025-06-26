@@ -36,7 +36,6 @@ class PracticeMenu {
     // Wait a bit for the app to fully load
     setTimeout(() => {
       this.updateCurrentSelections();
-      this.updateProgressDisplay();
     }, 100);
   }
 
@@ -132,11 +131,6 @@ class PracticeMenu {
     this.overlay.classList.add('open');
     this.saveMenuState();
     this.updateMenuDisplay();
-    
-    // Update progress display when menu opens
-    setTimeout(() => {
-      this.updateProgressDisplay();
-    }, 50);
   }
 
   closeMenu() {
@@ -205,23 +199,6 @@ class PracticeMenu {
   handleDifficultySelection(difficulty) {
     console.log(`Attempting to switch to difficulty: ${difficulty}`);
     
-    // Map difficulty options to app modes
-    const difficultyMap = {
-      'no-accidentals': 'no-accidentals',
-      '1-3-sharps': '1-3-sharps', 
-      '1-3-flats': '1-3-flats',
-      '4-6-sharps': '4-6-sharps',
-      '4-6-flats': '4-6-flats',
-      'full-random': 'random_all',
-      'spelling-random-sevenths': 'sevenths_only'
-    };
-    
-    const mode = difficultyMap[difficulty];
-    if (!mode) {
-      console.error(`Unknown difficulty: ${difficulty}`);
-      return;
-    }
-    
     // Validate that required functions are available
     if (!window.resetLearningState || !window.getLearningState || !window.saveLearningState) {
       console.error('Required functions not available for difficulty selection');
@@ -231,22 +208,89 @@ class PracticeMenu {
     // Reset learning state for new difficulty
     window.resetLearningState();
     
-    // Set the mode
+    // Get the state
     const state = window.getLearningState();
-    state.mode = mode;
+    
+    // Define difficulty modes with their key groups
+    const difficultyModes = {
+      'no-accidentals': {
+        keys: ['C'],
+        mode: 'linear',
+        description: 'No Accidentals - C major only'
+      },
+      '1-3-sharps': {
+        keys: ['G', 'D', 'A'],
+        mode: 'random_keys_linear_chapters',
+        description: '1-3 Sharps - G, D, A keys'
+      },
+      '1-3-flats': {
+        keys: ['F', 'Bb', 'Eb'],
+        mode: 'random_keys_linear_chapters',
+        description: '1-3 Flats - F, Bb, Eb keys'
+      },
+      '4-6-sharps': {
+        keys: ['E', 'B', 'F#'],
+        mode: 'random_keys_linear_chapters',
+        description: '4-6 Sharps - E, B, F# keys'
+      },
+      '4-6-flats': {
+        keys: ['Ab', 'Db', 'Gb'],
+        mode: 'random_keys_linear_chapters',
+        description: '4-6 Flats - Ab, Db, Gb keys'
+      },
+      'full-random': {
+        keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
+        mode: 'random_all',
+        description: 'Full Random - All keys'
+      },
+      'spelling-random-sevenths': {
+        keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
+        mode: 'sevenths_only',
+        description: 'Sevenths Only - All keys'
+      }
+    };
+    
+    const selectedMode = difficultyModes[difficulty];
+    if (!selectedMode) {
+      console.error(`Unknown difficulty: ${difficulty}`);
+      return;
+    }
+    
+    // Set up the custom learning path for this difficulty
+    const customGroup = {
+      name: selectedMode.description,
+      keys: selectedMode.keys,
+      mode: selectedMode.mode,
+      chapters: window.CORE_CHAPTERS || [
+        window.CHAPTERS.ACCIDENTALS_COUNT,
+        window.CHAPTERS.ACCIDENTALS_NAMES,
+        window.CHAPTERS.SCALE_SPELLING,
+        window.CHAPTERS.TRIADS
+      ],
+      requiredStreak: 3
+    };
+    
+    // Store the custom group in the learning state
+    state.customGroup = customGroup;
+    state.mode = selectedMode.mode;
+    state.currentKeyIndex = 0;
+    state.currentChapterIndex = 0;
+    state.usedDegrees = [];
+    state.correctAnswersInChapter = 0;
+    state.correctAnswerStreak = 0;
     
     // Save the state
     window.saveLearningState();
     
-    // Start advanced practice for random modes
-    if (mode === 'random_all' || mode === 'sevenths_only') {
+    // Start the practice
+    if (selectedMode.mode === 'random_all' || selectedMode.mode === 'sevenths_only') {
       if (window.startAdvancedPractice) {
-        window.startAdvancedPractice(mode);
+        window.startAdvancedPractice(selectedMode.mode);
       } else {
         console.error('startAdvancedPractice function not available');
       }
     } else {
-      // For linear modes, just ask a new question
+      // For linear and random_keys_linear_chapters modes, ask a new question
       if (window.askQuestion) {
         window.askQuestion();
       } else {
@@ -254,7 +298,7 @@ class PracticeMenu {
       }
     }
     
-    console.log(`Successfully switched to difficulty: ${difficulty} (mode: ${mode})`);
+    console.log(`Successfully switched to difficulty: ${difficulty} (${selectedMode.description})`);
   }
 
   saveMenuState() {
@@ -342,20 +386,37 @@ class PracticeMenu {
     // Update difficulty selection feedback
     if (window.getLearningState) {
       const state = window.getLearningState();
-      const currentMode = state.mode;
       
-      // Map mode back to difficulty option
-      const modeToDifficulty = {
-        'no-accidentals': 'no-accidentals',
-        '1-3-sharps': '1-3-sharps',
-        '1-3-flats': '1-3-flats',
-        '4-6-sharps': '4-6-sharps',
-        '4-6-flats': '4-6-flats',
-        'random_all': 'full-random',
-        'sevenths_only': 'spelling-random-sevenths'
-      };
+      // Determine current difficulty based on custom group
+      let currentDifficulty = null;
+      if (state.customGroup) {
+        const groupName = state.customGroup.name;
+        if (groupName.includes('No Accidentals')) {
+          currentDifficulty = 'no-accidentals';
+        } else if (groupName.includes('1-3 Sharps')) {
+          currentDifficulty = '1-3-sharps';
+        } else if (groupName.includes('1-3 Flats')) {
+          currentDifficulty = '1-3-flats';
+        } else if (groupName.includes('4-6 Sharps')) {
+          currentDifficulty = '4-6-sharps';
+        } else if (groupName.includes('4-6 Flats')) {
+          currentDifficulty = '4-6-flats';
+        } else if (groupName.includes('Full Random')) {
+          currentDifficulty = 'full-random';
+        } else if (groupName.includes('Sevenths Only')) {
+          currentDifficulty = 'spelling-random-sevenths';
+        }
+      } else {
+        // For standard learning path, determine difficulty from mode
+        const modeToDifficulty = {
+          'linear': 'no-accidentals',
+          'random_keys_linear_chapters': 'no-accidentals',
+          'random_all': 'full-random',
+          'sevenths_only': 'spelling-random-sevenths'
+        };
+        currentDifficulty = modeToDifficulty[state.mode];
+      }
       
-      const currentDifficulty = modeToDifficulty[currentMode];
       if (currentDifficulty) {
         this.menuOptions.forEach(option => {
           if (option.dataset.difficulty) {
@@ -375,25 +436,26 @@ class PracticeMenu {
     const state = window.getLearningState();
     const currentMode = state.mode;
     
-    // Define which keys are available for each mode
-    const keyAvailability = {
-      'no-accidentals': ['C'],
-      '1-3-sharps': ['G', 'D', 'A'],
-      '1-3-flats': ['F', 'Bb', 'Eb'],
-      '4-6-sharps': ['E', 'B', 'F#'],
-      '4-6-flats': ['Ab', 'Db', 'Gb'],
-      'random_all': ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
-      'sevenths_only': ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb']
-    };
+    // If there's a custom group, use its keys
+    if (state.customGroup) {
+      const availableKeys = state.customGroup.keys;
+      
+      // Update key options visibility
+      this.menuOptions.forEach(option => {
+        if (option.dataset.key) {
+          const isAvailable = availableKeys.includes(option.dataset.key);
+          option.style.display = isAvailable ? 'block' : 'none';
+          option.disabled = !isAvailable;
+        }
+      });
+      return;
+    }
     
-    const availableKeys = keyAvailability[currentMode] || [];
-    
-    // Update key options visibility
+    // For standard learning path, show all keys
     this.menuOptions.forEach(option => {
       if (option.dataset.key) {
-        const isAvailable = availableKeys.includes(option.dataset.key);
-        option.style.display = isAvailable ? 'block' : 'none';
-        option.disabled = !isAvailable;
+        option.style.display = 'block';
+        option.disabled = false;
       }
     });
   }
@@ -413,39 +475,6 @@ class PracticeMenu {
       this.optionsArea.classList.remove('show-back-nav');
       backNav.style.display = 'none';
     }
-  }
-
-  updateProgressDisplay() {
-    if (!window.getLearningState || !window.getCurrentGroup) return;
-    
-    const state = window.getLearningState();
-    const currentGroup = window.getCurrentGroup();
-    
-    if (!currentGroup) return;
-    
-    // Create or update progress display
-    let progressDisplay = document.getElementById('menu-progress-display');
-    if (!progressDisplay) {
-      progressDisplay = document.createElement('div');
-      progressDisplay.id = 'menu-progress-display';
-      progressDisplay.className = 'menu-progress-display';
-      this.overlay.querySelector('.practice-menu-overlay-inner').appendChild(progressDisplay);
-    }
-    
-    const currentKey = currentGroup.keys[state.currentKeyIndex];
-    const currentChapter = currentGroup.chapters[state.currentChapterIndex];
-    
-    let progressHTML = `
-      <div class="progress-info">
-        <h3>Current Progress</h3>
-        <p><strong>Key:</strong> ${currentKey}</p>
-        <p><strong>Chapter:</strong> ${currentChapter ? currentChapter.name : 'Unknown'}</p>
-        <p><strong>Correct Answers:</strong> ${state.correctAnswersInChapter}</p>
-        <p><strong>Streak:</strong> ${state.correctAnswerStreak}</p>
-      </div>
-    `;
-    
-    progressDisplay.innerHTML = progressHTML;
   }
 }
 
