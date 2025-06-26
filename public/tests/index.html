@@ -257,6 +257,31 @@
                     }
                 },
                 {
+                    name: 'Comprehensive User Input Validation',
+                    category: TEST_CATEGORIES.DATA,
+                    test: () => {
+                        const testResults = {
+                            scaleInputs: testScaleInputs(),
+                            chordInputs: testChordInputs(),
+                            accidentalsInputs: testAccidentalsInputs(),
+                            numericInputs: testNumericInputs(),
+                            edgeCases: testEdgeCases()
+                        };
+                        
+                        const totalTests = Object.values(testResults).reduce((sum, result) => sum + result.total, 0);
+                        const totalPassed = Object.values(testResults).reduce((sum, result) => sum + result.passed, 0);
+                        
+                        return {
+                            passed: totalPassed === totalTests,
+                            details: `Scale: ${testResults.scaleInputs.passed}/${testResults.scaleInputs.total}, ` +
+                                    `Chords: ${testResults.chordInputs.passed}/${testResults.chordInputs.total}, ` +
+                                    `Accidentals: ${testResults.accidentalsInputs.passed}/${testResults.accidentalsInputs.total}, ` +
+                                    `Numbers: ${testResults.numericInputs.passed}/${testResults.numericInputs.total}, ` +
+                                    `Edges: ${testResults.edgeCases.passed}/${testResults.edgeCases.total}`
+                        };
+                    }
+                },
+                {
                     name: 'Answer Validation',
                     category: TEST_CATEGORIES.DATA,
                     test: () => {
@@ -611,6 +636,278 @@
             document.getElementById('summary').style.display = 'none';
             document.getElementById('progress-container').style.display = 'none';
             document.getElementById('copy-status').style.display = 'none';
+        }
+
+        // Comprehensive Input Testing Functions
+        function testScaleInputs() {
+            const testCases = [
+                // Valid scale inputs
+                { input: 'C D E F G A B', expected: 'C D E F G A B', shouldPass: true },
+                { input: 'C,D,E,F,G,A,B', expected: 'C D E F G A B', shouldPass: true },
+                { input: 'C  D  E  F  G  A  B', expected: 'C D E F G A B', shouldPass: true },
+                { input: 'c d e f g a b', expected: 'C D E F G A B', shouldPass: true },
+                { input: 'C♯ D♯ E F♯ G♯ A♯ B', expected: 'C♯ D♯ E F♯ G♯ A♯ B', shouldPass: true },
+                { input: 'C# D# E F# G# A# B', expected: 'C♯ D♯ E F♯ G♯ A♯ B', shouldPass: true },
+                { input: 'D♭ E♭ F G♭ A♭ B♭ C', expected: 'D♭ E♭ F G♭ A♭ B♭ C', shouldPass: true },
+                { input: 'Db Eb F Gb Ab Bb C', expected: 'D♭ E♭ F G♭ A♭ B♭ C', shouldPass: true },
+                
+                // Invalid scale inputs
+                { input: 'C D E F G A', expected: 'C D E F G A B', shouldPass: false }, // Missing note
+                { input: 'C D E F G A B C', expected: 'C D E F G A B', shouldPass: false }, // Extra note
+                { input: 'C D E F G A B D', expected: 'C D E F G A B', shouldPass: false }, // Wrong note
+                { input: 'X Y Z', expected: 'C D E F G A B', shouldPass: false }, // Invalid notes
+                { input: '', expected: 'C D E F G A B', shouldPass: false }, // Empty
+                { input: '   ', expected: 'C D E F G A B', shouldPass: false }, // Whitespace only
+                
+                // Edge cases
+                { input: 'C,D,E,F,G,A,B,', expected: 'C D E F G A B', shouldPass: true }, // Trailing comma
+                { input: ',C,D,E,F,G,A,B', expected: 'C D E F G A B', shouldPass: true }, // Leading comma
+                { input: 'C,,D,,E,,F,,G,,A,,B', expected: 'C D E F G A B', shouldPass: true }, // Multiple commas
+                { input: 'C\tD\tE\tF\tG\tA\tB', expected: 'C D E F G A B', shouldPass: true }, // Tabs
+                { input: 'C\nD\nE\nF\nG\nA\nB', expected: 'C D E F G A B', shouldPass: true }, // Newlines
+            ];
+            
+            let passed = 0;
+            testCases.forEach(({ input, expected, shouldPass }) => {
+                const result = validateScaleInput(input, expected);
+                if (result === shouldPass) passed++;
+            });
+            
+            return { total: testCases.length, passed };
+        }
+
+        function testChordInputs() {
+            const testCases = [
+                // Valid triad inputs
+                { input: 'C E G', expected: 'C E G', shouldPass: true },
+                { input: 'C,E,G', expected: 'C E G', shouldPass: true },
+                { input: 'C♯ E♯ G♯', expected: 'C♯ E♯ G♯', shouldPass: true },
+                { input: 'C# E# G#', expected: 'C♯ E♯ G♯', shouldPass: true },
+                { input: 'D♭ F A♭', expected: 'D♭ F A♭', shouldPass: true },
+                { input: 'Db F Ab', expected: 'D♭ F A♭', shouldPass: true },
+                
+                // Valid seventh chord inputs
+                { input: 'C E G B', expected: 'C E G B', shouldPass: true },
+                { input: 'C,E,G,B', expected: 'C E G B', shouldPass: true },
+                { input: 'C♯ E♯ G♯ B♯', expected: 'C♯ E♯ G♯ B♯', shouldPass: true },
+                { input: 'D♭ F A♭ C♭', expected: 'D♭ F A♭ C♭', shouldPass: true },
+                
+                // Invalid chord inputs
+                { input: 'C E', expected: 'C E G', shouldPass: false }, // Missing note
+                { input: 'C E G B D', expected: 'C E G B', shouldPass: false }, // Extra note
+                { input: 'C E F', expected: 'C E G', shouldPass: false }, // Wrong note
+                { input: 'X Y Z', expected: 'C E G', shouldPass: false }, // Invalid notes
+                { input: '', expected: 'C E G', shouldPass: false }, // Empty
+                
+                // Edge cases
+                { input: 'C,E,G,', expected: 'C E G', shouldPass: true }, // Trailing comma
+                { input: ',C,E,G', expected: 'C E G', shouldPass: true }, // Leading comma
+                { input: 'C,,E,,G', expected: 'C E G', shouldPass: true }, // Multiple commas
+                { input: 'C\tE\tG', expected: 'C E G', shouldPass: true }, // Tabs
+                { input: 'C\nE\nG', expected: 'C E G', shouldPass: true }, // Newlines
+            ];
+            
+            let passed = 0;
+            testCases.forEach(({ input, expected, shouldPass }) => {
+                const result = validateChordInput(input, expected);
+                if (result === shouldPass) passed++;
+            });
+            
+            return { total: testCases.length, passed };
+        }
+
+        function testAccidentalsInputs() {
+            const testCases = [
+                // Valid accidentals inputs
+                { input: 'F♯ C♯', expected: 'F♯ C♯', shouldPass: true },
+                { input: 'F#,C#', expected: 'F♯ C♯', shouldPass: true },
+                { input: 'F# C#', expected: 'F♯ C♯', shouldPass: true },
+                { input: 'B♭ E♭ A♭', expected: 'B♭ E♭ A♭', shouldPass: true },
+                { input: 'Bb,Eb,Ab', expected: 'B♭ E♭ A♭', shouldPass: true },
+                { input: 'Bb Eb Ab', expected: 'B♭ E♭ A♭', shouldPass: true },
+                { input: 'F𝄪 C𝄪', expected: 'F𝄪 C𝄪', shouldPass: true },
+                { input: 'F## C##', expected: 'F𝄪 C𝄪', shouldPass: true },
+                { input: 'B𝄫 E𝄫', expected: 'B𝄫 E𝄫', shouldPass: true },
+                { input: 'Bbb Ebb', expected: 'B𝄫 E𝄫', shouldPass: true },
+                
+                // Invalid accidentals inputs
+                { input: 'F♯', expected: 'F♯ C♯', shouldPass: false }, // Missing note
+                { input: 'F♯ C♯ G♯', expected: 'F♯ C♯', shouldPass: false }, // Extra note
+                { input: 'F♯ D♯', expected: 'F♯ C♯', shouldPass: false }, // Wrong note
+                { input: 'X Y', expected: 'F♯ C♯', shouldPass: false }, // Invalid notes
+                { input: '', expected: 'F♯ C♯', shouldPass: false }, // Empty
+                
+                // Edge cases
+                { input: 'F♯,C♯,', expected: 'F♯ C♯', shouldPass: true }, // Trailing comma
+                { input: ',F♯,C♯', expected: 'F♯ C♯', shouldPass: true }, // Leading comma
+                { input: 'F♯,,C♯', expected: 'F♯ C♯', shouldPass: true }, // Multiple commas
+                { input: 'F♯\tC♯', expected: 'F♯ C♯', shouldPass: true }, // Tabs
+                { input: 'F♯\nC♯', expected: 'F♯ C♯', shouldPass: true }, // Newlines
+            ];
+            
+            let passed = 0;
+            testCases.forEach(({ input, expected, shouldPass }) => {
+                const result = validateAccidentalsInput(input, expected);
+                if (result === shouldPass) passed++;
+            });
+            
+            return { total: testCases.length, passed };
+        }
+
+        function testNumericInputs() {
+            const testCases = [
+                // Valid numeric inputs for accidentals count
+                { input: '0', expected: 0, shouldPass: true },
+                { input: '1', expected: 1, shouldPass: true },
+                { input: '2', expected: 2, shouldPass: true },
+                { input: '3', expected: 3, shouldPass: true },
+                { input: '4', expected: 4, shouldPass: true },
+                { input: '5', expected: 5, shouldPass: true },
+                { input: '6', expected: 6, shouldPass: true },
+                { input: '7', expected: 7, shouldPass: true },
+                
+                // Word representations
+                { input: 'zero', expected: 0, shouldPass: true },
+                { input: 'one', expected: 1, shouldPass: true },
+                { input: 'two', expected: 2, shouldPass: true },
+                { input: 'three', expected: 3, shouldPass: true },
+                { input: 'four', expected: 4, shouldPass: true },
+                { input: 'five', expected: 5, shouldPass: true },
+                { input: 'six', expected: 6, shouldPass: true },
+                { input: 'seven', expected: 7, shouldPass: true },
+                
+                // Case variations
+                { input: 'ZERO', expected: 0, shouldPass: true },
+                { input: 'One', expected: 1, shouldPass: true },
+                { input: 'TWO', expected: 2, shouldPass: true },
+                
+                // Invalid numeric inputs
+                { input: '8', expected: 7, shouldPass: false }, // Out of range
+                { input: '-1', expected: 0, shouldPass: false }, // Negative
+                { input: '1.5', expected: 1, shouldPass: false }, // Decimal
+                { input: 'abc', expected: 0, shouldPass: false }, // Non-numeric
+                { input: '', expected: 0, shouldPass: false }, // Empty
+                { input: '   ', expected: 0, shouldPass: false }, // Whitespace
+                { input: 'eight', expected: 7, shouldPass: false }, // Out of range word
+                { input: 'none', expected: 0, shouldPass: true }, // Special case for zero
+                
+                // Edge cases
+                { input: ' 1 ', expected: 1, shouldPass: true }, // Leading/trailing spaces
+                { input: '\t2\t', expected: 2, shouldPass: true }, // Tabs
+                { input: '\n3\n', expected: 3, shouldPass: true }, // Newlines
+            ];
+            
+            let passed = 0;
+            testCases.forEach(({ input, expected, shouldPass }) => {
+                const result = validateNumericInput(input, expected);
+                if (result === shouldPass) passed++;
+            });
+            
+            return { total: testCases.length, passed };
+        }
+
+        function testEdgeCases() {
+            const testCases = [
+                // Unicode and special characters
+                { input: 'C♯ D♯ E♯ F♯ G♯ A♯ B♯', expected: 'C♯ D♯ E♯ F♯ G♯ A♯ B♯', shouldPass: true },
+                { input: 'C♭ D♭ E♭ F♭ G♭ A♭ B♭', expected: 'C♭ D♭ E♭ F♭ G♭ A♭ B♭', shouldPass: true },
+                { input: 'C𝄪 D𝄪 E𝄪 F𝄪 G𝄪 A𝄪 B𝄪', expected: 'C𝄪 D𝄪 E𝄪 F𝄪 G𝄪 A𝄪 B𝄪', shouldPass: true },
+                { input: 'C𝄫 D𝄫 E𝄫 F𝄫 G𝄫 A𝄫 B𝄫', expected: 'C𝄫 D𝄫 E𝄫 F𝄫 G𝄫 A𝄫 B𝄫', shouldPass: true },
+                
+                // Mixed formats
+                { input: 'C♯ D# E♯ F# G♯ A# B♯', expected: 'C♯ D♯ E♯ F♯ G♯ A♯ B♯', shouldPass: true },
+                { input: 'C♭ Db E♭ Fb G♭ Ab B♭', expected: 'C♭ D♭ E♭ F♭ G♭ A♭ B♭', shouldPass: true },
+                
+                // Extreme whitespace
+                { input: '   C   D   E   F   G   A   B   ', expected: 'C D E F G A B', shouldPass: true },
+                { input: '\t\nC\t\nD\t\nE\t\nF\t\nG\t\nA\t\nB\t\n', expected: 'C D E F G A B', shouldPass: true },
+                
+                // Mixed separators
+                { input: 'C,D E,F G,A B', expected: 'C D E F G A B', shouldPass: true },
+                { input: 'C, D, E, F, G, A, B', expected: 'C D E F G A B', shouldPass: true },
+                
+                // Invalid edge cases
+                { input: 'C D E F G A B C D E F G A B', expected: 'C D E F G A B', shouldPass: false }, // Too many notes
+                { input: 'C♯♯ D♯♯', expected: 'C♯ D♯', shouldPass: false }, // Double accidentals
+                { input: 'C♭♭ D♭♭', expected: 'C♭ D♭', shouldPass: false }, // Double accidentals
+                { input: 'C#b D#b', expected: 'C♯ D♯', shouldPass: false }, // Mixed accidentals
+                { input: 'Cb# Db#', expected: 'C♭ D♭', shouldPass: false }, // Mixed accidentals
+            ];
+            
+            let passed = 0;
+            testCases.forEach(({ input, expected, shouldPass }) => {
+                const result = validateEdgeCase(input, expected);
+                if (result === shouldPass) passed++;
+            });
+            
+            return { total: testCases.length, passed };
+        }
+
+        // Helper validation functions
+        function validateScaleInput(input, expected) {
+            if (!input || !expected) return false;
+            const normalizedInput = normalizeInput(input);
+            const normalizedExpected = normalizeInput(expected);
+            return normalizedInput === normalizedExpected;
+        }
+
+        function validateChordInput(input, expected) {
+            if (!input || !expected) return false;
+            const normalizedInput = normalizeInput(input);
+            const normalizedExpected = normalizeInput(expected);
+            return normalizedInput === normalizedExpected;
+        }
+
+        function validateAccidentalsInput(input, expected) {
+            if (!input || !expected) return false;
+            const normalizedInput = normalizeInput(input);
+            const normalizedExpected = normalizeInput(expected);
+            return normalizedInput === normalizedExpected;
+        }
+
+        function validateNumericInput(input, expected) {
+            if (!input) return false;
+            const normalizedInput = input.trim().toLowerCase();
+            
+            // Handle special case for zero
+            if (expected === 0 && (normalizedInput === '0' || normalizedInput === 'zero' || normalizedInput === 'none')) {
+                return true;
+            }
+            
+            // Try parsing as number
+            const numValue = parseInt(normalizedInput, 10);
+            if (!isNaN(numValue) && numValue === expected) {
+                return true;
+            }
+            
+            // Try parsing as word
+            const wordValue = window.wordToNumber ? window.wordToNumber(normalizedInput) : null;
+            return wordValue === expected;
+        }
+
+        function validateEdgeCase(input, expected) {
+            if (!input || !expected) return false;
+            const normalizedInput = normalizeInput(input);
+            const normalizedExpected = normalizeInput(expected);
+            return normalizedInput === normalizedExpected;
+        }
+
+        function normalizeInput(input) {
+            if (!input) return '';
+            
+            // Normalize whitespace and separators
+            let normalized = input
+                .replace(/[\t\n\r]+/g, ' ') // Replace tabs/newlines with spaces
+                .replace(/,\s*/g, ' ') // Replace commas with spaces
+                .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
+                .trim();
+            
+            // Normalize accidentals to Unicode
+            if (window.accidentalToUnicode) {
+                normalized = normalized.split(' ').map(note => window.accidentalToUnicode(note)).join(' ');
+            }
+            
+            return normalized.toUpperCase();
         }
 
         // Initialize when page loads

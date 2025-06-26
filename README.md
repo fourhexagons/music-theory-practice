@@ -37,3 +37,47 @@ python3 -m http.server 8000
 - `learning.lightbath.com` - Landing page (future: course marketing)
 - `learning.lightbath.com/practice` - Music theory practice app
 - `learning.lightbath.com/dashboard` - Future student dashboards
+
+## Local Development: Running the Firebase Server
+
+To ensure you never have multiple Firebase servers running at once (which can cause port conflicts and confusion), **always use the provided script**:
+
+### Start or Restart the Server (Best Practice)
+
+```sh
+./serve-clean.sh
+```
+
+This script will:
+- Kill any running `firebase serve` processes
+- Start a new Firebase hosting server
+
+### Why?
+- Running multiple servers at once is a common source of bugs and confusion.
+- This script guarantees only one server is running at a time.
+- It works for both human developers and AI agents.
+
+### First Time Setup
+Make the script executable:
+```sh
+chmod +x serve-clean.sh
+```
+
+### Troubleshooting
+- If you ever see errors about ports in use, or the site doesn't load as expected, run:
+  ```sh
+  ./serve-clean.sh
+  ```
+- If you want to check for running servers manually:
+  ```sh
+  ps aux | grep firebase
+  ```
+- To kill all running servers manually:
+  ```sh
+  pkill -f "firebase serve"
+  ```
+
+### Protocol for Agents and Developers
+- **Always use `./serve-clean.sh` to start or restart the server.**
+- Do not run `firebase serve` directly unless you are sure no other instance is running.
+- This protocol should be followed by all agents and developers working on this project.
