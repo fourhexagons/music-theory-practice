@@ -131,36 +131,60 @@
   gap: 0;
 }
 
-.practice-menu-list {
+.practice-menu-list,
+.practice-menu-options-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 20px;
 }
 
 .practice-menu-item {
   margin: 0;
 }
 
-.practice-menu-link {
+.practice-menu-link,
+.practice-menu-option {
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #222;
   background: none;
   border: none;
-  color: #222;
-  font-size: 1rem;
-  font-family: inherit;
-  font-weight: 400;
   cursor: pointer;
-  padding: 0.75rem 0;
+  padding: 0 0 2px 0;
+  margin: 0;
   text-align: left;
-  width: 100%;
-  transition: none;
+  width: auto;
+  display: inline-block;
+  min-width: 0;
 }
 
 .practice-menu-link.active,
 .practice-menu-link:focus {
-  /* Remove background and color change */
+  /* Remove font-weight change */
+  font-weight: 500;
+}
+
+.practice-menu-link.current-selection,
+.practice-menu-option.current-selection,
+.practice-menu-link.current-selection:focus,
+.practice-menu-link.current-selection:active,
+.practice-menu-option.current-selection:focus,
+.practice-menu-option.current-selection:active {
+  border: none;
+  border-bottom: 2px solid #111;
+  background: none;
+  color: inherit;
+  box-shadow: none;
+  text-decoration: none;
+  padding-bottom: 2px;
+  margin-bottom: 0;
+  width: auto;
+  min-width: 0;
   font-weight: 500;
 }
 
@@ -180,52 +204,6 @@
 
 .practice-menu-options.active {
   display: block;
-}
-
-.practice-menu-options-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.practice-menu-option {
-  transition: border-bottom 0.2s;
-  background: none;
-  color: inherit;
-  border: none;
-  box-shadow: none;
-  text-decoration: none;
-  display: inline-block;
-  width: auto;
-  min-width: 0;
-  font-size: 1rem;
-  font-family: inherit;
-  font-weight: 400;
-  cursor: pointer;
-  padding: 0.75rem 0;
-  text-align: left;
-}
-
-.practice-menu-option:hover,
-.practice-menu-option:focus {
-  font-weight: 500;
-}
-
-.practice-menu-option.current-selection {
-  border: none;
-  border-bottom: 2px solid #111;
-  background: none;
-  color: inherit;
-  box-shadow: none;
-  text-decoration: none;
-  display: inline-block;
-  padding-bottom: 2px;
-  margin-bottom: -2px;
-  width: auto;
-  min-width: 0;
 }
 
 /* Back nav text for nested mobile menus */
@@ -305,5 +283,25 @@
   .practice-menu-options-area {
     padding: 1.5rem 1rem;
   }
+}
+
+a.practice-menu-link,
+a.practice-menu-option {
+  outline: none;
+  box-shadow: none;
+  background: none;
+  border: none;
+  text-decoration: none;
+}
+
+a.practice-menu-link:focus,
+a.practice-menu-link:active,
+a.practice-menu-option:focus,
+a.practice-menu-option:active {
+  outline: none;
+  box-shadow: none;
+  background: none;
+  border: none;
+  text-decoration: none;
 }
 /* --- End Practice Menu Overlay and Bar Refactor --- */ 

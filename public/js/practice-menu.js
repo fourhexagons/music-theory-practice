@@ -56,6 +56,7 @@ class PracticeMenu {
     // Section navigation
     this.menuLinks.forEach(link => {
       link.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
         const section = e.target.dataset.section;
         this.handleSectionClick(section);
@@ -65,6 +66,7 @@ class PracticeMenu {
     // Menu options
     this.menuOptions.forEach(option => {
       option.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
         this.handleMenuOption(e.target);
       });
@@ -105,6 +107,7 @@ class PracticeMenu {
       this.handleStartOver();
       return;
     }
+    // Always set and update, even if already selected
     this.currentSection = section;
     this.saveMenuState();
     this.updateMenuDisplay();
@@ -319,9 +322,11 @@ class PracticeMenu {
   }
 
   updateMenuDisplay() {
-    // Highlight active section link
+    // Highlight active section link and apply underline
     this.menuLinks.forEach(link => {
-      link.classList.toggle('active', link.dataset.section === this.currentSection);
+      const isActive = link.dataset.section === this.currentSection;
+      link.classList.toggle('active', isActive);
+      link.classList.toggle('current-selection', isActive);
     });
     
     // Show only the current options area
@@ -380,13 +385,22 @@ class PracticeMenu {
     // Update difficulty selection feedback
     if (window.getLearningState) {
       const state = window.getLearningState();
-      // Only underline a difficulty if a custom group is active
+      // Map customGroup.name to data-difficulty value
+      let selectedDifficulty = null;
+      if (state.customGroup && state.customGroup.name) {
+        const name = state.customGroup.name.toLowerCase();
+        if (name.includes('no accidentals')) selectedDifficulty = 'no-accidentals';
+        else if (name.includes('1-3 sharps')) selectedDifficulty = '1-3-sharps';
+        else if (name.includes('1-3 flats')) selectedDifficulty = '1-3-flats';
+        else if (name.includes('4-6 sharps')) selectedDifficulty = '4-6-sharps';
+        else if (name.includes('4-6 flats')) selectedDifficulty = '4-6-flats';
+        else if (name.includes('full random')) selectedDifficulty = 'full-random';
+        else if (name.includes('sevenths only')) selectedDifficulty = 'spelling-random-sevenths';
+        // If it's a key-locked mode, do not select any difficulty
+      }
       this.menuOptions.forEach(option => {
         if (option.dataset.difficulty) {
-          option.classList.toggle('current-selection',
-            state.customGroup && option.dataset.difficulty && state.customGroup.name &&
-            state.customGroup.name.toLowerCase().includes(option.dataset.difficulty.replace(/-/g, ' '))
-          );
+          option.classList.toggle('current-selection', option.dataset.difficulty === selectedDifficulty);
         }
       });
     }

@@ -92,7 +92,7 @@
         <div class="content-box">
             <div id="summary" class="summary" style="display:none;">
                 <div id="summary-content"></div>
-            </div>
+                    </div>
             <div class="test-controls">
                 <button class="btn" onclick="runAllTests()">Run All Tests</button>
                 <button class="btn" onclick="runCoreTests()">Core Logic Only</button>
@@ -102,7 +102,7 @@
                 <button class="btn" onclick="runPerformanceTests()">Performance Only</button>
                 <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
                 <button class="btn" onclick="clearResults()">Clear Results</button>
-            </div>
+                    </div>
             <div id="progress-container" style="display:none;">
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
@@ -517,7 +517,7 @@
             // Run tests
             let completed = 0;
             tests.forEach((test, index) => {
-                setTimeout(() => {
+                    setTimeout(() => {
                     try {
                         const result = test.test();
                         const testResult = {
