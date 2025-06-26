@@ -24,9 +24,19 @@ class PracticeMenu {
   }
 
   init() {
-    this.bindEvents();
     this.loadMenuState();
+    this.bindEvents();
     this.updateMenuDisplay();
+    
+    // Initialize menu with current app state
+    this.initializeWithCurrentState();
+  }
+
+  initializeWithCurrentState() {
+    // Wait a bit for the app to fully load
+    setTimeout(() => {
+      this.updateCurrentSelections();
+    }, 100);
   }
 
   bindEvents() {
@@ -145,38 +155,50 @@ class PracticeMenu {
   }
 
   handleKeySelection(key) {
-    // Set the current key in the learning state
-    if (window.getLearningState && window.getCurrentGroup) {
-      const state = window.getLearningState();
-      const currentGroup = window.getCurrentGroup();
-      
-      if (currentGroup && currentGroup.keys) {
-        const keyIndex = currentGroup.keys.indexOf(key);
-        if (keyIndex !== -1) {
-          state.currentKeyIndex = keyIndex;
-          state.currentChapterIndex = 0; // Reset to first chapter
-          state.usedDegrees = []; // Reset used degrees
-          state.correctAnswersInChapter = 0; // Reset progress
-          
-          // Save the state
-          if (window.saveLearningState) {
-            window.saveLearningState();
-          }
-          
-          // Generate a new question for the selected key
-          if (window.askQuestion) {
-            window.askQuestion();
-          }
-          
-          console.log(`Switched to key: ${key}`);
-        } else {
-          console.warn(`Key ${key} not found in current group`);
-        }
-      }
+    console.log(`Attempting to switch to key: ${key}`);
+    
+    // Validate that required functions are available
+    if (!window.getLearningState || !window.getCurrentGroup) {
+      console.error('Required functions not available for key selection');
+      return;
     }
+    
+    const state = window.getLearningState();
+    const currentGroup = window.getCurrentGroup();
+    
+    if (!currentGroup || !currentGroup.keys) {
+      console.error('No current group or keys available');
+      return;
+    }
+    
+    const keyIndex = currentGroup.keys.indexOf(key);
+    if (keyIndex === -1) {
+      console.warn(`Key ${key} not found in current group. Available keys: ${currentGroup.keys.join(', ')}`);
+      return;
+    }
+    
+    // Update the learning state
+    state.currentKeyIndex = keyIndex;
+    state.currentChapterIndex = 0; // Reset to first chapter
+    state.usedDegrees = []; // Reset used degrees
+    state.correctAnswersInChapter = 0; // Reset progress
+    
+    // Save the state
+    if (window.saveLearningState) {
+      window.saveLearningState();
+    }
+    
+    // Generate a new question for the selected key
+    if (window.askQuestion) {
+      window.askQuestion();
+    }
+    
+    console.log(`Successfully switched to key: ${key}`);
   }
 
   handleDifficultySelection(difficulty) {
+    console.log(`Attempting to switch to difficulty: ${difficulty}`);
+    
     // Map difficulty options to app modes
     const difficultyMap = {
       'no-accidentals': 'no-accidentals',
@@ -190,39 +212,43 @@ class PracticeMenu {
     
     const mode = difficultyMap[difficulty];
     if (!mode) {
-      console.warn(`Unknown difficulty: ${difficulty}`);
+      console.error(`Unknown difficulty: ${difficulty}`);
+      return;
+    }
+    
+    // Validate that required functions are available
+    if (!window.resetLearningState || !window.getLearningState || !window.saveLearningState) {
+      console.error('Required functions not available for difficulty selection');
       return;
     }
     
     // Reset learning state for new difficulty
-    if (window.resetLearningState) {
-      window.resetLearningState();
-    }
+    window.resetLearningState();
     
     // Set the mode
-    if (window.getLearningState) {
-      const state = window.getLearningState();
-      state.mode = mode;
-      
-      // Save the state
-      if (window.saveLearningState) {
-        window.saveLearningState();
-      }
-    }
+    const state = window.getLearningState();
+    state.mode = mode;
+    
+    // Save the state
+    window.saveLearningState();
     
     // Start advanced practice for random modes
     if (mode === 'random_all' || mode === 'sevenths_only') {
       if (window.startAdvancedPractice) {
         window.startAdvancedPractice(mode);
+      } else {
+        console.error('startAdvancedPractice function not available');
       }
     } else {
       // For linear modes, just ask a new question
       if (window.askQuestion) {
         window.askQuestion();
+      } else {
+        console.error('askQuestion function not available');
       }
     }
     
-    console.log(`Switched to difficulty: ${difficulty} (mode: ${mode})`);
+    console.log(`Successfully switched to difficulty: ${difficulty} (mode: ${mode})`);
   }
 
   saveMenuState() {
@@ -251,6 +277,7 @@ class PracticeMenu {
     this.menuLinks.forEach(link => {
       link.classList.toggle('active', link.dataset.section === this.currentSection);
     });
+    
     // Show only the current options area
     this.optionsAreas.forEach(area => {
       if (this.currentSection) {
@@ -259,6 +286,7 @@ class PracticeMenu {
         area.classList.remove('active');
       }
     });
+    
     // Handle mobile menu behavior
     if (this.isMobile) {
       // Only hamburger is clickable
@@ -284,6 +312,84 @@ class PracticeMenu {
       this.optionsArea.classList.remove('mobile-nested');
       this.showBackNav(false);
     }
+    
+    // Update visual feedback for current selections
+    this.updateCurrentSelections();
+  }
+
+  updateCurrentSelections() {
+    // Update key selection feedback
+    if (window.getLearningState && window.getCurrentGroup) {
+      const state = window.getLearningState();
+      const currentGroup = window.getCurrentGroup();
+      
+      if (currentGroup && currentGroup.keys) {
+        const currentKey = currentGroup.keys[state.currentKeyIndex];
+        this.menuOptions.forEach(option => {
+          if (option.dataset.key) {
+            option.classList.toggle('current-selection', option.dataset.key === currentKey);
+          }
+        });
+      }
+    }
+    
+    // Update difficulty selection feedback
+    if (window.getLearningState) {
+      const state = window.getLearningState();
+      const currentMode = state.mode;
+      
+      // Map mode back to difficulty option
+      const modeToDifficulty = {
+        'no-accidentals': 'no-accidentals',
+        '1-3-sharps': '1-3-sharps',
+        '1-3-flats': '1-3-flats',
+        '4-6-sharps': '4-6-sharps',
+        '4-6-flats': '4-6-flats',
+        'random_all': 'full-random',
+        'sevenths_only': 'spelling-random-sevenths'
+      };
+      
+      const currentDifficulty = modeToDifficulty[currentMode];
+      if (currentDifficulty) {
+        this.menuOptions.forEach(option => {
+          if (option.dataset.difficulty) {
+            option.classList.toggle('current-selection', option.dataset.difficulty === currentDifficulty);
+          }
+        });
+      }
+    }
+    
+    // Update available keys based on current difficulty
+    this.updateAvailableKeys();
+  }
+
+  updateAvailableKeys() {
+    if (!window.getLearningState) return;
+    
+    const state = window.getLearningState();
+    const currentMode = state.mode;
+    
+    // Define which keys are available for each mode
+    const keyAvailability = {
+      'no-accidentals': ['C'],
+      '1-3-sharps': ['G', 'D', 'A'],
+      '1-3-flats': ['F', 'Bb', 'Eb'],
+      '4-6-sharps': ['E', 'B', 'F#'],
+      '4-6-flats': ['Ab', 'Db', 'Gb'],
+      'random_all': ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
+      'sevenths_only': ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb']
+    };
+    
+    const availableKeys = keyAvailability[currentMode] || [];
+    
+    // Update key options visibility
+    this.menuOptions.forEach(option => {
+      if (option.dataset.key) {
+        const isAvailable = availableKeys.includes(option.dataset.key);
+        option.style.display = isAvailable ? 'block' : 'none';
+        option.disabled = !isAvailable;
+      }
+    });
   }
 
   showBackNav(show) {

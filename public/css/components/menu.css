@@ -203,10 +203,25 @@
   text-align: left;
   width: 100%;
   transition: none;
+  position: relative;
 }
 
+.practice-menu-option:hover,
 .practice-menu-option:focus {
-  /* Remove background and color change */
+  font-weight: 500;
+}
+
+.practice-menu-option.current-selection {
+  font-weight: 600;
+  color: #0066cc;
+}
+
+.practice-menu-option.current-selection::before {
+  content: "✓";
+  position: absolute;
+  left: -1.5rem;
+  color: #0066cc;
+  font-weight: bold;
 }
 
 /* Back nav text for nested mobile menus */
