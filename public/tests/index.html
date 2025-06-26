@@ -158,7 +158,7 @@
                     test: () => {
                         const question = window.generateQuestion();
                         return {
-                            passed: question && question.questionText && question.expectedAnswer,
+                            passed: !!(question && question.questionText && question.expectedAnswer),
                             details: `Generated question: ${question?.questionText || 'null'}`
                         };
                     }
@@ -798,10 +798,19 @@
             ];
             
             let passed = 0;
-            testCases.forEach(({ input, expected, shouldPass }) => {
+            let failedCases = [];
+            testCases.forEach(({ input, expected, shouldPass }, index) => {
                 const result = validateNumericInput(input, expected);
-                if (result === shouldPass) passed++;
+                if (result === shouldPass) {
+                    passed++;
+                } else {
+                    failedCases.push(`Case ${index + 1}: "${input}" expected ${expected} shouldPass=${shouldPass} but got ${result}`);
+                }
             });
+            
+            if (failedCases.length > 0) {
+                console.log('Numeric input validation failures:', failedCases);
+            }
             
             return { total: testCases.length, passed };
         }
@@ -882,7 +891,14 @@
             
             // Try parsing as word
             const wordValue = window.wordToNumber ? window.wordToNumber(normalizedInput) : null;
-            return wordValue === expected;
+            const result = wordValue === expected;
+            
+            // Debug logging for failed cases
+            if (!result && expected !== 0) {
+                console.log(`Numeric validation failed: input="${input}", normalized="${normalizedInput}", expected=${expected}, numValue=${numValue}, wordValue=${wordValue}`);
+            }
+            
+            return result;
         }
 
         function validateEdgeCase(input, expected) {
