@@ -491,16 +491,28 @@ function initializeApp() {
 window.askQuestion = askQuestion;
 window.startAdvancedPractice = startAdvancedPractice;
 window.resetQuiz = function() {
+    console.log('resetQuiz called');
+    
     if (window.resetLearningState) {
+        console.log('Calling resetLearningState');
         window.resetLearningState();
+        console.log('resetLearningState completed');
+    } else {
+        console.error('resetLearningState not available');
     }
+    
     if (window.saveLearningState) {
+        console.log('Calling saveLearningState');
         window.saveLearningState();
+        console.log('saveLearningState completed');
+    } else {
+        console.error('saveLearningState not available');
     }
     
     // Clear any feedback messages
     const feedback = document.getElementById('feedback');
     if (feedback) {
+        console.log('Clearing feedback');
         feedback.textContent = '';
         feedback.className = 'feedback';
     }
@@ -508,11 +520,14 @@ window.resetQuiz = function() {
     // Clear the answer input
     const answerInput = document.getElementById('answer-input');
     if (answerInput) {
+        console.log('Clearing answer input');
         answerInput.value = '';
     }
     
     // Ask a fresh question
+    console.log('Calling askQuestion');
     askQuestion();
+    console.log('resetQuiz completed');
 };
 
 // Kick off the app

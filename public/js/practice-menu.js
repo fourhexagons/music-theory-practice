@@ -101,9 +101,17 @@ class PracticeMenu {
   }
 
   handleStartOver() {
+    console.log('handleStartOver called');
+    console.log('window.resetQuiz exists:', !!window.resetQuiz);
+    
     if (window.resetQuiz) {
+      console.log('Calling window.resetQuiz()');
       window.resetQuiz();
+      console.log('window.resetQuiz() completed');
+    } else {
+      console.error('window.resetQuiz is not available');
     }
+    
     this.closeMenu();
   }
 
