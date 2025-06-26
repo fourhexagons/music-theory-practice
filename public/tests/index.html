@@ -158,7 +158,7 @@
                     test: () => {
                         const question = window.generateQuestion();
                         return {
-                            passed: !!(question && question.questionText && question.expectedAnswer),
+                            passed: !!(question && question.questionText && question.expectedAnswer !== null && question.expectedAnswer !== undefined),
                             details: `Generated question: ${question?.questionText || 'null'}`
                         };
                     }
@@ -883,10 +883,14 @@
                 return true;
             }
             
-            // Try parsing as number
+            // Try parsing as number - but reject decimals
             const numValue = parseInt(normalizedInput, 10);
             if (!isNaN(numValue) && numValue === expected) {
-                return true;
+                // Additional check: make sure it's not a decimal
+                const floatValue = parseFloat(normalizedInput);
+                if (floatValue === numValue) { // Only true if no decimal part
+                    return true;
+                }
             }
             
             // Try parsing as word
