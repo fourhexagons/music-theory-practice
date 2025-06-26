@@ -36,6 +36,7 @@ class PracticeMenu {
     // Wait a bit for the app to fully load
     setTimeout(() => {
       this.updateCurrentSelections();
+      this.updateProgressDisplay();
     }, 100);
   }
 
@@ -131,6 +132,11 @@ class PracticeMenu {
     this.overlay.classList.add('open');
     this.saveMenuState();
     this.updateMenuDisplay();
+    
+    // Update progress display when menu opens
+    setTimeout(() => {
+      this.updateProgressDisplay();
+    }, 50);
   }
 
   closeMenu() {
@@ -407,6 +413,39 @@ class PracticeMenu {
       this.optionsArea.classList.remove('show-back-nav');
       backNav.style.display = 'none';
     }
+  }
+
+  updateProgressDisplay() {
+    if (!window.getLearningState || !window.getCurrentGroup) return;
+    
+    const state = window.getLearningState();
+    const currentGroup = window.getCurrentGroup();
+    
+    if (!currentGroup) return;
+    
+    // Create or update progress display
+    let progressDisplay = document.getElementById('menu-progress-display');
+    if (!progressDisplay) {
+      progressDisplay = document.createElement('div');
+      progressDisplay.id = 'menu-progress-display';
+      progressDisplay.className = 'menu-progress-display';
+      this.overlay.querySelector('.practice-menu-overlay-inner').appendChild(progressDisplay);
+    }
+    
+    const currentKey = currentGroup.keys[state.currentKeyIndex];
+    const currentChapter = currentGroup.chapters[state.currentChapterIndex];
+    
+    let progressHTML = `
+      <div class="progress-info">
+        <h3>Current Progress</h3>
+        <p><strong>Key:</strong> ${currentKey}</p>
+        <p><strong>Chapter:</strong> ${currentChapter ? currentChapter.name : 'Unknown'}</p>
+        <p><strong>Correct Answers:</strong> ${state.correctAnswersInChapter}</p>
+        <p><strong>Streak:</strong> ${state.correctAnswerStreak}</p>
+      </div>
+    `;
+    
+    progressDisplay.innerHTML = progressHTML;
   }
 }
 
