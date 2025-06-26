@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Consolidated Test Suite</title>
+    <link rel="stylesheet" href="css/test-suite.css">
+    <style>
+        .test-result {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        
+        .test-result.pass {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .test-result.fail {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .test-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .status {
+            font-weight: bold;
+        }
+        
+        .test-details {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+        
+        .category-header {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin: 20px 0 10px 0;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .test-summary {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        
+        .chord-test {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+        }
+        
+        .chord-input {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .chord-output {
+            font-family: monospace;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Test Suite</a>
+        <div class="header">
+            <h1>🧪 Consolidated Test Suite</h1>
+            <p>Complete test coverage with all unique functionality from existing test files - no redundancy</p>
+        </div>
+        
+        <div class="content-box">
+            <div id="summary" class="summary" style="display:none;">
+                <div id="summary-content"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="runAllTests()">Run All Tests</button>
+                <button class="btn" onclick="runCategoryTests('core')">Core Logic Only</button>
+                <button class="btn" onclick="runCategoryTests('validation')">Validation Only</button>
+                <button class="btn" onclick="runCategoryTests('ui')">UI/UX Only</button>
+                <button class="btn" onclick="runCategoryTests('integration')">Integration Only</button>
+                <button class="btn" onclick="runCategoryTests('data')">Data Integrity Only</button>
+                <button class="btn" onclick="runCategoryTests('error')">Error Handling Only</button>
+                <button class="btn" onclick="runCategoryTests('sevenths')">Seventh Chords Only</button>
+                <button class="btn" onclick="runCategoryTests('learning')">Learning Path Only</button>
+                <button class="btn" onclick="copyResults()">Copy Results (JSON)</button>
+            </div>
+            
+            <div id="copy-status" class="status-area"></div>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="../js/data/quizData.js"></script>
+    <script src="../js/utils/normalization.js"></script>
+    <script src="../js/utils/helpers.js"></script>
+    <script src="../js/utils/validation.js"></script>
+    <script src="../js/utils/errorHandler.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/practice-menu.js"></script>
+    <script src="js/test-dashboard.js"></script>
+    
+    <script>
+        let testResults = [];
+        let currentCategory = null;
+        
+        function addResult(name, passed, expected, actual, category, details = '') {
+            const result = {
+                name,
+                passed,
+                expected,
+                actual,
+                category,
+                details,
+                timestamp: new Date().toISOString()
+            };
+            testResults.push(result);
+        }
+        
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            const failed = testResults.filter(r => !r.passed);
+            const passed = testResults.filter(r => r.passed);
+            
+            // Group by category
+            const categories = [...new Set(testResults.map(r => r.category))];
+            
+            if (failed.length > 0) {
+                const failHeader = document.createElement('h2');
+                failHeader.textContent = '❌ Failing Tests';
+                failHeader.style.color = '#dc3545';
+                resultsDiv.appendChild(failHeader);
+                
+                categories.forEach(category => {
+                    const categoryFailed = failed.filter(r => r.category === category);
+                    if (categoryFailed.length > 0) {
+                        const categoryHeader = document.createElement('div');
+                        categoryHeader.className = 'category-header';
+                        categoryHeader.textContent = `${category.toUpperCase()} - FAILING`;
+                        resultsDiv.appendChild(categoryHeader);
+                        
+                        const failContainer = document.createElement('div');
+                        failContainer.className = 'test-columns';
+                        categoryFailed.forEach(result => {
+                            const resultDiv = document.createElement('div');
+                            resultDiv.className = 'test-result fail';
+                            resultDiv.innerHTML = `
+                                <strong>${result.name}</strong> <span class="status">❌ FAIL</span><br>
+                                <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                                <em>Category:</em> ${result.category}
+                                ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                            `;
+                            failContainer.appendChild(resultDiv);
+                        });
+                        resultsDiv.appendChild(failContainer);
+                    }
+                });
+            }
+            
+            if (passed.length > 0) {
+                const passHeader = document.createElement('h2');
+                passHeader.textContent = '✅ Passing Tests';
+                passHeader.style.color = '#28a745';
+                passHeader.style.marginTop = '2rem';
+                resultsDiv.appendChild(passHeader);
+                
+                categories.forEach(category => {
+                    const categoryPassed = passed.filter(r => r.category === category);
+                    if (categoryPassed.length > 0) {
+                        const categoryHeader = document.createElement('div');
+                        categoryHeader.className = 'category-header';
+                        categoryHeader.textContent = `${category.toUpperCase()} - PASSING`;
+                        resultsDiv.appendChild(categoryHeader);
+                        
+                        const passContainer = document.createElement('div');
+                        passContainer.className = 'test-columns';
+                        categoryPassed.forEach(result => {
+                            const resultDiv = document.createElement('div');
+                            resultDiv.className = 'test-result pass';
+                            resultDiv.innerHTML = `
+                                <strong>${result.name}</strong> <span class="status">✅ PASS</span><br>
+                                <em>Expected:</em> ${result.expected}, <em>Actual:</em> ${result.actual}<br>
+                                <em>Category:</em> ${result.category}
+                                ${result.details ? `<div class="test-details">${result.details}</div>` : ''}
+                            `;
+                            passContainer.appendChild(resultDiv);
+                        });
+                        resultsDiv.appendChild(passContainer);
+                    }
+                });
+            }
+
+            const passCount = testResults.filter(r => r.passed).length;
+            const failCount = testResults.length - passCount;
+            const successRate = testResults.length > 0 ? Math.round((passCount / testResults.length) * 100) : 0;
+            
+            const summaryContent = document.getElementById('summary-content');
+            summaryContent.innerHTML = `
+                <div class="test-summary">
+                    <h3>Test Summary</h3>
+                    <p><strong>Total Tests:</strong> ${testResults.length}</p>
+                    <p><strong>Passed:</strong> ${passCount} ✅</p>
+                    <p><strong>Failed:</strong> ${failCount} ❌</p>
+                    <p><strong>Success Rate:</strong> ${successRate}%</p>
+                    <p><strong>Categories Tested:</strong> ${categories.join(', ')}</p>
+                </div>
+            `;
+            document.getElementById('summary').style.display = 'block';
+
+            // Save results to dashboard
+            if (window.TestDashboard) {
+                window.TestDashboard.saveTestResult('test_consolidated_suite.html', {
+                    total: testResults.length,
+                    passed: passCount,
+                    failed: failCount,
+                    successRate: successRate
+                });
+            }
+        }
+        
+        function runAllTests() {
+            testResults = [];
+            testCoreLogic();
+            testValidationAndNormalization();
+            testUIAndUX();
+            testIntegration();
+            testDataIntegrity();
+            testErrorHandling();
+            testSeventhChords();
+            testLearningPath();
+            displayResults();
+        }
+        
+        function runCategoryTests(category) {
+            testResults = [];
+            switch(category) {
+                case 'core':
+                    testCoreLogic();
+                    break;
+                case 'validation':
+                    testValidationAndNormalization();
+                    break;
+                case 'ui':
+                    testUIAndUX();
+                    break;
+                case 'integration':
+                    testIntegration();
+                    break;
+                case 'data':
+                    testDataIntegrity();
+                    break;
+                case 'error':
+                    testErrorHandling();
+                    break;
+                case 'sevenths':
+                    testSeventhChords();
+                    break;
+                case 'learning':
+                    testLearningPath();
+                    break;
+            }
+            displayResults();
+        }
+        
+        // ===== CORE LOGIC TESTS (from comprehensive suite) =====
+        function testCoreLogic() {
+            currentCategory = 'core';
+            
+            testLearningStateInitialization();
+            testQuestionGeneration();
+            testLearningProgression();
+            testAdvancedPracticeModes();
+            testStateManagement();
+        }
+        
+        function testLearningStateInitialization() {
+            const requiredProps = [
+                'currentLevelIndex', 'currentChapterIndex', 'currentKeyIndex',
+                'correctAnswerStreak', 'currentQuestion', 'lastAnswerIncorrect',
+                'usedDegrees', 'isAdvancedMode', 'advancedModeType',
+                'correctChordAnswersForCurrentKey', 'waitingForAccidentalsNaming', 'lastAccidentalsKey'
+            ];
+            
+            let initPass = true;
+            for (const prop of requiredProps) {
+                if (!(prop in window.learningState)) {
+                    initPass = false;
+                    break;
+                }
+            }
+            
+            addResult(
+                'Learning State Initialization',
+                initPass,
+                'State has all required properties',
+                initPass ? 'All properties present' : 'Missing required properties',
+                currentCategory,
+                `Required properties: ${requiredProps.join(', ')}`
+            );
+            
+            const initialValuesPass = window.learningState.currentLevelIndex === 0 &&
+                                    window.learningState.currentChapterIndex === 0 &&
+                                    window.learningState.currentKeyIndex === 0;
+            
+            addResult(
+                'Learning State Initial Values',
+                initialValuesPass,
+                'Initial indices are 0',
+                `Level: ${window.learningState.currentLevelIndex}, Chapter: ${window.learningState.currentChapterIndex}, Key: ${window.learningState.currentKeyIndex}`,
+                currentCategory
+            );
+        }
+        
+        function testQuestionGeneration() {
+            const question = window.generateQuestion();
+            const questionGenerated = question !== null && typeof question === 'object';
+            
+            addResult(
+                'Question Generation - Basic',
+                questionGenerated,
+                'Question object generated',
+                questionGenerated ? 'Question generated successfully' : 'Question generation failed',
+                currentCategory,
+                question ? `Question: ${JSON.stringify(question)}` : 'No question generated'
+            );
+            
+            if (question && question.key === 'C') {
+                const skipLogicPass = question.chapterId !== 'accNotes';
+                addResult(
+                    'C Major Skip Logic',
+                    skipLogicPass,
+                    'accNotes chapter skipped for C major',
+                    `Chapter ID: ${question.chapterId}`,
+                    currentCategory
+                );
+            }
+            
+            if (question) {
+                const requiredQuestionProps = ['chapterId', 'key', 'questionText', 'expectedAnswer'];
+                const structurePass = requiredQuestionProps.every(prop => prop in question);
+                
+                addResult(
+                    'Question Structure',
+                    structurePass,
+                    'Question has required properties',
+                    structurePass ? 'All properties present' : 'Missing properties',
+                    currentCategory,
+                    `Required: ${requiredQuestionProps.join(', ')}`
+                );
+            }
+        }
+        
+        function testLearningProgression() {
+            const initialLevel = window.getCurrentLevel();
+            const levelRetrieved = initialLevel !== null && typeof initialLevel === 'object';
+            
+            addResult(
+                'Level Retrieval',
+                levelRetrieved,
+                'Current level retrieved successfully',
+                levelRetrieved ? 'Level retrieved' : 'Level retrieval failed',
+                currentCategory,
+                initialLevel ? `Level: ${initialLevel.name}` : 'No level'
+            );
+            
+            const initialChapterIndex = window.learningState.currentChapterIndex;
+            window.advanceQuestionPointer();
+            const chapterAdvanced = window.learningState.currentChapterIndex !== initialChapterIndex;
+            
+            addResult(
+                'Question Pointer Advancement',
+                chapterAdvanced,
+                'Chapter index advanced',
+                `Before: ${initialChapterIndex}, After: ${window.learningState.currentChapterIndex}`,
+                currentCategory
+            );
+            
+            window.learningState.currentChapterIndex = initialChapterIndex;
+        }
+        
+        function testAdvancedPracticeModes() {
+            const testMode = 'random_all';
+            window.startAdvancedPractice(testMode);
+            
+            const modeSet = window.learningState.isAdvancedMode === true &&
+                           window.learningState.advancedModeType === testMode;
+            
+            addResult(
+                'Advanced Practice Mode Setting',
+                modeSet,
+                'Advanced practice mode set correctly',
+                `isAdvancedMode: ${window.learningState.isAdvancedMode}, type: ${window.learningState.advancedModeType}`,
+                currentCategory
+            );
+            
+            window.learningState.isAdvancedMode = false;
+            window.learningState.advancedModeType = null;
+        }
+        
+        function testStateManagement() {
+            const testState = {
+                currentLevelIndex: 2,
+                currentChapterIndex: 1,
+                currentKeyIndex: 3
+            };
+            
+            Object.assign(window.learningState, testState);
+            
+            const stateSet = window.learningState.currentLevelIndex === testState.currentLevelIndex &&
+                           window.learningState.currentChapterIndex === testState.currentChapterIndex &&
+                           window.learningState.currentKeyIndex === testState.currentKeyIndex;
+            
+            addResult(
+                'State Management - Set',
+                stateSet,
+                'State values set correctly',
+                `Level: ${window.learningState.currentLevelIndex}, Chapter: ${window.learningState.currentChapterIndex}, Key: ${window.learningState.currentKeyIndex}`,
+                currentCategory
+            );
+            
+            window.learningState.currentLevelIndex = 0;
+            window.learningState.currentChapterIndex = 0;
+            window.learningState.currentKeyIndex = 0;
+        }
+        
+        // ===== VALIDATION AND NORMALIZATION TESTS (from comprehensive suite) =====
+        function testValidationAndNormalization() {
+            currentCategory = 'validation';
+            
+            testChordNormalization();
+            testAnswerValidation();
+            testInputValidation();
+            testEdgeCases();
+        }
+        
+        function testChordNormalization() {
+            const testCases = [
+                { input: 'C#m7', expected: 'C♯m7' },
+                { input: 'Dbm7', expected: 'D♭m7' },
+                { input: 'F##m7', expected: 'F𝄪m7' },
+                { input: 'Bbbm7', expected: 'B𝄫m7' },
+                { input: 'Cm7', expected: 'Cm7' },
+                { input: null, expected: '' },
+                { input: undefined, expected: '' },
+                { input: '', expected: '' }
+            ];
+            
+            testCases.forEach(tc => {
+                const actual = window.normalizeChord ? window.normalizeChord(tc.input) : 'function not available';
+                const passed = actual === tc.expected;
+                
+                addResult(
+                    `Chord Normalization - ${tc.input}`,
+                    passed,
+                    tc.expected,
+                    actual,
+                    currentCategory,
+                    `Input: ${tc.input}, Type: ${typeof tc.input}`
+                );
+            });
+        }
+        
+        function testAnswerValidation() {
+            const triadTests = [
+                { answer: 'Cm', key: 'C', degree: 1, expected: true },
+                { answer: 'Dm', key: 'C', degree: 2, expected: true },
+                { answer: 'Em', key: 'C', degree: 3, expected: true },
+                { answer: 'F', key: 'C', degree: 4, expected: true },
+                { answer: 'G', key: 'C', degree: 5, expected: true },
+                { answer: 'Am', key: 'C', degree: 6, expected: true },
+                { answer: 'Bdim', key: 'C', degree: 7, expected: true },
+                { answer: 'Wrong', key: 'C', degree: 1, expected: false }
+            ];
+            
+            triadTests.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'triads', tc.key, tc.degree, window.quizData) : 'function not available';
+                const passed = actual === tc.expected;
+                
+                addResult(
+                    `Triad Validation - ${tc.answer} (${tc.key} ${tc.degree})`,
+                    passed,
+                    tc.expected,
+                    actual,
+                    currentCategory
+                );
+            });
+            
+            const scaleTests = [
+                { answer: 'C D E F G A B', key: 'C', expected: true },
+                { answer: 'G A B C D E F#', key: 'G', expected: true },
+                { answer: 'C D E F G A Bb', key: 'C', expected: false },
+                { answer: 'C D E F G A', key: 'C', expected: false }
+            ];
+            
+            scaleTests.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, 'scale', tc.key, null, window.quizData) : 'function not available';
+                const passed = actual === tc.expected;
+                
+                addResult(
+                    `Scale Validation - ${tc.answer} (${tc.key})`,
+                    passed,
+                    tc.expected,
+                    actual,
+                    currentCategory
+                );
+            });
+        }
+        
+        function testInputValidation() {
+            const invalidInputs = [
+                { answer: null, type: 'triads', key: 'C', degree: 1 },
+                { answer: undefined, type: 'triads', key: 'C', degree: 1 },
+                { answer: '', type: 'triads', key: 'C', degree: 1 },
+                { answer: 'Cm', type: 'invalid', key: 'C', degree: 1 },
+                { answer: 'Cm', type: 'triads', key: 'invalid', degree: 1 },
+                { answer: 'Cm', type: 'triads', key: 'C', degree: 99 }
+            ];
+            
+            invalidInputs.forEach(tc => {
+                const actual = window.checkAnswer ? window.checkAnswer(tc.answer, tc.type, tc.key, tc.degree, window.quizData) : 'function not available';
+                const passed = actual === false;
+                
+                addResult(
+                    `Invalid Input Validation - ${tc.answer}, ${tc.type}, ${tc.key}, ${tc.degree}`,
+                    passed,
+                    false,
+                    actual,
+                    currentCategory
+                );
+            });
+        }
+        
+        function testEdgeCases() {
+            const edgeCases = [
+                { input: '   C#m7   ', expected: 'C♯m7' },
+                { input: 'c#m7', expected: 'C♯m7' },
+                { input: 'C##m7', expected: 'C𝄪m7' },
+                { input: 'Bbbm7', expected: 'B𝄫m7' },
+                { input: 'C@m7', expected: 'C@m7' },
+                { input: 'C#m7#', expected: 'C♯m7#' }
+            ];
+            
+            edgeCases.forEach(tc => {
+                const actual = window.normalizeChord ? window.normalizeChord(tc.input) : 'function not available';
+                const passed = actual === tc.expected;
+                
+                addResult(
+                    `Edge Case Normalization - ${tc.input}`,
+                    passed,
+                    tc.expected,
+                    actual,
+                    currentCategory
+                );
+            });
+        }
+        
+        // ===== UI/UX TESTS (from comprehensive suite) =====
+        function testUIAndUX() {
+            currentCategory = 'ui';
+            
+            testPracticeMenu();
+            testUIElements();
+            testUserInteractions();
+        }
+        
+        function testPracticeMenu() {
+            const menuInitialized = typeof window.PracticeMenu === 'function' || 
+                                  (window.practiceMenu && typeof window.practiceMenu === 'object');
+            
+            addResult(
+                'Practice Menu Initialization',
+                menuInitialized,
+                'Practice menu initialized',
+                menuInitialized ? 'Menu available' : 'Menu not available',
+                currentCategory
+            );
+            
+            if (window.practiceMenu) {
+                const initialState = window.practiceMenu.isOpen;
+                window.practiceMenu.openMenu();
+                const opened = window.practiceMenu.isOpen === true;
+                
+                addResult(
+                    'Practice Menu Open',
+                    opened,
+                    true,
+                    window.practiceMenu.isOpen,
+                    currentCategory
+                );
+                
+                window.practiceMenu.closeMenu();
+                const closed = window.practiceMenu.isOpen === false;
+                
+                addResult(
+                    'Practice Menu Close',
+                    closed,
+                    false,
+                    window.practiceMenu.isOpen,
+                    currentCategory
+                );
+            }
+        }
+        
+        function testUIElements() {
+            const requiredElements = [
+                'question-display',
+                'answer-input',
+                'submit-btn',
+                'feedback'
+            ];
+            
+            const elementsExist = requiredElements.every(id => document.getElementById(id) !== null);
+            
+            addResult(
+                'Required UI Elements',
+                elementsExist,
+                'All required UI elements present',
+                elementsExist ? 'All elements found' : 'Missing elements',
+                currentCategory,
+                `Required: ${requiredElements.join(', ')}`
+            );
+        }
+        
+        function testUserInteractions() {
+            const form = document.getElementById('answer-form');
+            const formExists = form !== null;
+            
+            addResult(
+                'Answer Form Exists',
+                formExists,
+                'Answer form present',
+                formExists ? 'Form found' : 'Form not found',
+                currentCategory
+            );
+            
+            const input = document.getElementById('answer-input');
+            const inputExists = input !== null;
+            
+            addResult(
+                'Answer Input Exists',
+                inputExists,
+                'Answer input present',
+                inputExists ? 'Input found' : 'Input not found',
+                currentCategory
+            );
+            
+            if (inputExists) {
+                input.value = 'test';
+                const valueSet = input.value === 'test';
+                
+                addResult(
+                    'Answer Input Functionality',
+                    valueSet,
+                    'Input value can be set',
+                    `Value: ${input.value}`,
+                    currentCategory
+                );
+            }
+        }
+        
+        // ===== INTEGRATION TESTS (from comprehensive suite) =====
+        function testIntegration() {
+            currentCategory = 'integration';
+            
+            testCompleteWorkflow();
+            testDataFlow();
+            testStateConsistency();
+        }
+        
+        function testCompleteWorkflow() {
+            const initialQuestion = window.generateQuestion();
+            const questionGenerated = initialQuestion !== null;
+            
+            addResult(
+                'Complete Workflow - Question Generation',
+                questionGenerated,
+                'Question generated for workflow',
+                questionGenerated ? 'Question ready' : 'No question generated',
+                currentCategory
+            );
+            
+            if (questionGenerated) {
+                const testAnswer = 'test answer';
+                const answerProcessed = window.handleAnswerSubmit ? true : false;
+                
+                addResult(
+                    'Complete Workflow - Answer Processing',
+                    answerProcessed,
+                    'Answer processing available',
+                    answerProcessed ? 'Processing ready' : 'Processing not available',
+                    currentCategory
+                );
+            }
+        }
+        
+        function testDataFlow() {
+            const dataAvailable = window.quizData && typeof window.quizData === 'object';
+            
+            addResult(
+                'Data Flow - Quiz Data Available',
+                dataAvailable,
+                'Quiz data available for questions',
+                dataAvailable ? 'Data ready' : 'Data not available',
+                currentCategory
+            );
+            
+            if (dataAvailable) {
+                const keysAvailable = Object.keys(window.quizData).length > 0;
+                
+                addResult(
+                    'Data Flow - Keys Available',
+                    keysAvailable,
+                    'Key data available',
+                    keysAvailable ? `${Object.keys(window.quizData).length} keys available` : 'No keys available',
+                    currentCategory
+                );
+            }
+        }
+        
+        function testStateConsistency() {
+            const initialState = { ...window.learningState };
+            
+            window.generateQuestion();
+            
+            const stateChanged = JSON.stringify(initialState) !== JSON.stringify(window.learningState);
+            
+            addResult(
+                'State Consistency - Question Generation',
+                stateChanged,
+                'State changes during question generation',
+                stateChanged ? 'State updated' : 'State unchanged',
+                currentCategory
+            );
+            
+            Object.assign(window.learningState, initialState);
+        }
+        
+        // ===== DATA INTEGRITY TESTS (from comprehensive suite) =====
+        function testDataIntegrity() {
+            currentCategory = 'data';
+            
+            testQuizDataStructure();
+            testDataCompleteness();
+            testDataConsistency();
+        }
+        
+        function testQuizDataStructure() {
+            const dataExists = window.quizData && typeof window.quizData === 'object';
+            
+            addResult(
+                'Quiz Data Structure - Exists',
+                dataExists,
+                'Quiz data object exists',
+                dataExists ? 'Data object found' : 'Data object missing',
+                currentCategory
+            );
+            
+            if (dataExists) {
+                const requiredKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'F', 'Bb', 'Eb', 'Ab'];
+                const keysPresent = requiredKeys.every(key => key in window.quizData);
+                
+                addResult(
+                    'Quiz Data Structure - Required Keys',
+                    keysPresent,
+                    'All required keys present',
+                    keysPresent ? 'All keys found' : 'Missing keys',
+                    currentCategory,
+                    `Required: ${requiredKeys.join(', ')}`
+                );
+            }
+        }
+        
+        function testDataCompleteness() {
+            if (window.quizData) {
+                const requiredProps = ['scale', 'triads', 'sevenths', 'accidentals', 'notes'];
+                const keys = Object.keys(window.quizData);
+                
+                let allComplete = true;
+                let incompleteKeys = [];
+                
+                keys.forEach(key => {
+                    const hasAllProps = requiredProps.every(prop => prop in window.quizData[key]);
+                    if (!hasAllProps) {
+                        allComplete = false;
+                        incompleteKeys.push(key);
+                    }
+                });
+                
+                addResult(
+                    'Data Completeness - All Keys',
+                    allComplete,
+                    'All keys have required properties',
+                    allComplete ? 'All keys complete' : `Incomplete keys: ${incompleteKeys.join(', ')}`,
+                    currentCategory,
+                    `Required properties: ${requiredProps.join(', ')}`
+                );
+            }
+        }
+        
+        function testDataConsistency() {
+            if (window.quizData) {
+                let consistent = true;
+                let inconsistencies = [];
+                
+                Object.entries(window.quizData).forEach(([key, data]) => {
+                    if (data.accidentals !== data.notes.length) {
+                        consistent = false;
+                        inconsistencies.push(`${key}: accidentals=${data.accidentals}, notes.length=${data.notes.length}`);
+                    }
+                });
+                
+                addResult(
+                    'Data Consistency - Accidentals Count',
+                    consistent,
+                    'Accidentals count matches notes array length',
+                    consistent ? 'All counts consistent' : `Inconsistencies: ${inconsistencies.join(', ')}`,
+                    currentCategory
+                );
+            }
+        }
+        
+        // ===== ERROR HANDLING TESTS (from comprehensive suite) =====
+        function testErrorHandling() {
+            currentCategory = 'error';
+            
+            testErrorHandlingFunctions();
+            testGracefulDegradation();
+        }
+        
+        function testErrorHandlingFunctions() {
+            const errorHandlerAvailable = typeof window.handleError === 'function';
+            
+            addResult(
+                'Error Handler - Available',
+                errorHandlerAvailable,
+                'Error handler function available',
+                errorHandlerAvailable ? 'Handler ready' : 'Handler not available',
+                currentCategory
+            );
+            
+            if (errorHandlerAvailable) {
+                const originalConsole = console.error;
+                let errorLogged = false;
+                console.error = () => { errorLogged = true; };
+                
+                window.handleError('Test error', { test: 'data' });
+                
+                console.error = originalConsole;
+                
+                addResult(
+                    'Error Handler - Logging',
+                    errorLogged,
+                    'Errors are logged',
+                    errorLogged ? 'Error logged' : 'Error not logged',
+                    currentCategory
+                );
+            }
+        }
+        
+        function testGracefulDegradation() {
+            const originalQuizData = window.quizData;
+            window.quizData = null;
+            
+            const question = window.generateQuestion();
+            const gracefulHandling = question === null;
+            
+            addResult(
+                'Graceful Degradation - Missing Data',
+                gracefulHandling,
+                'App handles missing data gracefully',
+                gracefulHandling ? 'Handled gracefully' : 'App crashed',
+                currentCategory
+            );
+            
+            window.quizData = originalQuizData;
+        }
+        
+        // ===== SEVENTH CHORDS TESTS (unique from test_sevenths.html) =====
+        function testSeventhChords() {
+            currentCategory = 'sevenths';
+            
+            const allKeys = Object.keys(window.quizData);
+            const degrees = [2, 3, 4, 5, 6, 7];
+            const degreeNames = ['ii', 'iii', 'IV', 'V', 'vi', 'vii°'];
+            
+            allKeys.forEach(key => {
+                const keyData = window.quizData[key];
+                
+                degrees.forEach((degree, index) => {
+                    const chordName = keyData.sevenths[degree];
+                    const spelling = keyData.seventhSpelling[degree];
+                    const expectedSpelling = spelling.join(' ');
+                    
+                    // Test spelling has exactly 4 notes
+                    const correctLength = spelling.length === 4;
+                    addResult(
+                        `Seventh Chord Length - ${key} ${degreeNames[index]} (${chordName})`,
+                        correctLength,
+                        '4 notes',
+                        `${spelling.length} notes`,
+                        currentCategory,
+                        `Spelling: ${expectedSpelling}`
+                    );
+                    
+                    // Test all notes are valid
+                    const validNotes = [
+                        'C', 'C#', 'Cb', 'Db', 'D', 'D#', 'Eb', 'E', 'E#', 'Fb', 'F', 'F#', 'Gb',
+                        'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B', 'B#',
+                        'C♭', 'D♭', 'E♭', 'F♭', 'G♭', 'A♭', 'B♭'
+                    ];
+                    
+                    let allNotesValid = true;
+                    let invalidNotes = [];
+                    
+                    spelling.forEach(note => {
+                        const normalizedNote = note.trim();
+                        if (!validNotes.includes(normalizedNote)) {
+                            allNotesValid = false;
+                            invalidNotes.push(note);
+                        }
+                    });
+                    
+                    addResult(
+                        `Seventh Chord Notes - ${key} ${degreeNames[index]} (${chordName})`,
+                        allNotesValid,
+                        'All notes valid',
+                        allNotesValid ? 'All notes valid' : `Invalid notes: ${invalidNotes.join(', ')}`,
+                        currentCategory,
+                        `Spelling: ${expectedSpelling}`
+                    );
+                    
+                    // Test chord name format
+                    const validChordTypes = ['m7', 'maj7', '7', 'm7♭5'];
+                    const chordType = chordName.replace(/^[A-G][#♯b♭]?/, '');
+                    const validChordType = validChordTypes.includes(chordType);
+                    
+                    addResult(
+                        `Seventh Chord Type - ${key} ${degreeNames[index]} (${chordName})`,
+                        validChordType,
+                        'Valid chord type',
+                        validChordType ? chordType : `Invalid type: ${chordType}`,
+                        currentCategory,
+                        `Chord: ${chordName}`
+                    );
+                });
+            });
+        }
+        
+        // ===== LEARNING PATH TESTS (unique from test_learning_path.html) =====
+        function testLearningPath() {
+            currentCategory = 'learning';
+            
+            // Test learning path structure
+            const pathExists = window.learningPath && Array.isArray(window.learningPath);
+            addResult(
+                'Learning Path Structure',
+                pathExists,
+                'Learning path array exists',
+                pathExists ? 'Path found' : 'Path not found',
+                currentCategory
+            );
+            
+            if (pathExists) {
+                const pathLength = window.learningPath.length;
+                addResult(
+                    'Learning Path Length',
+                    pathLength > 0,
+                    'Path has levels',
+                    `${pathLength} levels`,
+                    currentCategory
+                );
+                
+                // Test each level has required properties
+                let validLevels = 0;
+                window.learningPath.forEach((level, index) => {
+                    const hasRequiredProps = level.name && level.keys && level.mode && level.chapters;
+                    if (hasRequiredProps) validLevels++;
+                });
+                
+                addResult(
+                    'Learning Path Level Structure',
+                    validLevels === window.learningPath.length,
+                    'All levels have required properties',
+                    `${validLevels}/${window.learningPath.length} valid levels`,
+                    currentCategory
+                );
+                
+                // Test first level is accessible
+                const firstLevel = window.learningPath[0];
+                const firstLevelAccessible = firstLevel && typeof firstLevel === 'object';
+                
+                addResult(
+                    'Learning Path First Level',
+                    firstLevelAccessible,
+                    'First level accessible',
+                    firstLevelAccessible ? `Level: ${firstLevel.name}` : 'No first level',
+                    currentCategory
+                );
+            }
+            
+            // Test learning path progression simulation
+            const initialState = { ...window.learningState };
+            
+            // Simulate a few questions
+            let questionsGenerated = 0;
+            const maxQuestions = 10;
+            
+            for (let i = 0; i < maxQuestions; i++) {
+                const question = window.generateQuestion();
+                if (question) {
+                    questionsGenerated++;
+                } else {
+                    break;
+                }
+            }
+            
+            addResult(
+                'Learning Path Question Generation',
+                questionsGenerated > 0,
+                'Questions can be generated from path',
+                `${questionsGenerated} questions generated`,
+                currentCategory
+            );
+            
+            // Reset state
+            Object.assign(window.learningState, initialState);
+        }
+        
+        function copyResults() {
+            const results = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    total: testResults.length,
+                    passed: testResults.filter(r => r.passed).length,
+                    failed: testResults.filter(r => !r.passed).length,
+                    successRate: testResults.length > 0 ? Math.round((testResults.filter(r => r.passed).length / testResults.length) * 100) : 0
+                },
+                results: testResults
+            };
+            
+            const jsonString = JSON.stringify(results, null, 2);
+            navigator.clipboard.writeText(jsonString).then(() => {
+                const status = document.getElementById('copy-status');
+                status.textContent = 'Results copied to clipboard!';
+                status.style.display = 'block';
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy results:', err);
+                const status = document.getElementById('copy-status');
+                status.textContent = 'Failed to copy results';
+                status.style.display = 'block';
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            });
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Consolidated test suite loaded');
+        });
+    </script>
+</body>
+</html> 
