@@ -43,7 +43,7 @@ function accidentalToUnicode(s) {
   if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
   if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
   if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
-  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '#';
+  if (/^([A-Ga-g])#$/.test(s)) return s[0].toUpperCase() + '♯';
   return s.toUpperCase().normalize('NFC');
 }
 

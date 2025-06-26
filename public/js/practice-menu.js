@@ -322,6 +322,8 @@ class PracticeMenu {
   }
 
   updateMenuDisplay() {
+    // Always update key display to Unicode
+    this.updateAvailableKeys();
     // Highlight active section link and apply underline
     this.menuLinks.forEach(link => {
       const isActive = link.dataset.section === this.currentSection;
@@ -409,15 +411,38 @@ class PracticeMenu {
   updateAvailableKeys() {
     // Always show all keys in the keys menu, regardless of current group or difficulty
     const allKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
+    
+    // Test the function directly
+    console.log('Direct test of accidentalToUnicode:');
+    console.log('  F# →', window.accidentalToUnicode('F#'));
+    console.log('  Bb →', window.accidentalToUnicode('Bb'));
+    console.log('  Function exists:', typeof window.accidentalToUnicode);
+    
     this.menuOptions.forEach(option => {
       if (option.dataset.key) {
         option.style.display = 'block';
         option.disabled = false;
-        // Display keys with proper Unicode symbols
-        let displayKey = option.dataset.key
-          .replace('b', '♭')
-          .replace('#', '♯');
-        option.textContent = displayKey;
+        // Display keys with proper Unicode symbols and wrap accidentals in a span
+        let displayKey = window.accidentalToUnicode(option.dataset.key);
+        console.log('Key:', option.dataset.key, '→', displayKey);
+        
+        // Debug the function step by step
+        if (option.dataset.key === 'F#') {
+          console.log('Debug F#:');
+          console.log('  Original:', option.dataset.key);
+          console.log('  Regex match:', option.dataset.key.match(/^([a-g])(.*)/i));
+          console.log('  Result:', displayKey);
+          console.log('  Result char codes:', Array.from(displayKey).map(c => c.charCodeAt(0)));
+        }
+        
+        // Wrap accidentals in a span for styling
+        displayKey = displayKey.replace(/([♯♭𝄫𝄪]+)/g, '<span class="accidental">$1</span>');
+        
+        // Add specific classes for sharp and flat symbols
+        displayKey = displayKey.replace(/<span class="accidental">♯<\/span>/g, '<span class="accidental sharp">♯</span>');
+        displayKey = displayKey.replace(/<span class="accidental">♭<\/span>/g, '<span class="accidental flat">♭</span>');
+        
+        option.innerHTML = displayKey;
       }
     });
   }

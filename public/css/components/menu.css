@@ -295,4 +295,21 @@ a.practice-menu-option:active {
   border: none;
   text-decoration: none;
 }
+
+.accidental {
+  font-size: 0.8em;
+  vertical-align: super;
+  position: relative;
+  font-family: Arial, 'Jost', sans-serif;
+}
+
+/* Sharp symbol needs different positioning than flat */
+.accidental.sharp {
+  left: 0.1em;
+}
+
+/* Flat symbol positioning */
+.accidental.flat {
+  left: -0.2em;
+}
 /* --- End Practice Menu Overlay and Bar Refactor --- */ 

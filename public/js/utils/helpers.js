@@ -35,12 +35,21 @@ window.MusicTheoryHelpers = {
    * @returns {string} - The note with Unicode accidentals
    */
   accidentalToUnicode(note) {
+    console.log('accidentalToUnicode called with:', note, 'type:', typeof note);
     if (!note) return '';
     // Use regex to capture the note and the accidentals separately
     const rootMatch = note.match(/^([a-g])(.*)/i);
     if (!rootMatch) return note; // Return original if it doesn't match expected pattern
 
     const [, root, accidentals] = rootMatch;
+    
+    // Debug logging
+    if (note === 'F#') {
+      console.log('accidentalToUnicode debug for F#:');
+      console.log('  root:', root);
+      console.log('  accidentals:', accidentals);
+      console.log('  accidentals char codes:', Array.from(accidentals).map(c => c.charCodeAt(0)));
+    }
 
     // Process replacements on the accidentals part only. Order is critical.
     const normalizedAccidentals = accidentals
@@ -49,6 +58,12 @@ window.MusicTheoryHelpers = {
         .replace(/##|x/ig, '𝄪')
         .replace(/b/ig, '♭')
         .replace(/#/g, '♯');
+    
+    // Debug logging
+    if (note === 'F#') {
+      console.log('  normalizedAccidentals:', normalizedAccidentals);
+      console.log('  normalizedAccidentals char codes:', Array.from(normalizedAccidentals).map(c => c.charCodeAt(0)));
+    }
 
     return root.toUpperCase() + normalizedAccidentals;
   },
