@@ -27,7 +27,10 @@ const learningState = {
     inProgress: false,
     currentKey: null,
     countAnswered: false
-  }
+  },
+  // Reset advanced mode flags
+  isAdvancedMode: false,
+  advancedModeType: null
 };
 window.learningState = learningState;
 
@@ -119,6 +122,10 @@ function resetLearningState() {
     currentLevelIndex: 0,
     correctAnswerStreak: 0,
     correctChordAnswersForCurrentKey: 0,
+    // Reset advanced mode flags
+    isAdvancedMode: false,
+    advancedModeType: null,
+    currentQuestion: null,
     accidentalsPairState: {
       inProgress: false,
       currentKey: null,

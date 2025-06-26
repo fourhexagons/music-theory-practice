@@ -497,6 +497,21 @@ window.resetQuiz = function() {
     if (window.saveLearningState) {
         window.saveLearningState();
     }
+    
+    // Clear any feedback messages
+    const feedback = document.getElementById('feedback');
+    if (feedback) {
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+    }
+    
+    // Clear the answer input
+    const answerInput = document.getElementById('answer-input');
+    if (answerInput) {
+        answerInput.value = '';
+    }
+    
+    // Ask a fresh question
     askQuestion();
 };
 
