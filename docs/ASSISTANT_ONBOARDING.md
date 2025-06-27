@@ -151,6 +151,68 @@ If you encounter something not covered in the documentation:
 3. **Follow the testing checklist** to isolate issues
 4. **Ask for clarification** on specific patterns or decisions
 
+## 📝 Documentation Maintenance
+
+### Keeping This Guide Current
+
+**After making ANY significant changes, update these files:**
+
+1. **DEVELOPMENT_STATUS.md** - Update:
+   - Current version number
+   - Recent fixes section
+   - Architecture changes
+   - Next steps
+
+2. **docs/DEBUGGING_GUIDE.md** - Update:
+   - New common issues discovered
+   - Additional debugging commands
+   - Updated testing checklist
+
+3. **Code Headers** - Update:
+   - `public/js/main.js` header comments
+   - `public/js/state/learningState.js` header comments
+   - Version numbers in comments
+
+4. **This File (ASSISTANT_ONBOARDING.md)** - Update:
+   - Current version and status
+   - New common issues
+   - Updated architecture overview
+   - New debugging commands
+
+### Documentation Update Checklist
+
+When making changes, ask yourself:
+
+- [ ] Does this change affect the architecture?
+- [ ] Are there new debugging patterns to document?
+- [ ] Do we have new common issues to watch for?
+- [ ] Should version numbers be updated?
+- [ ] Are there new dependencies or file relationships?
+
+### Version Update Protocol
+
+1. **Increment version numbers** in:
+   - Script tags in `practice.html` (?v=15)
+   - Header comments in main files
+   - DEVELOPMENT_STATUS.md
+
+2. **Update commit messages** to reference documentation updates:
+   ```
+   git commit -m "Fix [issue] and update documentation
+   
+   - Fix [specific issue]
+   - Update DEVELOPMENT_STATUS.md with new version
+   - Update debugging guide with new patterns
+   - Update code headers with current status"
+   ```
+
+### Documentation Review Schedule
+
+- **After each significant fix**: Update relevant docs immediately
+- **Before starting new features**: Review and update docs if needed
+- **When encountering new issues**: Document the debugging process
+- **Before committing**: Ensure docs reflect current state
+
 ---
 
 **Remember**: The goal is to maintain the debugging efficiency and targeted fixes we've developed. Read the documentation first, then apply the systematic approach to any new issues. 

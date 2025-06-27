@@ -199,4 +199,56 @@ If you encounter:
 - **Update version numbers** when making changes to bust cache
 - **Test on hard refresh** - this catches most state issues
 - **Use the debugging commands** above to quickly diagnose problems
-- **Keep this guide updated** with new patterns you discover 
+- **Keep this guide updated** with new patterns you discover
+
+## 📝 Documentation Maintenance
+
+### When to Update This Guide
+
+**Update this debugging guide when you discover:**
+
+1. **New Common Issues** - Add to "Common Issues & Solutions" section
+2. **Better Debugging Commands** - Add to "Console Debugging Commands"
+3. **New Testing Patterns** - Update "Testing Checklist"
+4. **Improved Quick Fixes** - Update "Quick Fixes by Symptom"
+5. **New Error Messages** - Add to debugging process
+
+### Documentation Update Process
+
+1. **Document the Issue** - Write down what happened
+2. **Document the Solution** - Record how you fixed it
+3. **Update Relevant Sections** - Add to appropriate parts of this guide
+4. **Test the Documentation** - Make sure it's clear and actionable
+5. **Commit with Documentation** - Include doc updates in commit message
+
+### Example Documentation Update
+
+When you discover a new issue:
+
+```markdown
+### Issue: "Cannot read property 'chordData' of undefined"
+**Cause**: quizData not loaded or corrupted
+**Solution**: 
+- Check if window.quizData exists
+- Verify quizData.js loads before main.js
+- Update script version numbers
+```
+
+### Keeping Debugging Commands Current
+
+**Add new useful commands to the "Console Debugging Commands" section:**
+
+```javascript
+// New useful command discovered
+console.log('Chord data loaded:', !!window.quizData);
+```
+
+### Version Tracking
+
+- **Update version numbers** when making changes that affect debugging
+- **Note version in commit messages** when updating this guide
+- **Reference this guide** in other documentation updates
+
+---
+
+**Remember**: This guide is only useful if it stays current. Update it as you learn new debugging patterns! 
