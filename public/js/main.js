@@ -36,8 +36,6 @@ function wordToNumber(word) {
 
 function accidentalToUnicode(s) {
   s = s.trim();
-  if (/^bb$/i.test(s)) return 'B♭';
-    if (/^b$/i.test(s)) return 'B'; // common mistake
   if (/^([A-Ga-g])bb$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2B';
   if (/^([A-Ga-g])(##|x)$/.test(s)) return s[0].toUpperCase() + '\uD834\uDD2A';
   if (/^([A-Ga-g])b$/.test(s)) return s[0].toUpperCase() + '♭';
@@ -418,6 +416,7 @@ function checkAnswer(answer) {
       return normalizeChord(answer).toUpperCase() === normalizeChord(data.sevenths[degree]).toUpperCase();
 
     case QUESTION_TYPES.SEVENTH_SPELLING:
+      // For seventh spelling, we need to check space-separated notes, not chord symbols
       const correctSpelling = data.seventhSpelling[degree].map(n => n.toUpperCase()).join('');
       const userSpelling = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
       return userSpelling === correctSpelling;
