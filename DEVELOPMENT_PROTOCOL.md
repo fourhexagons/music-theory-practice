@@ -163,9 +163,9 @@ When debugging UI/UX or state issues, always use a systematic, broad-to-narrow a
 
 ### Current Version History
 - **v1.0.1** - Clean production version with debug output removed
-- **v1.1.0** - Feature: Hide header title on narrow viewports  
 - **v1.1.1** - Documentation: Update development protocol to use port 5002
 - **v1.1.2** - Bug fix: Correct accidentalToUnicode function for seventh chord spelling
+- **v1.1.3** - Documentation: Update semantic versioning protocol
 
 ### Versioning Rules
 1. **Always increment appropriately** based on change type
