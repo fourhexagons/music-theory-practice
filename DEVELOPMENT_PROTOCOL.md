@@ -71,11 +71,11 @@ grep_search "functionName" --include-pattern "*.js"
 ### 4. Testing Strategy
 ```bash
 # Start development server
-firebase serve --only hosting
+firebase serve --only hosting --port 5002
 
 # Test core functionality
-open http://localhost:5000/practice
-open http://localhost:5000/tests/index.html
+open http://localhost:5002/practice
+open http://localhost:5002/tests/index.html
 
 # Create targeted tests
 # - test_app_functionality.html
@@ -268,6 +268,42 @@ A development session is successful when:
 4. **User workflows work** - Complete user sessions function correctly
 5. **Code is clean** - No console errors or warnings
 6. **Documentation is updated** - Changes are properly documented
+
+## 🔥 Firebase Hosting Protocol
+
+**Status:** ✅ **MANDATORY** - Must be followed for consistent local development
+
+### Default Port Configuration
+- **Default Port:** 5002 (port 5000 is occupied by system processes)
+- **Command:** `firebase serve --only hosting --port 5002`
+- **URL:** http://localhost:5002
+
+### Server Management Protocol
+1. **Always terminate previous instances** before starting a new server
+2. **Use port 5002 explicitly** to avoid auto-increment conflicts
+3. **Verify single instance** - only one Firebase hosting process should run
+4. **Check server status** with `ps aux | grep firebase`
+
+### Port Management Commands
+```bash
+# Check for running Firebase processes
+ps aux | grep firebase
+
+# Terminate existing processes (if needed)
+kill <PID>
+
+# Start server on default port
+firebase serve --only hosting --port 5002
+
+# Verify server is running
+curl -I http://localhost:5002
+```
+
+### Why Port 5002?
+- Port 5000 is occupied by macOS system processes (ControlCenter)
+- Port 5001 may be used by other development tools
+- Port 5002 provides consistent, reliable access for this project
+- Explicit port specification prevents auto-increment confusion
 
 ---
 
