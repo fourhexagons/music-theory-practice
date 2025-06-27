@@ -32,45 +32,29 @@
   - State structure and persistence patterns
   - Common issues and debugging notes
 
-## 🎯 Quick Context Summary
+### Step 4: Quick Context Summary (2 minutes)
 
-### Current State
-- **Version**: v14 with state persistence and validation fixes
-- **Status**: Stable with recent fixes for seventh chord validation and page refresh issues
-- **Branch**: `bugfix/seventh-chord-validation`
+**Current Version**: v14  
+**Server Protocol**: Always use `./serve-clean.sh` (never `firebase serve` directly)  
+**Local URL**: http://localhost:5002 (check terminal output for actual port)  
+**Main Files**: `main.js`, `learningState.js`, `quizData.js`, `normalization.js`
 
-### Recent Major Fixes (June 27, 2025)
-1. **Seventh Chord Validation**: Fixed normalization mismatch between ASCII "b" and Unicode "♭"
-2. **State Persistence**: Fixed advanced mode not persisting after refresh
-3. **Page Loading**: Fixed blank page issues with enhanced initialization
-4. **Script Loading**: Added missing `ADVANCED_SEVENTHS` mode to `window.MODES`
+**Architecture Overview**:
+- **State Management**: `learningState.js` handles persistence and restoration
+- **Data**: `quizData.js` provides MODES, CHAPTERS, and chord data
+- **Validation**: `normalization.js` handles accidental normalization (ASCII ↔ Unicode)
+- **UI**: `main.js` orchestrates everything and handles user interactions
 
-### Architecture Overview
-```
-practice.html
-├── js/utils/errorHandler.js
-├── js/utils/helpers.js
-├── js/data/quizData.js (defines MODES, CHAPTERS, learningPath)
-├── js/utils/normalization.js
-├── js/state/learningState.js (v14) - State management
-├── js/practice-menu.js
-└── js/main.js (v14) - Main application logic
-```
-
-## 🔧 Essential Debugging Commands
-
+**Essential Debugging Commands**:
 ```javascript
+// Check if everything loaded
+console.log('quizData:', !!window.quizData);
+console.log('learningState:', !!window.learningState);
+console.log('MODES:', window.MODES);
+
 // Check current state
-console.log(window.learningState);
-
-// Check if modes are loaded
-console.log(window.MODES);
-
-// Check advanced mode
-console.log('Advanced mode:', window.learningState.isAdvancedMode);
-
-// Force state reset if corrupted
-window.resetLearningState();
+console.log('Current state:', window.learningState);
+console.log('Current question:', window.learningState.currentQuestion);
 ```
 
 ## 🚨 Common Issues & Quick Fixes

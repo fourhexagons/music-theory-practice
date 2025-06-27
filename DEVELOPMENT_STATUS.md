@@ -317,8 +317,9 @@ firebase login --reauth
 - Consider adding automated testing for state persistence
 
 ## 📚 Resources
-- **Firebase Hosting**: `http://localhost:5003` (current port)
-- **Practice Page**: `http://localhost:5003/practice`
+- **Firebase Hosting**: `http://localhost:5002` (current port)
+- **Practice Page**: `http://localhost:5002/practice`
+- **Server Protocol**: Always use `./serve-clean.sh` (never `firebase serve` directly)
 - **Git Branch**: `bugfix/seventh-chord-validation`
 - **Last Commit**: "Fix seventh chord validation and synchronization issues"
 

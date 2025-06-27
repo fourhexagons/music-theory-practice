@@ -4,6 +4,11 @@
 
 **Before committing ANY changes, run through this checklist:**
 
+### 0. Server Protocol
+- [ ] Using `./serve-clean.sh` for development (not `firebase serve` directly)
+- [ ] Only one Firebase server running at a time
+- [ ] Current port noted in documentation
+
 ### 1. Version Numbers
 - [ ] Script versions updated in `practice.html` (?v=15)
 - [ ] Version number updated in `DEVELOPMENT_STATUS.md`

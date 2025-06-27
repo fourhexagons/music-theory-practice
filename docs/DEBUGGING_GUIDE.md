@@ -2,6 +2,15 @@
 
 ## 🚨 Emergency Quick Fixes
 
+### Server Protocol (IMPORTANT)
+```bash
+# ALWAYS use the serve-clean.sh script to avoid multiple servers
+./serve-clean.sh
+
+# DO NOT use firebase serve directly - this can cause port conflicts
+# firebase serve --only hosting  # ❌ Don't do this
+```
+
 ### Blank Page on Load
 ```bash
 # 1. Check script versions - update if needed
