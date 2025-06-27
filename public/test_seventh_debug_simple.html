@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seventh Chord Validation Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background-color: #d4edda; }
+        .fail { background-color: #f8d7da; }
+        input, button { margin: 5px; padding: 5px; }
+        .json-output { 
+            background-color: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            padding: 10px; 
+            margin: 10px 0; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .summary { 
+            background-color: #e9ecef; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Seventh Chord Validation Debug</h1>
+    
+    <div>
+        <h3>Individual Test</h3>
+        <label>Key: <input type="text" id="keyInput" value="C"></label>
+        <label>Degree: <input type="number" id="degreeInput" value="1" min="1" max="7"></label>
+        <label>Answer: <input type="text" id="answerInput" value="Cmaj7"></label>
+        <button onclick="testValidation()">Test</button>
+        <button onclick="testNormalizationFix()">Test Normalization Fix</button>
+        <button onclick="testAppValidation()">Test App Validation</button>
+        <button onclick="testUserExperience()">Test User Experience</button>
+    </div>
+    
+    <div>
+        <h3>Comprehensive Test</h3>
+        <button onclick="runComprehensiveTest()">Run All Tests</button>
+        <button onclick="copyResults()">Copy JSON Results</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="summary" class="summary" style="display:none;"></div>
+    <div id="jsonOutput" class="json-output" style="display:none;"></div>
+    <div id="results"></div>
+
+    <script src="js/data/quizData.js"></script>
+    <script src="js/utils/normalization.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/state/learningState.js?v=13"></script>
+    <script src="js/main.js?v=13"></script>
+    
+    <script>
+        let comprehensiveResults = null;
+        
+        function testValidation() {
+            const key = document.getElementById('keyInput').value;
+            const degree = parseInt(document.getElementById('degreeInput').value);
+            const answer = document.getElementById('answerInput').value;
+            
+            // Set up the learning state as the app would
+            window.learningState.currentQuestion = {
+                key: key,
+                chapterId: 'sevenths',
+                degree: degree
+            };
+            
+            // Test the validation
+            const result = window.checkAnswer(answer);
+            const keyData = window.quizData[key];
+            const expected = keyData.sevenths[degree.toString()];
+            
+            const resultsDiv = document.getElementById('results');
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${result ? 'pass' : 'fail'}`;
+            
+            testDiv.innerHTML = `
+                <strong>${result ? '✅ PASS' : '❌ FAIL'}</strong><br>
+                Key: ${key}, Degree: ${degree}<br>
+                Input: "${answer}"<br>
+                Expected: "${expected}"<br>
+                Normalized Input: "${window.normalizeChord(answer)}"<br>
+                Normalized Expected: "${window.normalizeChord(expected)}"<br>
+                Match: ${window.normalizeChord(answer).toUpperCase() === window.normalizeChord(expected).toUpperCase()}
+            `;
+            
+            resultsDiv.appendChild(testDiv);
+        }
+        
+        function testNormalizationFix() {
+            console.log('🧪 Testing normalization fix for min7♭5 and minor7♭5...');
+            
+            const testCases = [
+                { input: 'Bmin7♭5', expected: 'Bm7♭5' },
+                { input: 'Bminor7♭5', expected: 'Bm7♭5' },
+                { input: 'Bmin7b5', expected: 'Bm7♭5' },
+                { input: 'Bminor7b5', expected: 'Bm7♭5' },
+                { input: 'C#min7♭5', expected: 'C♯m7♭5' },
+                { input: 'C#minor7♭5', expected: 'C♯m7♭5' },
+                { input: 'F#min7♭5', expected: 'F♯m7♭5' },
+                { input: 'F#minor7♭5', expected: 'F♯m7♭5' }
+            ];
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h4>Normalization Fix Test Results:</h4>';
+            
+            testCases.forEach(test => {
+                const normalized = window.normalizeChord(test.input);
+                const passed = normalized === test.expected;
+                
+                console.log(`${passed ? '✅' : '❌'} "${test.input}" → "${normalized}" (expected: "${test.expected}")`);
+                
+                const testDiv = document.createElement('div');
+                testDiv.className = `test-case ${passed ? 'pass' : 'fail'}`;
+                testDiv.innerHTML = `
+                    <strong>${passed ? '✅ PASS' : '❌ FAIL'}</strong><br>
+                    Input: "${test.input}"<br>
+                    Normalized: "${normalized}"<br>
+                    Expected: "${test.expected}"
+                `;
+                
+                resultsDiv.appendChild(testDiv);
+            });
+        }
+        
+        function testAppValidation() {
+            console.log('🧪 Testing app validation with console logging...');
+            
+            // Set up a test question
+            window.learningState.currentQuestion = {
+                key: 'C',
+                chapterId: 'sevenths',
+                degree: 7
+            };
+            
+            // Test the app's checkAnswer function
+            const testInput = 'Bm7♭5';
+            console.log('Testing app validation with input:', testInput);
+            
+            const result = window.checkAnswer(testInput);
+            console.log('App validation result:', result);
+            
+            const resultsDiv = document.getElementById('results');
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${result ? 'pass' : 'fail'}`;
+            testDiv.innerHTML = `
+                <strong>App Validation Test: ${result ? '✅ PASS' : '❌ FAIL'}</strong><br>
+                Input: "${testInput}"<br>
+                Expected: "Bm7♭5" (C major, degree 7)<br>
+                Result: ${result}
+            `;
+            
+            resultsDiv.appendChild(testDiv);
+        }
+        
+        function testUserExperience() {
+            console.log('🧪 Testing real user experience scenarios...');
+            
+            const userScenarios = [
+                // Test 1: Basic seventh chord naming
+                {
+                    key: 'C',
+                    degree: 1,
+                    inputs: ['Cmaj7', 'CM7', 'CMAJ7', 'CMaj7'],
+                    expected: 'Cmaj7',
+                    description: 'C major, degree 1 (maj7 variations)'
+                },
+                // Test 2: Minor seventh chord naming
+                {
+                    key: 'C',
+                    degree: 2,
+                    inputs: ['Dm7', 'Dmin7', 'Dminor7'],
+                    expected: 'Dm7',
+                    description: 'C major, degree 2 (m7 variations)'
+                },
+                // Test 3: Dominant seventh chord naming
+                {
+                    key: 'C',
+                    degree: 5,
+                    inputs: ['G7', 'Gdom7', 'Gdominant7'],
+                    expected: 'G7',
+                    description: 'C major, degree 5 (7 variations)'
+                },
+                // Test 4: Half-diminished seventh chord naming
+                {
+                    key: 'C',
+                    degree: 7,
+                    inputs: ['Bm7♭5', 'Bm7b5', 'Bmin7♭5', 'Bmin7b5', 'Bminor7♭5', 'Bminor7b5'],
+                    expected: 'Bm7♭5',
+                    description: 'C major, degree 7 (m7♭5 variations)'
+                },
+                // Test 5: Sharp keys
+                {
+                    key: 'G',
+                    degree: 7,
+                    inputs: ['F#m7♭5', 'F#m7b5', 'F♯m7♭5', 'F♯m7b5'],
+                    expected: 'F♯m7♭5',
+                    description: 'G major, degree 7 (sharp key)'
+                }
+            ];
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h4>User Experience Test Results:</h4>';
+            
+            let totalTests = 0;
+            let passedTests = 0;
+            
+            userScenarios.forEach((scenario, scenarioIndex) => {
+                console.log(`\n🧪 Testing scenario ${scenarioIndex + 1}: ${scenario.description}`);
+                
+                const scenarioDiv = document.createElement('div');
+                scenarioDiv.className = 'test-case';
+                scenarioDiv.innerHTML = `<h5>Scenario ${scenarioIndex + 1}: ${scenario.description}</h5>`;
+                
+                scenario.inputs.forEach(input => {
+                    totalTests++;
+                    
+                    // Set up the learning state
+                    window.learningState.currentQuestion = {
+                        key: scenario.key,
+                        chapterId: 'sevenths',
+                        degree: scenario.degree
+                    };
+                    
+                    // Test the validation
+                    const result = window.checkAnswer(input);
+                    const passed = result === true;
+                    
+                    if (passed) passedTests++;
+                    
+                    console.log(`  ${passed ? '✅' : '❌'} "${input}" → ${result}`);
+                    
+                    const testDiv = document.createElement('div');
+                    testDiv.className = `test-case ${passed ? 'pass' : 'fail'}`;
+                    testDiv.style.marginLeft = '20px';
+                    testDiv.innerHTML = `
+                        <strong>${passed ? '✅ PASS' : '❌ FAIL'}</strong><br>
+                        Input: "${input}"<br>
+                        Expected: "${scenario.expected}"<br>
+                        Result: ${result}
+                    `;
+                    
+                    scenarioDiv.appendChild(testDiv);
+                });
+                
+                resultsDiv.appendChild(scenarioDiv);
+            });
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'summary';
+            summaryDiv.innerHTML = `
+                <h4>User Experience Test Summary</h4>
+                <strong>Total Tests:</strong> ${totalTests}<br>
+                <strong>Passed:</strong> ${passedTests}<br>
+                <strong>Failed:</strong> ${totalTests - passedTests}<br>
+                <strong>Success Rate:</strong> ${((passedTests / totalTests) * 100).toFixed(1)}%
+            `;
+            
+            resultsDiv.appendChild(summaryDiv);
+        }
+        
+        function runComprehensiveTest() {
+            const keys = Object.keys(window.quizData);
+            const testCases = [];
+            const results = {
+                timestamp: new Date().toISOString(),
+                totalTests: 0,
+                passed: 0,
+                failed: 0,
+                successRate: 0,
+                tests: [],
+                summary: {}
+            };
+            
+            // Generate all possible test cases
+            keys.forEach(key => {
+                for (let degree = 1; degree <= 7; degree++) {
+                    const keyData = window.quizData[key];
+                    const expected = keyData.sevenths[degree.toString()];
+                    
+                    // Test various input formats for each expected answer
+                    const inputVariations = generateInputVariations(expected);
+                    
+                    inputVariations.forEach(input => {
+                        testCases.push({
+                            key: key,
+                            degree: degree,
+                            input: input,
+                            expected: expected
+                        });
+                    });
+                }
+            });
+            
+            results.totalTests = testCases.length;
+            
+            // Run all tests
+            testCases.forEach((testCase, index) => {
+                // Set up the learning state
+                window.learningState.currentQuestion = {
+                    key: testCase.key,
+                    chapterId: 'sevenths',
+                    degree: testCase.degree
+                };
+                
+                // Test the validation
+                const result = window.checkAnswer(testCase.input);
+                const normalizedInput = window.normalizeChord(testCase.input);
+                const normalizedExpected = window.normalizeChord(testCase.expected);
+                const match = normalizedInput.toUpperCase() === normalizedExpected.toUpperCase();
+                
+                const testResult = {
+                    index: index + 1,
+                    key: testCase.key,
+                    degree: testCase.degree,
+                    input: testCase.input,
+                    expected: testCase.expected,
+                    normalizedInput: normalizedInput,
+                    normalizedExpected: normalizedExpected,
+                    match: match,
+                    result: result,
+                    passed: result === true
+                };
+                
+                results.tests.push(testResult);
+                
+                if (result === true) {
+                    results.passed++;
+                } else {
+                    results.failed++;
+                }
+            });
+            
+            results.successRate = ((results.passed / results.totalTests) * 100).toFixed(2);
+            
+            // Generate summary by key and degree
+            results.summary = generateSummary(results.tests);
+            
+            comprehensiveResults = results;
+            displayResults(results);
+        }
+        
+        function generateInputVariations(expected) {
+            const variations = [expected]; // Always test the exact expected answer
+            
+            // Generate common variations
+            if (expected.includes('maj7')) {
+                variations.push(expected.replace('maj7', 'M7'));
+                variations.push(expected.replace('maj7', 'MAJ7'));
+                variations.push(expected.replace('maj7', 'Maj7'));
+            }
+            
+            if (expected.includes('m7')) {
+                variations.push(expected.replace('m7', 'min7'));
+                variations.push(expected.replace('m7', 'minor7'));
+            }
+            
+            if (expected.includes('7') && !expected.includes('maj7') && !expected.includes('m7')) {
+                variations.push(expected.replace('7', 'dom7'));
+                variations.push(expected.replace('7', 'dominant7'));
+            }
+            
+            // Test with different accidental formats
+            if (expected.includes('♭')) {
+                variations.push(expected.replace('♭', 'b'));
+            }
+            if (expected.includes('♯')) {
+                variations.push(expected.replace('♯', '#'));
+            }
+            if (expected.includes('b') && !expected.includes('♭')) {
+                variations.push(expected.replace('b', '♭'));
+            }
+            if (expected.includes('#') && !expected.includes('♯')) {
+                variations.push(expected.replace('#', '♯'));
+            }
+            
+            return [...new Set(variations)]; // Remove duplicates
+        }
+        
+        function generateSummary(tests) {
+            const summary = {
+                byKey: {},
+                byDegree: {},
+                byChordType: {}
+            };
+            
+            tests.forEach(test => {
+                // Summary by key
+                if (!summary.byKey[test.key]) {
+                    summary.byKey[test.key] = { total: 0, passed: 0, failed: 0 };
+                }
+                summary.byKey[test.key].total++;
+                if (test.passed) {
+                    summary.byKey[test.key].passed++;
+                } else {
+                    summary.byKey[test.key].failed++;
+                }
+                
+                // Summary by degree
+                if (!summary.byDegree[test.degree]) {
+                    summary.byDegree[test.degree] = { total: 0, passed: 0, failed: 0 };
+                }
+                summary.byDegree[test.degree].total++;
+                if (test.passed) {
+                    summary.byDegree[test.degree].passed++;
+                } else {
+                    summary.byDegree[test.degree].failed++;
+                }
+                
+                // Summary by chord type
+                const chordType = getChordType(test.expected);
+                if (!summary.byChordType[chordType]) {
+                    summary.byChordType[chordType] = { total: 0, passed: 0, failed: 0 };
+                }
+                summary.byChordType[chordType].total++;
+                if (test.passed) {
+                    summary.byChordType[chordType].passed++;
+                } else {
+                    summary.byChordType[chordType].failed++;
+                }
+            });
+            
+            return summary;
+        }
+        
+        function getChordType(chord) {
+            if (chord.includes('maj7')) return 'maj7';
+            if (chord.includes('m7')) return 'm7';
+            if (chord.includes('7') && !chord.includes('maj7') && !chord.includes('m7')) return '7';
+            if (chord.includes('m7♭5')) return 'm7♭5';
+            return 'other';
+        }
+        
+        function displayResults(results) {
+            // Display summary
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            summaryDiv.innerHTML = `
+                <h4>Test Summary</h4>
+                <strong>Total Tests:</strong> ${results.totalTests}<br>
+                <strong>Passed:</strong> ${results.passed}<br>
+                <strong>Failed:</strong> ${results.failed}<br>
+                <strong>Success Rate:</strong> ${results.successRate}%<br>
+                <br>
+                <strong>By Key:</strong><br>
+                ${Object.entries(results.summary.byKey).map(([key, stats]) => 
+                    `${key}: ${stats.passed}/${stats.total} (${((stats.passed/stats.total)*100).toFixed(1)}%)`
+                ).join('<br>')}<br>
+                <br>
+                <strong>By Degree:</strong><br>
+                ${Object.entries(results.summary.byDegree).map(([degree, stats]) => 
+                    `Degree ${degree}: ${stats.passed}/${stats.total} (${((stats.passed/stats.total)*100).toFixed(1)}%)`
+                ).join('<br>')}<br>
+                <br>
+                <strong>By Chord Type:</strong><br>
+                ${Object.entries(results.summary.byChordType).map(([type, stats]) => 
+                    `${type}: ${stats.passed}/${stats.total} (${((stats.passed/stats.total)*100).toFixed(1)}%)`
+                ).join('<br>')}
+            `;
+            
+            // Display JSON output
+            const jsonDiv = document.getElementById('jsonOutput');
+            jsonDiv.style.display = 'block';
+            jsonDiv.textContent = JSON.stringify(results, null, 2);
+        }
+        
+        function copyResults() {
+            if (comprehensiveResults) {
+                navigator.clipboard.writeText(JSON.stringify(comprehensiveResults, null, 2))
+                    .then(() => alert('Results copied to clipboard!'))
+                    .catch(err => console.error('Failed to copy:', err));
+            } else {
+                alert('No results to copy. Run the comprehensive test first.');
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('jsonOutput').style.display = 'none';
+            document.getElementById('results').innerHTML = '';
+            comprehensiveResults = null;
+        }
+        
+        // Test some common cases on load
+        window.onload = function() {
+            // Test the normalization fix for min7♭5 and minor7♭5
+            console.log('🧪 Testing normalization fix...');
+            const testNormalizations = [
+                { input: 'Bmin7♭5', expected: 'Bm7♭5' },
+                { input: 'Bminor7♭5', expected: 'Bm7♭5' },
+                { input: 'Bmin7b5', expected: 'Bm7♭5' },
+                { input: 'Bminor7b5', expected: 'Bm7♭5' }
+            ];
+            
+            testNormalizations.forEach(test => {
+                const normalized = window.normalizeChord(test.input);
+                const passed = normalized === test.expected;
+                console.log(`${passed ? '✅' : '❌'} "${test.input}" → "${normalized}" (expected: "${test.expected}")`);
+            });
+            
+            const testCases = [
+                { key: 'C', degree: 1, answer: 'Cmaj7' },
+                { key: 'C', degree: 1, answer: 'CM7' },
+                { key: 'F', degree: 4, answer: 'Bbmaj7' },
+                { key: 'G', degree: 5, answer: 'D7' }
+            ];
+            
+            testCases.forEach(testCase => {
+                document.getElementById('keyInput').value = testCase.key;
+                document.getElementById('degreeInput').value = testCase.degree;
+                document.getElementById('answerInput').value = testCase.answer;
+                testValidation();
+            });
+        };
+    </script>
+</body>
+</html> 

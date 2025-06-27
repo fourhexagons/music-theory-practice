@@ -120,6 +120,7 @@
     <script src="../js/state/learningState.js"></script>
     <script src="../js/utils/errorHandler.js"></script>
     <script src="../js/practice-menu.js"></script>
+    <script src="../js/main.js"></script>
     <script>
         // Test Results Storage
         let testResults = {
@@ -409,6 +410,220 @@
                         return {
                             passed: passed === 7,
                             details: details.join(', ')
+                        };
+                    }
+                },
+                {
+                    name: 'Seventh Chord Spelling Validation',
+                    category: TEST_CATEGORIES.ADVANCED,
+                    test: () => {
+                        // Create a validation function that matches the app's logic for seventh chord spellings
+                        const validateSeventhChordSpelling = (input, expected) => {
+                            if (!input || !expected) return false;
+                            
+                            // Normalize both input and expected to handle spaces, commas, and accidentals
+                            const normalizeSpelling = (spelling) => {
+                                return spelling.trim()
+                                    .replace(/,/g, ' ')
+                                    .split(/\s+/)
+                                    .map(note => window.accidentalToUnicode(note))
+                                    .join(' ')
+                                    .toUpperCase();
+                            };
+                            
+                            const normalizedInput = normalizeSpelling(input);
+                            const normalizedExpected = normalizeSpelling(expected);
+                            
+                            return normalizedInput === normalizedExpected;
+                        };
+                        
+                        // Test cases for seventh chord spelling validation
+                        const testCases = [
+                            // C major key tests
+                            { key: 'C', degree: 1, input: 'C E G B', expected: 'C E G B', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'C,E,G,B', expected: 'C E G B', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'C E G B ', expected: 'C E G B', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'C E G Bb', expected: 'C E G B', shouldPass: false },
+                            
+                            // F major key tests (has Bb)
+                            { key: 'F', degree: 1, input: 'F A C E', expected: 'F A C E', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'Bb D F A', expected: 'Bb D F A', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'B♭ D F A', expected: 'Bb D F A', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'Bb D F A', expected: 'Bb D F A', shouldPass: true },
+                            
+                            // G major key tests (has F#)
+                            { key: 'G', degree: 1, input: 'G B D F#', expected: 'G B D F#', shouldPass: true },
+                            { key: 'G', degree: 1, input: 'G B D F♯', expected: 'G B D F#', shouldPass: true },
+                            { key: 'G', degree: 5, input: 'D F# A C', expected: 'D F# A C', shouldPass: true },
+                            
+                            // Edge cases
+                            { key: 'C', degree: 1, input: '', expected: 'C E G B', shouldPass: false },
+                            { key: 'C', degree: 1, input: 'C E G', expected: 'C E G B', shouldPass: false },
+                            { key: 'C', degree: 1, input: 'C E G B D', expected: 'C E G B', shouldPass: false }
+                        ];
+                        
+                        let passed = 0;
+                        let details = [];
+                        let failures = [];
+                        
+                        testCases.forEach(({ key, degree, input, expected, shouldPass }, index) => {
+                            try {
+                                // Get the actual expected answer from quiz data (use seventhSpelling, not sevenths)
+                                const keyData = window.quizData[key];
+                                const actualExpected = keyData.seventhSpelling[degree.toString()].join(' ');
+                                
+                                // Use our validation function
+                                const result = validateSeventhChordSpelling(input, actualExpected);
+                                const success = result === shouldPass;
+                                
+                                if (success) {
+                                    passed++;
+                                    details.push(`Test ${index + 1}: ✓`);
+                                } else {
+                                    failures.push(`Test ${index + 1}: Expected ${shouldPass ? 'pass' : 'fail'}, got ${result ? 'pass' : 'fail'} (${key} degree ${degree}, input: "${input}", expected: "${actualExpected}")`);
+                                }
+                            } catch (error) {
+                                failures.push(`Test ${index + 1}: Error - ${error.message}`);
+                            }
+                        });
+                        
+                        const allPassed = passed === testCases.length;
+                        const detailsText = allPassed ? 
+                            `All ${testCases.length} tests passed` : 
+                            `${passed}/${testCases.length} passed. Failures: ${failures.join('; ')}`;
+                        
+                        return {
+                            passed: allPassed,
+                            details: detailsText
+                        };
+                    }
+                },
+                {
+                    name: 'Seventh Chord Symbol Validation',
+                    category: TEST_CATEGORIES.ADVANCED,
+                    test: () => {
+                        // Test the app's actual validation logic for seventh chord symbols
+                        const testCases = [
+                            // C major key tests
+                            { key: 'C', degree: 1, input: 'Cmaj7', expected: 'Cmaj7', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'CM7', expected: 'Cmaj7', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'C', expected: 'Cmaj7', shouldPass: false },
+                            
+                            // F major key tests
+                            { key: 'F', degree: 1, input: 'Fmaj7', expected: 'Fmaj7', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'Bbmaj7', expected: 'Bbmaj7', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'Bb7', expected: 'Bbmaj7', shouldPass: false },
+                            
+                            // G major key tests
+                            { key: 'G', degree: 1, input: 'Gmaj7', expected: 'Gmaj7', shouldPass: true },
+                            { key: 'G', degree: 5, input: 'D7', expected: 'D7', shouldPass: true },
+                            
+                            // Edge cases
+                            { key: 'C', degree: 1, input: '', expected: 'Cmaj7', shouldPass: false },
+                            { key: 'C', degree: 1, input: 'Cm7', expected: 'Cmaj7', shouldPass: false }
+                        ];
+                        
+                        let passed = 0;
+                        let details = [];
+                        let failures = [];
+                        
+                        testCases.forEach(({ key, degree, input, expected, shouldPass }, index) => {
+                            try {
+                                // Get the actual expected answer from quiz data
+                                const keyData = window.quizData[key];
+                                const actualExpected = keyData.sevenths[degree.toString()];
+                                
+                                // Use the app's normalizeChord function
+                                const normalizedInput = window.normalizeChord(input);
+                                const normalizedExpected = window.normalizeChord(actualExpected);
+                                const result = normalizedInput.toUpperCase() === normalizedExpected.toUpperCase();
+                                const success = result === shouldPass;
+                                
+                                if (success) {
+                                    passed++;
+                                    details.push(`Test ${index + 1}: ✓`);
+                                } else {
+                                    failures.push(`Test ${index + 1}: Expected ${shouldPass ? 'pass' : 'fail'}, got ${result ? 'pass' : 'fail'} (${key} degree ${degree}, input: "${input}" → "${normalizedInput}", expected: "${actualExpected}" → "${normalizedExpected}")`);
+                                }
+                            } catch (error) {
+                                failures.push(`Test ${index + 1}: Error - ${error.message}`);
+                            }
+                        });
+                        
+                        const allPassed = passed === testCases.length;
+                        const detailsText = allPassed ? 
+                            `All ${testCases.length} tests passed` : 
+                            `${passed}/${testCases.length} passed. Failures: ${failures.join('; ')}`;
+                        
+                        return {
+                            passed: allPassed,
+                            details: detailsText
+                        };
+                    }
+                },
+                {
+                    name: 'App Seventh Chord Validation Logic',
+                    category: TEST_CATEGORIES.ADVANCED,
+                    test: () => {
+                        // Test the app's actual checkAnswer function for seventh chords
+                        const testCases = [
+                            // C major key tests
+                            { key: 'C', degree: 1, input: 'Cmaj7', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'CM7', shouldPass: true },
+                            { key: 'C', degree: 1, input: 'C', shouldPass: false },
+                            
+                            // F major key tests
+                            { key: 'F', degree: 1, input: 'Fmaj7', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'Bbmaj7', shouldPass: true },
+                            { key: 'F', degree: 4, input: 'Bb7', shouldPass: false },
+                            
+                            // G major key tests
+                            { key: 'G', degree: 1, input: 'Gmaj7', shouldPass: true },
+                            { key: 'G', degree: 5, input: 'D7', shouldPass: true },
+                            
+                            // Edge cases
+                            { key: 'C', degree: 1, input: '', shouldPass: false },
+                            { key: 'C', degree: 1, input: 'Cm7', shouldPass: false }
+                        ];
+                        
+                        let passed = 0;
+                        let details = [];
+                        let failures = [];
+                        
+                        testCases.forEach(({ key, degree, input, shouldPass }, index) => {
+                            try {
+                                // Set up the current question as the app would
+                                window.learningState.currentQuestion = {
+                                    key: key,
+                                    chapterId: 'sevenths',
+                                    degree: degree
+                                };
+                                
+                                // Use the app's actual checkAnswer function
+                                const result = window.checkAnswer(input);
+                                const success = result === shouldPass;
+                                
+                                if (success) {
+                                    passed++;
+                                    details.push(`Test ${index + 1}: ✓`);
+                                } else {
+                                    const keyData = window.quizData[key];
+                                    const expected = keyData.sevenths[degree.toString()];
+                                    failures.push(`Test ${index + 1}: Expected ${shouldPass ? 'pass' : 'fail'}, got ${result ? 'pass' : 'fail'} (${key} degree ${degree}, input: "${input}", expected: "${expected}")`);
+                                }
+                            } catch (error) {
+                                failures.push(`Test ${index + 1}: Error - ${error.message}`);
+                            }
+                        });
+                        
+                        const allPassed = passed === testCases.length;
+                        const detailsText = allPassed ? 
+                            `All ${testCases.length} tests passed` : 
+                            `${passed}/${testCases.length} passed. Failures: ${failures.join('; ')}`;
+                        
+                        return {
+                            passed: allPassed,
+                            details: detailsText
                         };
                     }
                 }
