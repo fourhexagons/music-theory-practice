@@ -1,8 +1,38 @@
 /**
  * Music Theory Practice - Learning State Management
  * 
- * Manages the application's learning state including progress, current questions,
- * and user session data.
+ * CURRENT STATUS: v14 - Enhanced state restoration and persistence
+ * 
+ * RECENT FIXES (June 27, 2025):
+ * - Added proper advanced mode state restoration
+ * - Enhanced state validation and corruption detection
+ * - Improved state saving after initialization
+ * - Added debugging logging for state restoration
+ * 
+ * STATE STRUCTURE:
+ * - currentGroup: Index of current learning group
+ * - currentKeyIndex: Index of current key within group
+ * - currentChapterIndex: Index of current chapter within group
+ * - mode: Current practice mode (linear, random_all, etc.)
+ * - isAdvancedMode: Boolean flag for advanced practice
+ * - advancedModeType: Type of advanced practice ('random_all', 'sevenths_only')
+ * - currentQuestion: Current question object with key, chapterId, degree
+ * - usedDegrees: Array of degrees already used in current session
+ * 
+ * PERSISTENCE:
+ * - State is automatically saved to localStorage after changes
+ * - State is restored on page load via initLearningState()
+ * - Transient states (lastAnswerIncorrect) are reset on load
+ * - Advanced mode flags persist across page refreshes
+ * 
+ * DEBUGGING:
+ * - Use console.log(window.learningState) to inspect state
+ * - Check localStorage.getItem('learningState') for saved state
+ * - Use window.resetLearningState() to clear corrupted state
+ * 
+ * DEPENDENCIES:
+ * - Requires window.MODES to be defined (from quizData.js)
+ * - Requires window.learningPath to be defined (from quizData.js)
  */
 
 /**
@@ -104,6 +134,14 @@ function initLearningState() {
   if (!Array.isArray(learningState.usedDegrees)) {
     learningState.usedDegrees = [];
   }
+  
+  // Ensure advanced mode flags are properly set
+  if (learningState.isAdvancedMode && learningState.advancedModeType) {
+    console.log('🔄 Restoring advanced mode:', learningState.advancedModeType);
+  }
+  
+  // Save the validated state back to localStorage
+  saveLearningState();
 }
 window.initLearningState = initLearningState;
 

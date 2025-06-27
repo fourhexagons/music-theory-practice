@@ -1,3 +1,31 @@
+/**
+ * Music Theory Practice - Main Application Logic
+ * 
+ * CURRENT STATUS: v14 - State persistence and validation fixes
+ * 
+ * RECENT FIXES (June 27, 2025):
+ * - Fixed seventh chord validation by normalizing both input and expected with accidentalToUnicode
+ * - Enhanced state restoration to properly handle advanced mode persistence
+ * - Added fallback initialization mechanism for blank page issues
+ * - Improved error handling and debugging capabilities
+ * 
+ * KEY DEPENDENCIES:
+ * - quizData.js: Provides MODES, CHAPTERS, learningPath, and chord data
+ * - learningState.js: Manages application state and persistence
+ * - normalization.js: Handles accidental normalization (ASCII ↔ Unicode)
+ * 
+ * DEBUGGING NOTES:
+ * - Check console for "undefined" errors - usually indicates script loading order issues
+ * - Update version numbers (?v=15) to bust cache when making changes
+ * - Use window.learningState to inspect current state
+ * - Advanced mode flags: isAdvancedMode, advancedModeType
+ * 
+ * COMMON ISSUES:
+ * - State not persisting: Check if saveLearningState() is called
+ * - Validation failures: Check normalization with accidentalToUnicode
+ * - Blank page: Check script loading order and version numbers
+ */
+
 // --- 1. Constants and Data ---
 // Data is now loaded from quizData.js and is available on the window object.
 
@@ -454,6 +482,11 @@ function startAdvancedPractice(mode) {
   window.learningState.usedDegrees = [];
   window.learningState.currentQuestion = null;
   
+  // Save the state immediately
+  if (window.saveLearningState) {
+    window.saveLearningState();
+  }
+  
   if (mode === 'random_all') {
     // For random practice, pick a random key and random chapter
     const randomKeys = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
@@ -524,12 +557,24 @@ function initializeApp() {
             return;
         }
         
-        renderAppLayout();
-        attachEventListeners();
+        // Initialize learning state first
         if (window.initLearningState) {
             window.initLearningState();
         }
-        askQuestion();
+        
+        // Render the app layout
+        renderAppLayout();
+        attachEventListeners();
+        
+        // Check if we should restore advanced mode
+        if (window.learningState.isAdvancedMode && window.learningState.advancedModeType) {
+            console.log('🔄 Restoring advanced practice mode:', window.learningState.advancedModeType);
+            startAdvancedPractice(window.learningState.advancedModeType);
+        } else {
+            // Ask a regular question
+            askQuestion();
+        }
+        
         console.log('✅ App initialized successfully');
     } catch (error) {
         console.error('❌ Error initializing app:', error);
@@ -575,4 +620,27 @@ if (document.readyState === 'loading') {
 } else {
     // DOM is already ready
     initializeApp();
-} 
+}
+
+// Add a fallback initialization in case the main initialization fails
+setTimeout(() => {
+    const appContainer = document.getElementById('app-container');
+    if (appContainer && !appContainer.innerHTML.trim()) {
+        console.warn('⚠️ App container is empty, attempting fallback initialization...');
+        try {
+            initializeApp();
+        } catch (error) {
+            console.error('❌ Fallback initialization failed:', error);
+            // Show a basic error message
+            if (appContainer) {
+                appContainer.innerHTML = `
+                    <div style="padding: 20px; text-align: center;">
+                        <h2>Loading Error</h2>
+                        <p>The app failed to load properly. Please refresh the page.</p>
+                        <button onclick="location.reload()" style="padding: 10px 20px; margin: 10px;">Refresh Page</button>
+                    </div>
+                `;
+            }
+        }
+    }
+}, 2000); // Wait 2 seconds before checking 
