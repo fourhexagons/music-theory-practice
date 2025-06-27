@@ -204,12 +204,9 @@ class PracticeMenu {
     }
     // Update menu display to reflect selection
     this.updateMenuDisplay();
-    console.log(`Locked practice to key: ${key}`);
   }
 
   handleDifficultySelection(difficulty) {
-    console.log(`Attempting to switch to difficulty: ${difficulty}`);
-    
     // Validate that required functions are available
     if (!window.resetLearningState || !window.getLearningState || !window.saveLearningState) {
       console.error('Required functions not available for difficulty selection');
@@ -308,8 +305,6 @@ class PracticeMenu {
         console.error('askQuestion function not available');
       }
     }
-    
-    console.log(`Successfully switched to difficulty: ${difficulty} (${selectedMode.description})`);
   }
 
   saveMenuState() {
@@ -448,28 +443,12 @@ class PracticeMenu {
     // Always show all keys in the keys menu, regardless of current group or difficulty
     const allKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
     
-    // Test the function directly
-    console.log('Direct test of accidentalToUnicode:');
-    console.log('  F# →', window.accidentalToUnicode('F#'));
-    console.log('  Bb →', window.accidentalToUnicode('Bb'));
-    console.log('  Function exists:', typeof window.accidentalToUnicode);
-    
     this.menuOptions.forEach(option => {
       if (option.dataset.key) {
         option.style.display = 'block';
         option.disabled = false;
         // Display keys with proper Unicode symbols and wrap accidentals in a span
         let displayKey = window.accidentalToUnicode(option.dataset.key);
-        console.log('Key:', option.dataset.key, '→', displayKey);
-        
-        // Debug the function step by step
-        if (option.dataset.key === 'F#') {
-          console.log('Debug F#:');
-          console.log('  Original:', option.dataset.key);
-          console.log('  Regex match:', option.dataset.key.match(/^([a-g])(.*)/i));
-          console.log('  Result:', displayKey);
-          console.log('  Result char codes:', Array.from(displayKey).map(c => c.charCodeAt(0)));
-        }
         
         // Wrap accidentals in a span for styling
         displayKey = displayKey.replace(/([♯♭𝄫𝄪]+)/g, '<span class="accidental">$1</span>');

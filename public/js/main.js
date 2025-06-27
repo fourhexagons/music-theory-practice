@@ -1,5 +1,3 @@
-console.log('main.js loaded');
-
 // --- 1. Constants and Data ---
 // Data is now loaded from quizData.js and is available on the window object.
 
