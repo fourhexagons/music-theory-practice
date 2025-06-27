@@ -152,49 +152,42 @@ When debugging UI/UX or state issues, always use a systematic, broad-to-narrow a
 
 **Protocol Reminder:** If you notice the debugging process is getting too focused or missing the big picture, do a "protocol check" and step back to re-audit all layers.
 
-## 🏷️ Semantic Versioning Protocol
+## 📋 Semantic Versioning Protocol
 
-**Status:** ✅ **MANDATORY** - Must be followed automatically without user prompting
+**Status:** ✅ **MANDATORY** - Must be followed for all version releases
 
-### Version Format
-- **v1.0.0** - Initial working version (major.minor.patch)
-- **v1.0.1** - Bug fix/cleanup (patch increment)
-- **v1.1.0** - New features (minor increment) 
-- **v2.0.0** - Breaking changes (major increment)
+### Version Format: MAJOR.MINOR.PATCH
+- **MAJOR** (1.x.x) - Incompatible API changes
+- **MINOR** (x.1.x) - Backwards-compatible functionality additions  
+- **PATCH** (x.x.1) - Backwards-compatible bug fixes
 
-### Automatic Version Management
-**I MUST suggest semantic versioning automatically when:**
-1. **After any successful fix or improvement** - Suggest patch increment (e.g., v1.0.1)
-2. **After adding new features** - Suggest minor increment (e.g., v1.1.0)
-3. **After major refactoring** - Suggest major increment (e.g., v2.0.0)
-4. **When creating stable checkpoints** - Tag working versions for rollback
+### Current Version History
+- **v1.0.1** - Clean production version with debug output removed
+- **v1.1.0** - Feature: Hide header title on narrow viewports  
+- **v1.1.1** - Documentation: Update development protocol to use port 5002
+- **v1.1.2** - Bug fix: Correct accidentalToUnicode function for seventh chord spelling
 
-### Version Tagging Commands
+### Versioning Rules
+1. **Always increment appropriately** based on change type
+2. **Never skip versions** (e.g., v1.0.1 → v1.6.2 is invalid)
+3. **Tag every release** with proper semantic version
+4. **Use descriptive commit messages** that explain the change
+5. **Document breaking changes** in commit messages
+
+### Tagging Commands
 ```bash
-# Patch increment (bug fixes, cleanup)
-git tag -a v1.0.1 -m "v1.0.1 - Bug fix/cleanup description"
+# Tag current commit with patch version (bug fix)
+git tag v1.1.3
 
-# Minor increment (new features)
-git tag -a v1.1.0 -m "v1.1.0 - New feature description"
+# Tag current commit with minor version (new feature)
+git tag v1.2.0
 
-# Major increment (breaking changes)
-git tag -a v2.0.0 -m "v2.0.0 - Major update description"
+# Tag current commit with major version (breaking change)
+git tag v2.0.0
 
-# Working state checkpoint
-git tag -a v1.0.0-working-menu -m "Working menu state - all functionality intact"
+# Push tags to remote
+git push --tags
 ```
-
-### Protocol Requirements
-- **NO user prompting required** - I must suggest versioning automatically
-- **User only approves the number** - I handle the format and tagging
-- **Always tag stable states** - Create checkpoints for rollback
-- **Follow semantic versioning strictly** - Patch for fixes, minor for features, major for breaking changes
-
-### Version History Tracking
-- Keep track of current version in development
-- Suggest appropriate increments based on changes made
-- Document version changes in commit messages
-- Maintain clear version history for rollback purposes
 
 ## 🚀 Future Development Guidelines
 
