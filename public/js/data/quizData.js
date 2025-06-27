@@ -109,7 +109,8 @@ window.MODES = {
   LINEAR: 'linear',
     RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
     RANDOM_ALL: 'random_all',
-    COMPLETE: 'complete'
+    COMPLETE: 'complete',
+    ADVANCED_SEVENTHS: 'advanced_sevenths'
 };
 
 window.CHAPTERS = {

@@ -92,13 +92,13 @@
     <script src="js/utils/helpers.js"></script>
     <script src="/js/data/quizData.js"></script>
     <script src="/js/utils/normalization.js"></script>
-    <script src="/js/state/learningState.js?v=13"></script>
+    <script src="/js/state/learningState.js?v=14"></script>
 
     <!-- Practice Menu Component -->
     <script src="/js/practice-menu.js"></script>
 
     <!-- Main Application Logic -->
-    <script src="/js/main.js?v=13"></script>
+    <script src="/js/main.js?v=14"></script>
 
     <script>
       // Register service worker for PWA
@@ -107,6 +107,14 @@
           .then(registration => console.log('ServiceWorker registered'))
           .catch(err => console.log('ServiceWorker registration failed:', err));
       }
+      
+      // Add error handling for script loading
+      window.addEventListener('error', function(e) {
+        console.error('Script loading error:', e);
+        if (e.target && e.target.tagName === 'SCRIPT') {
+          console.error('Failed to load script:', e.target.src);
+        }
+      });
     </script>
   </body>
 </html>
