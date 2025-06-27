@@ -109,6 +109,7 @@ class PracticeMenu {
     }
     // Always set and update, even if already selected
     this.currentSection = section;
+    this.lastSectionType = section;
     this.saveMenuState();
     this.updateMenuDisplay();
   }
@@ -132,6 +133,16 @@ class PracticeMenu {
     this.isOpen = true;
     this.body.classList.add('practice-menu-open');
     this.overlay.classList.add('open');
+    // Restore last section and nested selection if available
+    if (this.currentSection == null && (this.lastSectionType || this.lastSelectedKey || this.lastSelectedDifficulty)) {
+      if (this.lastSectionType) {
+        this.currentSection = this.lastSectionType;
+      } else if (this.lastSelectedKey) {
+        this.currentSection = 'keys';
+      } else if (this.lastSelectedDifficulty) {
+        this.currentSection = 'difficulty';
+      }
+    }
     this.saveMenuState();
     this.updateMenuDisplay();
   }
@@ -148,10 +159,13 @@ class PracticeMenu {
   handleMenuOption(option) {
     const key = option.dataset.key;
     const difficulty = option.dataset.difficulty;
-    
     if (key) {
+      this.lastSectionType = 'keys';
+      this.saveMenuState();
       this.handleKeySelection(key);
     } else if (difficulty) {
+      this.lastSectionType = 'difficulty';
+      this.saveMenuState();
       this.handleDifficultySelection(difficulty);
     }
     this.closeMenu();
@@ -301,9 +315,14 @@ class PracticeMenu {
   }
 
   saveMenuState() {
+    // Save currentSection, lastSelectedKey, lastSelectedDifficulty, lastSectionType
+    const state = window.getLearningState && window.getLearningState();
     const menuState = {
       isOpen: this.isOpen,
-      currentSection: this.currentSection
+      currentSection: this.currentSection,
+      lastSelectedKey: state && state.currentKeyIndex !== undefined && state.currentKeyIndex !== null && state.customGroup && state.customGroup.keys ? state.customGroup.keys[state.currentKeyIndex] : null,
+      lastSelectedDifficulty: state && state.customGroup && state.customGroup.name ? state.customGroup.name : null,
+      lastSectionType: this.lastSectionType || this.currentSection || null
     };
     localStorage.setItem('practiceMenuState', JSON.stringify(menuState));
   }
@@ -315,9 +334,19 @@ class PracticeMenu {
         const state = JSON.parse(savedState);
         this.isOpen = state.isOpen || false;
         this.currentSection = state.currentSection || null;
+        this.lastSelectedKey = state.lastSelectedKey || null;
+        this.lastSelectedDifficulty = state.lastSelectedDifficulty || null;
+        this.lastSectionType = state.lastSectionType || null;
       } catch (e) {
         console.warn('Failed to load menu state:', e);
+        this.lastSelectedKey = null;
+        this.lastSelectedDifficulty = null;
+        this.lastSectionType = null;
       }
+    } else {
+      this.lastSelectedKey = null;
+      this.lastSelectedDifficulty = null;
+      this.lastSectionType = null;
     }
   }
 
@@ -330,16 +359,25 @@ class PracticeMenu {
       link.classList.toggle('active', isActive);
       link.classList.toggle('current-selection', isActive);
     });
-    
     // Show only the current options area
     this.optionsAreas.forEach(area => {
-      if (this.currentSection) {
-        area.classList.toggle('active', area.id === `${this.currentSection}-section`);
-      } else {
-        area.classList.remove('active');
-      }
+      // Always expand the area if currentSection matches
+      area.classList.toggle('active', this.currentSection && area.id === `${this.currentSection}-section`);
     });
-    
+    // Restore nested selection underline if needed
+    if (this.currentSection === 'keys' && this.lastSelectedKey) {
+      this.menuOptions.forEach(option => {
+        if (option.dataset.key) {
+          option.classList.toggle('current-selection', option.dataset.key === this.lastSelectedKey);
+        }
+      });
+    } else if (this.currentSection === 'difficulty' && this.lastSelectedDifficulty) {
+      this.menuOptions.forEach(option => {
+        if (option.dataset.difficulty) {
+          option.classList.toggle('current-selection', option.textContent.trim() === this.lastSelectedDifficulty.trim());
+        }
+      });
+    }
     // Handle mobile menu behavior
     if (this.isMobile) {
       // Only hamburger is clickable
