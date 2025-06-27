@@ -33,10 +33,8 @@ class PracticeMenu {
   }
 
   initializeWithCurrentState() {
-    // Wait a bit for the app to fully load
-    setTimeout(() => {
-      this.updateCurrentSelections();
-    }, 100);
+    // Call updateCurrentSelections immediately (no setTimeout)
+    this.updateCurrentSelections();
   }
 
   bindEvents() {
