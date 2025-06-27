@@ -152,6 +152,50 @@ When debugging UI/UX or state issues, always use a systematic, broad-to-narrow a
 
 **Protocol Reminder:** If you notice the debugging process is getting too focused or missing the big picture, do a "protocol check" and step back to re-audit all layers.
 
+## 🏷️ Semantic Versioning Protocol
+
+**Status:** ✅ **MANDATORY** - Must be followed automatically without user prompting
+
+### Version Format
+- **v1.0.0** - Initial working version (major.minor.patch)
+- **v1.0.1** - Bug fix/cleanup (patch increment)
+- **v1.1.0** - New features (minor increment) 
+- **v2.0.0** - Breaking changes (major increment)
+
+### Automatic Version Management
+**I MUST suggest semantic versioning automatically when:**
+1. **After any successful fix or improvement** - Suggest patch increment (e.g., v1.0.1)
+2. **After adding new features** - Suggest minor increment (e.g., v1.1.0)
+3. **After major refactoring** - Suggest major increment (e.g., v2.0.0)
+4. **When creating stable checkpoints** - Tag working versions for rollback
+
+### Version Tagging Commands
+```bash
+# Patch increment (bug fixes, cleanup)
+git tag -a v1.0.1 -m "v1.0.1 - Bug fix/cleanup description"
+
+# Minor increment (new features)
+git tag -a v1.1.0 -m "v1.1.0 - New feature description"
+
+# Major increment (breaking changes)
+git tag -a v2.0.0 -m "v2.0.0 - Major update description"
+
+# Working state checkpoint
+git tag -a v1.0.0-working-menu -m "Working menu state - all functionality intact"
+```
+
+### Protocol Requirements
+- **NO user prompting required** - I must suggest versioning automatically
+- **User only approves the number** - I handle the format and tagging
+- **Always tag stable states** - Create checkpoints for rollback
+- **Follow semantic versioning strictly** - Patch for fixes, minor for features, major for breaking changes
+
+### Version History Tracking
+- Keep track of current version in development
+- Suggest appropriate increments based on changes made
+- Document version changes in commit messages
+- Maintain clear version history for rollback purposes
+
 ## 🚀 Future Development Guidelines
 
 ### Before Making Changes
