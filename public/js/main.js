@@ -159,12 +159,8 @@ function attachEventListeners() {
   
   const answerInput = document.getElementById('answer-input');
   if (answerInput) {
-    answerInput.addEventListener('click', () => {
-      if (window.learningState.lastAnswerIncorrect) {
-        answerInput.value = '';
-        window.learningState.lastAnswerIncorrect = false;
-      }
-    });
+    // Remove the click event listener that was clearing the field
+    // Users should be able to click in the field without losing their answer
   } else {
     console.error('Answer input not found');
   }
@@ -181,7 +177,7 @@ function attachEventListeners() {
   }
 }
 
-function updateQuestionUI(text) {
+function updateQuestionUI(text, clearInput = true) {
   const questionDisplay = document.getElementById('question-display');
   const answerInput = document.getElementById('answer-input');
   const feedback = document.getElementById('feedback');
@@ -192,7 +188,9 @@ function updateQuestionUI(text) {
   } else {
       document.getElementById('answer-form').style.display = 'flex';
       questionDisplay.textContent = text;
-      answerInput.value = '';
+      if (clearInput) {
+        answerInput.value = '';
+      }
       feedback.textContent = '';
       feedback.className = 'feedback';
       answerInput.focus();
@@ -266,7 +264,6 @@ function askQuestion() {
   }
   
   updateQuestionUI(text);
-  window.learningState.lastAnswerIncorrect = false;
 }
 
 function handleAnswerSubmit(e) {
@@ -280,6 +277,12 @@ function handleAnswerSubmit(e) {
     feedback.textContent = '';
     feedback.className = 'feedback';
     
+    // Clear the input field for the next answer
+    const answerInput = document.getElementById('answer-input');
+    if (answerInput) {
+      answerInput.value = '';
+    }
+    
     if (window.learningState.isAdvancedMode) {
       // Handle A/B pair logic for accidentals questions
       if (window.learningState.currentQuestion && 
@@ -289,7 +292,7 @@ function handleAnswerSubmit(e) {
         const key = window.learningState.currentQuestion.key;
         window.learningState.currentQuestion = { key: key, chapterId: QUESTION_TYPES.ACCIDENTALS_NAMES };
         const text = `Name the accidentals in ${key} major.`;
-        updateQuestionUI(text);
+        updateQuestionUI(text, false); // Don't clear input since we already cleared it above
       } else {
         // Normal case - start a new random question
         startAdvancedPractice(window.learningState.advancedModeType);
@@ -377,7 +380,7 @@ function handleAnswerSubmit(e) {
     feedback.textContent = 'Incorrect. Try again.';
     feedback.className = 'feedback incorrect';
     window.learningState.correctAnswerStreak = 0;
-    window.learningState.lastAnswerIncorrect = true;
+    // Don't clear the input field - let user edit their answer
   }
 }
 
