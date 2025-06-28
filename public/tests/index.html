@@ -120,6 +120,7 @@
     <script src="../js/state/learningState.js"></script>
     <script src="../js/utils/errorHandler.js"></script>
     <script src="../js/practice-menu.js"></script>
+    <script src="../js/tests/chord-normalization.test.js"></script>
     <script>
         // Test Results Storage
         let testResults = {
@@ -253,6 +254,24 @@
                         return {
                             passed: passed === testCases.length,
                             details: details.join(', ')
+                        };
+                    }
+                },
+                {
+                    name: 'Chord Normalization Edge Cases',
+                    category: TEST_CATEGORIES.DATA,
+                    test: () => {
+                        if (typeof window.runChordNormalizationEdgeCases !== 'function') {
+                            return {
+                                passed: false,
+                                details: 'Chord normalization test function not found'
+                            };
+                        }
+                        
+                        const result = window.runChordNormalizationEdgeCases();
+                        return {
+                            passed: result.failed === 0,
+                            details: `Passed: ${result.passed}/${result.total}, Failed: ${result.failed}`
                         };
                     }
                 },
