@@ -21,6 +21,7 @@ const QUALITY_TRANSFORMATIONS = [
 
   // Case-insensitive text-based chords and other symbols.
   { match: /^(MAJ7|Maj7|MAJOR7|Δ7?|∆7?)$/i, output: 'maj7' },
+  { match: /^(Δ+|∆+)$/i, output: 'maj7' },
   { match: /^(m7b5|m7♭5|ø7?|halfdim|half-?dim)$/i, output: 'm7♭5' },
   { match: /^(min7b5|min7♭5|minor7b5|minor7♭5)$/i, output: 'm7♭5' },
   { match: /^(dom|dominant)7?$/i, output: '7' },
