@@ -263,24 +263,18 @@ function askQuestion() {
         break;
       case QUESTION_TYPES.TRIADS:
       case QUESTION_TYPES.SEVENTHS:
-        const allDegrees = [2, 3, 4, 5, 6, 7];
+        const allDegrees = [1, 2, 3, 4, 5, 6, 7];
         let availableDegrees = allDegrees.filter(d => !window.learningState.usedDegrees.includes(d));
-        
         if (availableDegrees.length === 0) {
-          // All degrees have been used for this key
-          // For linear mode, this should not happen as we handle progression in handleAnswerSubmit
-          // For non-linear modes, reset and continue
           if (group.mode !== MODES.LINEAR) {
             window.learningState.usedDegrees = [];
             availableDegrees = allDegrees;
           }
         }
-        
         degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
         window.learningState.currentQuestion.degree = degree;
-        
         const chordType = chapter.id === QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
-        const action = chapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
+        const action = chapter.id === QUESTION_TYPES.TRIADS ? 'Name' : 'Name';
         text = `${action} the ${ordinal(degree)} ${chordType} in ${key} major.`;
         break;
     }

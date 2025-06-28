@@ -165,11 +165,6 @@ window.ordinal = window.MusicTheoryHelpers.ordinal;
 window.wordToNumber = window.MusicTheoryHelpers.wordToNumber;
 window.accidentalToUnicode = window.MusicTheoryHelpers.accidentalToUnicode;
 
-function setQuestion(question) {
-    learningState.currentQuestion = question;
-}
-window.setQuestion = setQuestion;
-
 function generateQuestion() {
     const state = window.getLearningState();
     const currentGroup = window.getCurrentGroup();
@@ -222,7 +217,6 @@ function generateQuestion() {
             handleError(`Unknown chapter id: ${currentChapter.id}`);
             return null;
     }
-    setQuestion(question);
     return question;
 }
 window.generateQuestion = generateQuestion;
