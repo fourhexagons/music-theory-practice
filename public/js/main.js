@@ -199,39 +199,29 @@ function updateQuestionUI(text, clearInput = true) {
 // --- 5. Question and Answer Logic ---
 
 function askQuestion() {
+  console.log('📝 Asking question...');
+  
   try {
     const group = window.getCurrentGroup();
-    if (!group || group.mode === MODES.COMPLETE) {
-        updateQuestionUI('');
+    if (!group) {
+      console.error('❌ No current group found');
+      updateQuestionUI('Error: No learning group available. Please refresh the page.');
       return;
     }
     
-    let key, chapter;
-    
-    // Determine the key for the question
-    if (group.mode === MODES.LINEAR) {
-        key = group.keys[window.learningState.currentKeyIndex];
-    } else { // All other modes use random keys from the group's key list
-        key = group.keys[Math.floor(Math.random() * group.keys.length)];
+    if (group.mode === MODES.COMPLETE) {
+      updateQuestionUI('Congratulations! You have completed all levels.');
+      return;
     }
+    
+    let key, chapter, degree;
     
     // Determine the chapter for the question
     if (group.mode === MODES.RANDOM_ALL) {
-        chapter = group.chapters[Math.floor(Math.random() * group.chapters.length)];
-    } else { // Linear and Random_Keys_Linear_Chapters use the linear chapter progression
-        chapter = group.chapters[window.learningState.currentChapterIndex];
+      chapter = group.chapters[Math.floor(Math.random() * group.chapters.length)];
+    } else {
+      chapter = group.chapters[window.learningState.currentChapterIndex];
     }
-
-    window.learningState.currentQuestion = { key, chapterId: chapter.id };
-    let text = '';
-    let degree;
-
-    // Debug logging to track question generation
-    console.log('🔍 Question Generation Debug:');
-    console.log('  Setting question key:', key);
-    console.log('  Setting chapter ID:', chapter.id);
-    console.log('  Current key index:', window.learningState.currentKeyIndex);
-    console.log('  Current chapter index:', window.learningState.currentChapterIndex);
 
     // Special handling for seventhSpelling questions
     if (chapter && chapter.id === QUESTION_TYPES.SEVENTH_SPELLING) {
@@ -249,6 +239,28 @@ function askQuestion() {
       updateQuestionUI(text);
       return;
     }
+
+    // Determine the key for the question (non-seventhSpelling)
+    if (group.mode === MODES.LINEAR) {
+      key = group.keys[window.learningState.currentKeyIndex];
+    } else {
+      key = group.keys[Math.floor(Math.random() * group.keys.length)];
+    }
+
+    if (!key) {
+      console.error('❌ No key found for group:', group);
+      updateQuestionUI('Error: No key available. Please refresh the page.');
+      return;
+    }
+
+    if (!chapter) {
+      console.error('❌ No chapter found for group:', group);
+      updateQuestionUI('Error: No chapter available. Please refresh the page.');
+      return;
+    }
+
+    window.learningState.currentQuestion = { key, chapterId: chapter.id };
+    let text = '';
 
     switch (chapter.id) {
       case QUESTION_TYPES.ACCIDENTALS_COUNT:
@@ -277,9 +289,13 @@ function askQuestion() {
         const action = chapter.id === QUESTION_TYPES.TRIADS ? 'Name' : 'Name';
         text = `${action} the ${ordinal(degree)} ${chordType} in ${key} major.`;
         break;
+      default:
+        console.error('❌ Unknown chapter ID:', chapter.id);
+        text = 'Error: Unknown question type. Please refresh the page.';
     }
-    
+    console.log('📝 Question text:', text);
     updateQuestionUI(text);
+    
   } catch (error) {
     console.error('❌ Error in askQuestion:', error);
     updateQuestionUI('Error: Something went wrong. Please refresh the page.');
