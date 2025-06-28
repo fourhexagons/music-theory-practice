@@ -2,6 +2,18 @@
  * Music Theory Practice - Helper Utilities
  * 
  * Contains general helper functions used throughout the application.
+ * 
+ * 🚨 CRITICAL WARNING: DO NOT MODIFY LEARNING PATH LOGIC 🚨
+ * 
+ * The generateQuestion() function is part of the core learning path logic that is WORKING CORRECTLY.
+ * Any modifications to this function require explicit permission.
+ * 
+ * See docs/LEARNING_PATH_PROTECTION.md for the mandatory protocol.
+ * 
+ * The current progression works correctly:
+ * - Key progression: C → G → D → A → E → B → F# → C#
+ * - Chapter progression: accCount → accNotes → scale → triads → sevenths
+ * - C major skips accNotes (intentional behavior)
  */
 
 // Create a namespace for our helper functions

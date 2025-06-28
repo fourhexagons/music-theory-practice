@@ -20,6 +20,10 @@ window.runChordNormalizationEdgeCases = function() {
     { input: "Ehalfdim", expected: "Em7♭5", description: "Half diminished - halfdim text" },
     { input: "Ehalf-dim", expected: "Em7♭5", description: "Half diminished - half-dim text" },
     { input: "Em7b5", expected: "Em7♭5", description: "Half diminished - m7b5 notation" },
+    { input: "Emin7b5", expected: "Em7♭5", description: "Half diminished - min7b5 notation" },
+    { input: "Emin7♭5", expected: "Em7♭5", description: "Half diminished - min7♭5 notation" },
+    { input: "Eminor7b5", expected: "Em7♭5", description: "Half diminished - minor7b5 notation" },
+    { input: "Eminor7♭5", expected: "Em7♭5", description: "Half diminished - minor7♭5 notation" },
     { input: "Eø", expected: "Em7♭5", description: "Half diminished - ø symbol" },
     
     // Mixed case tests

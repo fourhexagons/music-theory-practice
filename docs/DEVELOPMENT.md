@@ -1,5 +1,47 @@
 # Development Guide
 
+## 🚨 CRITICAL: LEARNING PATH LOGIC PROTECTION PROTOCOL 🚨
+
+**BEFORE making ANY changes to learning path logic, you MUST follow this protocol:**
+
+### Step 1: STOP and READ
+If you're about to modify any of these files/functions, STOP immediately:
+- `public/js/state/learningState.js` - `advanceLearningPath()` function
+- `public/js/state/learningState.js` - `getCurrentChapter()` function  
+- `public/js/state/learningState.js` - `getCurrentKey()` function
+- `public/js/state/learningState.js` - `getCurrentGroup()` function
+- `public/js/utils/helpers.js` - `generateQuestion()` function
+- Any file containing learning path progression logic
+
+### Step 2: ASK PERMISSION
+**You MUST ask the user explicitly:**
+> "I'm about to modify the learning path logic in [specific file/function]. This could break the app's progression. Do you want me to proceed, or should I find an alternative solution?"
+
+### Step 3: ALTERNATIVE SOLUTIONS FIRST
+Before modifying learning path logic, consider these alternatives:
+- **UI/UX changes**: Modify the interface, not the logic
+- **Question generation**: Change how questions are asked, not how progression works
+- **Validation logic**: Modify answer checking, not progression
+- **State display**: Change how progress is shown, not how it's tracked
+- **Error handling**: Improve error messages, not core logic
+
+### Step 4: IF PERMISSION GRANTED
+- Create a backup branch first: `git checkout -b backup-learning-path-[date]`
+- Make minimal, targeted changes only
+- Test thoroughly before committing
+- Document exactly what was changed and why
+
+### Step 5: REMEMBER
+The learning path logic is **WORKING CORRECTLY** and follows a predictable pattern:
+- C major → G major → D major → A major → E major → B major → F# major → C# major
+- Each key: accCount → accNotes → scale → triads → sevenths
+- C major skips accNotes (intentional behavior)
+- Triads/sevenths require 3 correct answers, others advance immediately
+
+**This protocol is MANDATORY for all assistants and developers.**
+
+---
+
 This guide is for developers who want to set up the project locally, contribute to development, or understand the technical architecture.
 
 ## 🛠️ Prerequisites

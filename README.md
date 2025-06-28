@@ -17,6 +17,17 @@ Currently in beta testing with students.
 - FIX chord quality detection conflicts between m7 and M7
 - TEST 100% pass rate for all normalization functions
 
+## 🚨 CRITICAL: Learning Path Protection
+
+**Before making any changes to the app, read the [Learning Path Protection Protocol](docs/LEARNING_PATH_PROTECTION.md).**
+
+The learning path logic is working correctly and follows a predictable pattern:
+- **Key progression**: C → G → D → A → E → B → F# → C#
+- **Chapter progression**: accCount → accNotes → scale → triads → sevenths
+- **Special cases**: C major skips accNotes (intentional behavior)
+
+**Any modifications to learning path logic require explicit permission and must follow the mandatory protocol.**
+
 ## Usage
 
 - **Test Mode**: Press Ctrl+Shift+Q (Mac: Cmd+Shift+Q)

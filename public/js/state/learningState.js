@@ -3,6 +3,25 @@
  * 
  * Manages the application's learning state including progress, current questions,
  * and user session data.
+ * 
+ * 🚨 CRITICAL WARNING: DO NOT MODIFY LEARNING PATH LOGIC 🚨
+ * 
+ * This file contains the core learning path progression logic that is WORKING CORRECTLY.
+ * Any modifications to the following functions require explicit permission:
+ * - advanceLearningPath()
+ * - getCurrentChapter()
+ * - getCurrentKey()
+ * - getCurrentGroup()
+ * - recordCorrectAnswer()
+ * - recordIncorrectAnswer()
+ * 
+ * See docs/LEARNING_PATH_PROTECTION.md for the mandatory protocol.
+ * 
+ * The current progression works correctly:
+ * - Key progression: C → G → D → A → E → B → F# → C#
+ * - Chapter progression: accCount → accNotes → scale → triads → sevenths
+ * - C major skips accNotes (intentional behavior)
+ * - Triads/sevenths require 3 correct answers, others advance immediately
  */
 
 /**
