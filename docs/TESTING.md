@@ -4,6 +4,118 @@
 
 This app includes a comprehensive test suite that can be run at any time during development to ensure code quality and catch regressions.
 
+## 🔍 SYSTEMATIC DEBUGGING APPROACH
+
+**CRITICAL: Before fixing any test failures, follow this systematic approach**
+
+### The Problem with Quick Fixes
+Developers and assistants often make mistakes when they:
+- Assume they understand the test failure immediately
+- Apply the first fix that comes to mind
+- Don't investigate the root cause
+- Make changes without understanding the full context
+
+### Systematic Investigation Protocol
+
+#### Step 1: UNDERSTAND THE FAILURE
+**DO NOT** start coding immediately. Instead:
+
+1. **Read the test failure carefully**
+   - What exactly is failing?
+   - What was the expected vs actual result?
+   - Which test case is failing?
+
+2. **Examine the test code**
+   - Understand what the test is trying to verify
+   - Check if the test logic is correct
+   - Verify the expected values make sense
+
+3. **Check the implementation**
+   - Look at the function being tested
+   - Understand how it should work
+   - Identify potential issues
+
+#### Step 2: INVESTIGATE THE CONTEXT
+**DO NOT** assume the problem is where you first look:
+
+1. **Check recent changes**
+   ```bash
+   git log --oneline -10  # Recent commits
+   git show <commit> --name-only  # What files changed
+   ```
+
+2. **Look for related issues**
+   - Are there similar test failures?
+   - Is this part of a larger problem?
+   - Are there other functions with similar logic?
+
+3. **Consider the broader impact**
+   - Will fixing this break other functionality?
+   - Are there edge cases to consider?
+   - Is this a symptom of a larger issue?
+
+#### Step 3: FORM A HYPOTHESIS
+**DO NOT** proceed without a clear understanding:
+
+1. **Document your theory**
+   - Write down what you think is wrong
+   - Explain why you think this is the issue
+   - List your assumptions
+
+2. **Gather evidence**
+   - Look for supporting evidence
+   - Check for contradictory evidence
+   - Test your hypothesis with additional debugging
+
+3. **Consider alternatives**
+   - What else could be causing this?
+   - Are there other explanations?
+   - What would disprove your theory?
+
+#### Step 4: IMPLEMENT AND VERIFY
+**DO NOT** make changes until you're certain:
+
+1. **Make minimal changes**
+   - Fix only what's necessary
+   - Preserve working functionality
+   - Document your changes
+
+2. **Test thoroughly**
+   - Run the specific failing test
+   - Run all related tests
+   - Run the full test suite
+
+3. **Verify the fix**
+   - Confirm the test now passes
+   - Ensure no new failures
+   - Test edge cases
+
+### Real Example: Seventh Chord Validation Issue
+
+**Test Failure**: Seventh chord spelling validation was failing with key mismatches.
+
+**Systematic Investigation**:
+
+1. **Understood the failure**: Keys shown in questions didn't match keys used in validation
+2. **Investigated context**: Found the issue was in `startAdvancedPractice()`, not the main validation logic
+3. **Formed hypothesis**: Multiple random key selections were causing inconsistency
+4. **Implemented fix**: Selected key once and reused it throughout the function
+
+**Result**: Complete resolution with no regressions.
+
+### Key Principles
+
+1. **Always investigate before coding**
+2. **Consider multiple possible causes**
+3. **Look for patterns and related issues**
+4. **Make minimal, targeted fixes**
+5. **Test thoroughly after changes**
+6. **Document your process**
+
+**This systematic approach prevents the most common debugging mistakes.**
+
+---
+
 ## 🚀 Running Tests
 
 ### Keyboard Shortcut (Recommended)
