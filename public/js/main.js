@@ -226,6 +226,30 @@ function askQuestion() {
     let text = '';
     let degree;
 
+    // Debug logging to track question generation
+    console.log('🔍 Question Generation Debug:');
+    console.log('  Setting question key:', key);
+    console.log('  Setting chapter ID:', chapter.id);
+    console.log('  Current key index:', window.learningState.currentKeyIndex);
+    console.log('  Current chapter index:', window.learningState.currentChapterIndex);
+
+    // Special handling for seventhSpelling questions
+    if (chapter && chapter.id === QUESTION_TYPES.SEVENTH_SPELLING) {
+      // Always select key and degree together for spelling questions
+      const allDegrees = [1, 2, 3, 4, 5, 6, 7];
+      const keyIdx = Math.floor(Math.random() * group.keys.length);
+      const degreeIdx = Math.floor(Math.random() * allDegrees.length);
+      const key = group.keys[keyIdx];
+      const degree = allDegrees[degreeIdx];
+      window.learningState.currentQuestion = { key, chapterId: chapter.id, degree };
+      // Always use the currentQuestion object for text and debug
+      const q = window.learningState.currentQuestion;
+      const text = `Spell the ${ordinal(q.degree)} seventh chord in ${q.key} major.`;
+      console.log('📝 Question text:', text);
+      updateQuestionUI(text);
+      return;
+    }
+
     switch (chapter.id) {
       case QUESTION_TYPES.ACCIDENTALS_COUNT:
         text = `How many accidentals are in ${key} major?`;
@@ -239,7 +263,6 @@ function askQuestion() {
         break;
       case QUESTION_TYPES.TRIADS:
       case QUESTION_TYPES.SEVENTHS:
-      case QUESTION_TYPES.SEVENTH_SPELLING:
         const allDegrees = [2, 3, 4, 5, 6, 7];
         let availableDegrees = allDegrees.filter(d => !window.learningState.usedDegrees.includes(d));
         
