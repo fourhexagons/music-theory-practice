@@ -144,3 +144,6 @@ uploads/
 
 # Ignore Cursor chat logs
 cursor/chats/
+
+# Ignore Firebase hosting cache files
+.firebase/hosting.cHVibGlj.cache
