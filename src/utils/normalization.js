@@ -40,7 +40,7 @@ const QUALITY_TRANSFORMATIONS = [
 function normalizeRootNote(root) {
   if (!root) return '';
   const note = root[0].toUpperCase();
-  let accidentals = root.substring(1);
+  const accidentals = root.substring(1);
   
   // Explicitly handle triple flats, then doubles
   if (accidentals.toLowerCase() === 'bbb') return note + '𝄫♭';

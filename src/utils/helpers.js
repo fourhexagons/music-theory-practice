@@ -179,7 +179,7 @@ function generateQuestion() {
     }
     const currentKey = currentGroup.keys[state.currentKeyIndex];
     const keyData = window.quizData[currentKey];
-    let question = {
+    const question = {
         chapterId: currentChapter.id,
         key: currentKey,
         questionText: '',

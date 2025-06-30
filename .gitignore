@@ -155,3 +155,8 @@ node_modules/
 # Development
 .eslintcache
 *.log
+
+# macOS system files
+.DS_Store
+public/.DS_Store
+cursor/.DS_Store

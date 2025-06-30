@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
 import { VitePWA } from 'vite-plugin-pwa';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   // Build output goes to 'dist' so it doesn't interfere with current 'public'
@@ -67,7 +68,7 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
-        require('autoprefixer')
+        autoprefixer
       ]
     }
   }

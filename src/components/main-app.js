@@ -1,7 +1,3 @@
-// Modern module imports
-import './styles/variables.css';
-import './styles/style.css';
-
 // --- 1. Constants and Data ---
 // Data is now loaded from quizData.js and is available on the window object.
 
@@ -464,7 +460,7 @@ function startAdvancedPractice(mode) {
   if (mode === 'random_all') {
     // For random practice, we'll use a simple approach
     // Pick a random key and random chapter
-    let randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
+    const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
     let randomChapter;
     
     // Pick a random chapter, but exclude accidentals naming and seventh spelling
