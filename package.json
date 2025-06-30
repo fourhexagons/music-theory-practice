@@ -1,0 +1,38 @@
+{
+  "name": "music-theory-practice",
+  "version": "1.5.0",
+  "description": "A web-based music theory practice application",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node tests/runner.js",
+    "test:integration": "node tests/integration/runner.js",
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --ext .js --fix",
+    "format": "prettier --write src/**/*.{js,css,html}",
+    "serve:old": "firebase serve --only hosting --port 5002",
+    "serve:new": "npm run build && npm run preview"
+  },
+  "keywords": ["music", "theory", "practice", "education", "pwa"],
+  "author": "Music Theory Practice Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-legacy": "^5.0.0",
+    "vite-plugin-pwa": "^0.17.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "terser": "^5.24.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}
