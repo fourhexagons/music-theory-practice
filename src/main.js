@@ -2,6 +2,11 @@
 import './styles/variables.css';
 import './styles/style.css';
 
+// Import utilities and error handling
+import './utils/errorHandler.js';
+import './utils/accessibility.js';
+import { AppLayout } from './modules/ui/components/AppLayout.js';
+
 // --- 1. Constants and Data ---
 // Data is now loaded from quizData.js and is available on the window object.
 
@@ -570,16 +575,32 @@ window.resetQuiz = function() {
 };
 
 // Initialize landing page
+class LandingApp {
+  constructor() {
+    this.layout = new AppLayout();
+  }
+
+  initialize() {
+    this.layout.renderLandingLayout();
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    const startButton = document.querySelector('a[href="/practice"]');
+    if (startButton) {
+      startButton.addEventListener('click', (e) => {
+        console.log('User navigating to practice');
+        // Optional: Add analytics tracking here
+      });
+    }
+  }
+}
+
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Music Theory Practice - Landing Page Loaded');
-  // Add any landing page specific initialization here
-  const startButton = document.querySelector('a[href="/practice"]');
-  if (startButton) {
-    startButton.addEventListener('click', (e) => {
-      // Optional: Add analytics tracking here
-      console.log('User navigating to practice');
-    });
-  }
+  const app = new LandingApp();
+  app.initialize();
 });
 
 // Kick off the app
