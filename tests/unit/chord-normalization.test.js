@@ -6,8 +6,9 @@
  * to ensure these cases remain fixed.
  */
 
-// Make the test function available globally
-window.runChordNormalizationEdgeCases = function() {
+import { normalizeChord } from '../../src/utils/normalization.js';
+
+export function runChordNormalizationEdgeCases() {
   const tests = [
     // Major 7th notation variations
     { input: "CM7", expected: "Cmaj7", description: "Major 7th - M7 notation" },
@@ -68,4 +69,8 @@ window.runChordNormalizationEdgeCases = function() {
     failures,
     total: tests.length
   };
-}; 
+}
+
+export function runTests() {
+  return runChordNormalizationEdgeCases();
+} 

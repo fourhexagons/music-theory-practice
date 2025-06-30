@@ -5,6 +5,8 @@
  * Run tests by pressing Ctrl+Shift+Q (or Cmd+Shift+Q on Mac)
  */
 
+import { runTests as runChordNormalizationEdgeCases } from './chord-normalization.test.js';
+
 // Test configuration
 const TEST_CONFIG = {
   autoRun: false, // Set to true to run tests automatically on page load

@@ -37,7 +37,7 @@ const QUALITY_TRANSFORMATIONS = [
  * @param {string} root - The root note to normalize
  * @returns {string} - The normalized root note
  */
-function normalizeRootNote(root) {
+export function normalizeRootNote(root) {
   if (!root) return '';
   const note = root[0].toUpperCase();
   const accidentals = root.substring(1);
@@ -60,7 +60,7 @@ function normalizeRootNote(root) {
  * @param {string} quality - The chord quality to normalize
  * @returns {string} - The normalized chord quality
  */
-function normalizeQuality(quality) {
+export function normalizeQuality(quality) {
   if (!quality) return '';
   
   // Try each transformation pattern in order
@@ -78,7 +78,7 @@ function normalizeQuality(quality) {
  * @param {string} chord - The chord symbol to normalize
  * @returns {string} - The normalized chord symbol
  */
-function normalizeChord(chord) {
+export function normalizeChord(chord) {
   if (typeof chord !== 'string') return '';
   if (!chord) return '';
   // Stage 1: Basic cleanup - remove outer and inner whitespace
@@ -105,7 +105,9 @@ function normalizeChord(chord) {
   return normalizedRoot + normalizedQuality;
 }
 
-// Make the primary function available globally
-window.normalizeChord = normalizeChord;
-window.normalizeRootNote = normalizeRootNote;
-window.normalizeQuality = normalizeQuality; 
+// Make the primary function available globally (browser only)
+if (typeof window !== 'undefined') {
+  window.normalizeChord = normalizeChord;
+  window.normalizeRootNote = normalizeRootNote;
+  window.normalizeQuality = normalizeQuality;
+} 
