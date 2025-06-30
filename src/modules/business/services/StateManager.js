@@ -1,0 +1,183 @@
+/**
+ * State Management Service
+ * Centralized state management for learning progression
+ */
+export class StateManager {
+  constructor(learningState) {
+    this.learningState = learningState;
+  }
+
+  getCurrentLevel() {
+    return window.learningPath[this.learningState.currentGroup];
+  }
+
+  getCurrentGroup() {
+    return window.getCurrentGroup();
+  }
+
+  advanceQuestionPointer() {
+    const group = this.getCurrentGroup();
+    
+    if (group.mode === 'linear') {
+      // For linear mode, advance chapter normally
+      this.learningState.currentChapterIndex++;
+      
+      // If the key is C and we would now ask to NAME the accidentals, skip it.
+      const key = group.keys[this.learningState.currentKeyIndex];
+      const nextChapter = group.chapters[this.learningState.currentChapterIndex];
+      if (key === 'C' && nextChapter && nextChapter.id === 'accNotes') {
+        this.learningState.currentChapterIndex++; // Skip ahead
+      }
+      
+      if (this.learningState.currentChapterIndex >= group.chapters.length) {
+        this.learningState.currentChapterIndex = 0;
+        this.learningState.usedDegrees = []; // Reset for triad questions in next chapter
+      }
+    } else {
+      // For random modes, advance chapter normally
+      this.learningState.currentChapterIndex++;
+      
+      if (this.learningState.currentChapterIndex >= group.chapters.length) {
+        this.learningState.currentChapterIndex = 0;
+        this.learningState.currentKeyIndex = 0;
+        this.learningState.correctAnswerStreak = 0;
+      }
+    }
+  }
+
+  advanceLevel() {
+    this.learningState.currentGroup++;
+    this.learningState.currentChapterIndex = 0;
+    this.learningState.currentKeyIndex = 0;
+    this.learningState.correctAnswerStreak = 0;
+  }
+
+  handleCorrectAnswer() {
+    const group = this.getCurrentGroup();
+
+    // Handle advanced mode separately
+    if (this.learningState.isAdvancedMode) {
+      return this.handleAdvancedModeProgression();
+    }
+
+    // Single-key custom group logic
+    if (this.learningState.customGroup && group.keys.length === 1) {
+      return this.handleSingleKeyProgression(group);
+    }
+
+    // Normal progression logic
+    return this.handleNormalProgression(group);
+  }
+
+  handleAdvancedModeProgression() {
+    // Handle A/B pair logic for accidentals questions
+    if (this.learningState.currentQuestion && 
+        this.learningState.currentQuestion.chapterId === 'accCount' &&
+        window.quizData[this.learningState.currentQuestion.key].accidentals > 0) {
+      
+      // Ask naming question for the same key
+      const key = this.learningState.currentQuestion.key;
+      this.learningState.currentQuestion = { key: key, chapterId: 'accNotes' };
+      return {
+        action: 'askNaming',
+        text: `Name the accidentals in ${key} major.`
+      };
+    } else {
+      // Start new random question
+      return { action: 'startAdvanced' };
+    }
+  }
+
+  handleSingleKeyProgression(group) {
+    const currentChapter = group.chapters[this.learningState.currentChapterIndex];
+    
+    if (currentChapter.id === 'triads') {
+      this.learningState.correctChordAnswersForCurrentKey++;
+      if (this.learningState.currentQuestion && this.learningState.currentQuestion.degree) {
+        this.learningState.usedDegrees.push(this.learningState.currentQuestion.degree);
+      }
+      
+      if (this.learningState.correctChordAnswersForCurrentKey >= 3) {
+        this.learningState.correctChordAnswersForCurrentKey = 0;
+        this.learningState.usedDegrees = [];
+      }
+      
+      this.learningState.currentChapterIndex = group.chapters.findIndex(ch => ch.id === 'triads');
+    } else {
+      this.advanceQuestionPointer();
+      const triadsIdx = group.chapters.findIndex(ch => ch.id === 'triads');
+      if (this.learningState.currentChapterIndex >= triadsIdx) {
+        this.learningState.currentChapterIndex = triadsIdx;
+        this.learningState.usedDegrees = [];
+      }
+    }
+    
+    return { action: 'askQuestion' };
+  }
+
+  handleNormalProgression(group) {
+    if (group.mode === 'linear') {
+      const currentChapter = group.chapters[this.learningState.currentChapterIndex];
+      if (currentChapter.id === 'triads') {
+        this.learningState.correctChordAnswersForCurrentKey++;
+        if (this.learningState.currentQuestion && this.learningState.currentQuestion.degree) {
+          this.learningState.usedDegrees.push(this.learningState.currentQuestion.degree);
+        }
+        if (this.learningState.correctChordAnswersForCurrentKey >= 3) {
+          this.learningState.correctChordAnswersForCurrentKey = 0;
+          this.learningState.usedDegrees = [];
+          this.learningState.currentKeyIndex++;
+          if (this.learningState.currentKeyIndex >= group.keys.length) {
+            if (this.learningState.customGroup) {
+              this.learningState.currentKeyIndex = 0;
+              this.learningState.currentChapterIndex = 0;
+            } else {
+              this.advanceLevel();
+            }
+          } else {
+            this.learningState.currentChapterIndex = 0;
+          }
+        }
+      } else {
+        this.advanceQuestionPointer();
+      }
+    } else {
+      this.learningState.correctAnswerStreak++;
+      if (this.learningState.correctAnswerStreak >= group.requiredStreak) {
+        if (this.learningState.customGroup) {
+          this.learningState.correctAnswerStreak = 0;
+          this.learningState.currentKeyIndex = 0;
+          this.learningState.currentChapterIndex = 0;
+        } else {
+          this.advanceLevel();
+        }
+      } else {
+        this.advanceQuestionPointer();
+      }
+    }
+    
+    return { action: 'askQuestion' };
+  }
+
+  handleIncorrectAnswer() {
+    this.learningState.correctAnswerStreak = 0;
+    return { action: 'showIncorrect' };
+  }
+
+  resetState() {
+    if (window.resetLearningState) {
+      window.resetLearningState();
+    }
+    
+    if (this.learningState) {
+      this.learningState.customGroup = null;
+      this.learningState.mode = 'linear';
+      this.learningState.currentKeyIndex = 0;
+      this.learningState.currentChapterIndex = 0;
+    }
+    
+    if (window.saveLearningState) {
+      window.saveLearningState();
+    }
+  }
+} 
