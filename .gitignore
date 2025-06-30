@@ -141,3 +141,6 @@ dist
 .pnp.*
 
 uploads/
+
+# Ignore Cursor chat logs
+cursor/chats/
