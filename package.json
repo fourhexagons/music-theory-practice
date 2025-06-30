@@ -13,6 +13,7 @@
     "test:accessibility": "node tests/accessibility/index.js",
     "test:performance": "node tests/performance/index.js",
     "test:old": "echo 'Open browser and press Ctrl+Shift+Q to run old tests'",
+    "test:browser": "open tests/index.html",
     "lint": "eslint src --ext .js",
     "lint:fix": "eslint src --ext .js --fix",
     "format": "prettier --write src/**/*.{js,css,html}",

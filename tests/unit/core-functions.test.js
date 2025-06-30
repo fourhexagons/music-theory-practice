@@ -343,18 +343,20 @@ function runAllTests() {
 
 // Helper function to copy results to clipboard
 function copyResultsToClipboard(results) {
-  const json = JSON.stringify(results, null, 2);
-  navigator.clipboard.writeText(json).then(() => {
-    const button = document.getElementById('copy-json-button');
-    if (button) {
-      button.textContent = 'Copied!';
-      setTimeout(() => {
-        button.textContent = 'Copy JSON';
-      }, 2000);
-    }
-  }).catch(err => {
-    console.error('Failed to copy results:', err);
-  });
+  if (typeof window !== 'undefined' && typeof document !== 'undefined' && navigator.clipboard) {
+    const json = JSON.stringify(results, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+      const button = document.getElementById('copy-json-button');
+      if (button) {
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.textContent = 'Copy JSON';
+        }, 2000);
+      }
+    }).catch(err => {
+      console.error('Failed to copy results:', err);
+    });
+  }
 }
 
 // Display test results
@@ -440,30 +442,29 @@ function displayTestResults(results, totalPassed, totalFailed, totalTests) {
     </html>
   `;
 
-  // Display results
-  if (TEST_CONFIG.openInNewTab) {
-    const newWindow = window.open('', '_blank');
-    if (newWindow) {
-      newWindow.document.write(resultsHtml);
-      newWindow.document.close();
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    // Display results in browser
+    if (TEST_CONFIG.openInNewTab) {
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(resultsHtml);
+        newWindow.document.close();
+      } else {
+        // Fallback: show results in current page if popup is blocked
+        showResultsOverlay(resultsHtml);
+      }
     } else {
-      // Fallback: show results in current page if popup is blocked
       showResultsOverlay(resultsHtml);
     }
-  } else {
-    showResultsOverlay(resultsHtml);
+    // Attach event listener to the copy button
+    const copyButton = document.getElementById('copy-json-button');
+    if (copyButton) {
+      copyButton.addEventListener('click', () => copyResultsToClipboard(results));
+    }
   }
-
-  // Attach event listener to the copy button
-  const copyButton = document.getElementById('copy-json-button');
-  if (copyButton) {
-    copyButton.addEventListener('click', () => copyResultsToClipboard(results));
-  }
-
-  // Console summary
+  // Console summary (always)
   console.log(`\n🧪 Test Summary: ${totalPassed} passed, ${totalFailed} failed out of ${totalTests} total tests`);
   console.log(`Success Rate: ${percentage}%`);
-  
   if (totalFailed > 0) {
     console.log('\n❌ Some tests failed! Check the detailed report.');
   } else {
@@ -473,47 +474,47 @@ function displayTestResults(results, totalPassed, totalFailed, totalTests) {
 
 // Show results as overlay
 function showResultsOverlay(html) {
-  const resultsDiv = document.createElement('div');
-  resultsDiv.id = 'test-results-overlay';
-  resultsDiv.innerHTML = html;
-  resultsDiv.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: white; z-index: 10000; overflow-y: auto; padding: 20px;
-  `;
-  
-  // Add close button
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = '✕ Close Test Results';
-  closeBtn.style.cssText = `
-    position: fixed; top: 10px; right: 10px; z-index: 10001;
-    background: #dc3545; color: white; border: none; padding: 10px 15px;
-    border-radius: 5px; cursor: pointer; font-size: 14px;
-  `;
-  closeBtn.onclick = () => {
-    document.body.removeChild(resultsDiv);
-    document.body.removeChild(closeBtn);
-  };
-  
-  document.body.appendChild(resultsDiv);
-  document.body.appendChild(closeBtn);
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const resultsDiv = document.createElement('div');
+    resultsDiv.id = 'test-results-overlay';
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: white; z-index: 10000; overflow-y: auto; padding: 20px;
+    `;
+    // Add close button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Close Test Results';
+    closeBtn.style.cssText = `
+      position: fixed; top: 10px; right: 10px; z-index: 10001;
+      background: #dc3545; color: white; border: none; padding: 10px 15px;
+      border-radius: 5px; cursor: pointer; font-size: 14px;
+    `;
+    closeBtn.onclick = () => {
+      document.body.removeChild(resultsDiv);
+      document.body.removeChild(closeBtn);
+    };
+    document.body.appendChild(resultsDiv);
+    document.body.appendChild(closeBtn);
+  }
 }
 
 // Keyboard shortcut handler
 function setupKeyboardShortcut() {
-  if (!TEST_CONFIG.keyboardShortcut) return;
-  
-  document.addEventListener('keydown', (e) => {
-    // Ctrl+Shift+Q (or Cmd+Shift+Q on Mac) - Test shortcut
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Q') {
-      e.preventDefault();
-      console.clear();
-      runAllTests();
-    }
-  });
+  if (typeof window !== 'undefined' && typeof document !== 'undefined' && TEST_CONFIG.keyboardShortcut) {
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+Shift+Q (or Cmd+Shift+Q on Mac) - Test shortcut
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Q') {
+        e.preventDefault();
+        console.clear();
+        runAllTests();
+      }
+    });
+  }
 }
 
 // Auto-run on page load if configured
-if (TEST_CONFIG.autoRun) {
+if (typeof window !== 'undefined' && typeof document !== 'undefined' && TEST_CONFIG.autoRun) {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       console.clear();
@@ -525,15 +526,40 @@ if (TEST_CONFIG.autoRun) {
 // Setup keyboard shortcut
 setupKeyboardShortcut();
 
-// Export for global access
-window.MusicTheoryTests = {
-  runAllTests,
-  runChordNormalizationTests,
-  runAccidentalNormalizationTests,
-  runFunctionExistenceTests,
-  runAppStateTests,
-  TEST_CONFIG,
-  TEST_CATEGORIES
-};
+// Export for global access (browser only)
+if (typeof window !== 'undefined') {
+  window.MusicTheoryTests = {
+    runAllTests,
+    runChordNormalizationTests,
+    runAccidentalNormalizationTests,
+    runFunctionExistenceTests,
+    runAppStateTests,
+    TEST_CONFIG,
+    TEST_CATEGORIES
+  };
+}
 
-console.log('🧪 Music Theory Test Suite loaded! Press Ctrl+Shift+Q (or Cmd+Shift+Q) to run tests.'); 
+if (typeof window !== 'undefined') {
+  console.log('🧪 Music Theory Test Suite loaded! Press Ctrl+Shift+Q (or Cmd+Shift+Q) to run tests.');
+}
+
+export function runTests() {
+  // Run all core test categories and return a summary object
+  const results = {};
+  let totalPassed = 0;
+  let totalFailed = 0;
+  let totalTests = 0;
+  for (const [key, category] of Object.entries(TEST_CATEGORIES)) {
+    const result = category.run();
+    results[key] = result;
+    totalPassed += result.passed;
+    totalFailed += result.failed;
+    totalTests += result.total;
+  }
+  return {
+    passed: totalPassed,
+    failed: totalFailed,
+    total: totalTests,
+    categories: results
+  };
+} 

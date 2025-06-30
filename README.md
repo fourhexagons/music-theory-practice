@@ -116,3 +116,27 @@ chmod +x serve-clean.sh
 - **Always use `./serve-clean.sh` to start or restart the server.**
 - Do not run `firebase serve` directly unless you are sure no other instance is running.
 - This protocol should be followed by all agents and developers working on this project.
+
+## Testing Strategy
+
+### Node-Compatible Tests (CI-friendly)
+- Run with:
+  ```sh
+  npm test
+  ```
+- Runs all unit and Node-compatible performance tests in Node.js (no browser required).
+- Skips integration and accessibility tests that require a browser/DOM.
+
+### Full Suite / Browser-Only Tests
+- Run with:
+  ```sh
+  npm run test:browser
+  ```
+- Opens the comprehensive test suite in your browser (via `public/tests/index.html`).
+- Includes all integration, accessibility, UI, and DOM-dependent tests.
+
+### Why this split?
+- **Node-compatible tests** are fast, reliable, and run automatically in CI/CD.
+- **Browser-only tests** cover UI, accessibility, and integration scenarios that require a real DOM.
+
+See comments in the test files and scripts for more details.

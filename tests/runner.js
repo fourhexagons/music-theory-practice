@@ -15,18 +15,23 @@ class TestRunner {
   }
   async runAllTests() {
     console.log('🧪 Running comprehensive test suite...\n');
-    const startTime = performance.now();
+    const startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     try {
       // Run all test categories
       console.log('Running unit tests...');
       this.results.unit = await runUnitTests();
-      console.log('Running integration tests...');
-      this.results.integration = await runIntegrationTests();
-      console.log('Running accessibility tests...');
-      this.results.accessibility = await runAccessibilityTests();
+      // Only run integration and accessibility tests in browser
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        console.log('Running integration tests...');
+        this.results.integration = await runIntegrationTests();
+        console.log('Running accessibility tests...');
+        this.results.accessibility = await runAccessibilityTests();
+      } else {
+        console.log('Skipping integration and accessibility tests (Node.js environment)');
+      }
       console.log('Running performance tests...');
       this.results.performance = await runPerformanceTests();
-      const endTime = performance.now();
+      const endTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
       const duration = ((endTime - startTime) / 1000).toFixed(2);
       this.generateSummaryReport(duration);
       return this.results;

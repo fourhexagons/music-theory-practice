@@ -41,14 +41,13 @@ export async function runPerformanceTests() {
 }
 // Performance test implementations
 async function testQuestionGenerationSpeed() {
+  if (typeof performance === 'undefined' || typeof window === 'undefined' || typeof window.generateQuestion !== 'function') {
+    return { success: false, error: 'Performance API or generateQuestion not available' };
+  }
   const iterations = 100;
   const startTime = performance.now();
   for (let i = 0; i < iterations; i++) {
-    if (typeof window.generateQuestion === 'function') {
-      window.generateQuestion();
-    } else {
-      return { success: false, error: 'generateQuestion function not available' };
-    }
+    window.generateQuestion();
   }
   const endTime = performance.now();
   const duration = endTime - startTime;
@@ -59,21 +58,19 @@ async function testQuestionGenerationSpeed() {
   return { success: true, metrics: { avgTime: avgTime.toFixed(2), totalTime: duration.toFixed(2) } };
 }
 async function testMemoryUsage() {
-  if (performance.memory) {
-    const initialMemory = performance.memory.usedJSHeapSize;
-    for (let i = 0; i < 50; i++) {
-      if (typeof window.generateQuestion === 'function') {
-        window.generateQuestion();
-      }
-    }
-    const finalMemory = performance.memory.usedJSHeapSize;
-    const memoryGrowth = finalMemory - initialMemory;
-    if (memoryGrowth > 1024 * 1024) {
-      return { success: false, error: `Excessive memory growth: ${(memoryGrowth/1024/1024).toFixed(2)}MB` };
-    }
-    return { success: true, metrics: { memoryGrowth: `${(memoryGrowth/1024).toFixed(2)}KB` } };
+  if (typeof performance === 'undefined' || !performance.memory || typeof window === 'undefined' || typeof window.generateQuestion !== 'function') {
+    return { success: true, note: 'Memory API or generateQuestion not available in this environment' };
   }
-  return { success: true, note: 'Memory API not available in this browser' };
+  const initialMemory = performance.memory.usedJSHeapSize;
+  for (let i = 0; i < 50; i++) {
+    window.generateQuestion();
+  }
+  const finalMemory = performance.memory.usedJSHeapSize;
+  const memoryGrowth = finalMemory - initialMemory;
+  if (memoryGrowth > 1024 * 1024) {
+    return { success: false, error: `Excessive memory growth: ${(memoryGrowth/1024/1024).toFixed(2)}MB` };
+  }
+  return { success: true, metrics: { memoryGrowth: `${(memoryGrowth/1024).toFixed(2)}KB` } };
 }
 async function testDOMPerformance() {
   const iterations = 1000;
