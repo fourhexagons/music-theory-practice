@@ -157,6 +157,4 @@ node_modules/
 *.log
 
 # macOS system files
-.DS_Store
-public/.DS_Store
-cursor/.DS_Store
+*.DS_Store
