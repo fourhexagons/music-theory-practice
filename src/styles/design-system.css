@@ -1,0 +1,111 @@
+/*
+ * Music Theory Practice - Design System
+ * Design tokens and component-based CSS architecture
+ */
+
+/* Design Tokens - Level 1 (Core Values) */
+:root {
+  --color-gray-100: #f8f9fa;
+  --color-gray-200: #e9ecef;
+  --color-gray-300: #dee2e6;
+  --color-gray-400: #ced4da;
+  --color-gray-500: #adb5bd;
+  --color-gray-600: #6c757d;
+  --color-gray-700: #495057;
+  --color-gray-800: #343a40;
+  --color-gray-900: #212529;
+  --color-green-400: #89ff89;
+  --color-red-400: #ff8989;
+  --color-blue-400: #007acc;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+}
+
+/* Semantic Tokens - Level 2 (Component Meanings) */
+:root {
+  --ds-bg-primary: var(--color-gray-600);
+  --ds-bg-secondary: var(--color-gray-700);
+  --ds-bg-surface: var(--color-gray-200);
+  --ds-bg-overlay: rgba(0, 0, 0, 0.5);
+  --ds-text-primary: var(--color-gray-100);
+  --ds-text-secondary: var(--color-gray-900);
+  --ds-text-muted: var(--color-gray-600);
+  --ds-interactive-primary: var(--color-gray-800);
+  --ds-interactive-primary-hover: var(--color-gray-900);
+  --ds-interactive-secondary: var(--color-gray-300);
+  --ds-interactive-secondary-hover: var(--color-gray-400);
+  --ds-feedback-success: var(--color-green-400);
+  --ds-feedback-error: var(--color-red-400);
+  --ds-feedback-focus: var(--color-blue-400);
+  --ds-space-component-xs: var(--space-2);
+  --ds-space-component-sm: var(--space-3);
+  --ds-space-component-md: var(--space-4);
+  --ds-space-component-lg: var(--space-6);
+  --ds-space-component-xl: var(--space-8);
+  --ds-space-layout-sm: var(--space-8);
+  --ds-space-layout-md: var(--space-12);
+  --ds-space-layout-lg: var(--space-16);
+  --ds-space-layout-xl: var(--space-20);
+}
+
+/* Component Tokens - Level 3 (Specific Components) */
+:root {
+  --ds-button-bg: var(--ds-interactive-primary);
+  --ds-button-bg-hover: var(--ds-interactive-primary-hover);
+  --ds-button-text: var(--ds-text-primary);
+  --ds-button-padding-x: var(--space-12);
+  --ds-button-padding-y: var(--ds-space-component-md);
+  --ds-button-font-size: var(--font-size-lg);
+  --ds-button-border-radius: var(--radius-none);
+  --ds-button-transition: var(--transition-fast);
+  --ds-input-bg: var(--ds-bg-surface);
+  --ds-input-text: var(--ds-text-secondary);
+  --ds-input-placeholder: var(--ds-text-muted);
+  --ds-input-border: transparent;
+  --ds-input-border-focus: var(--ds-feedback-focus);
+  --ds-input-padding-x: var(--ds-space-component-lg);
+  --ds-input-padding-y: var(--ds-space-component-md);
+  --ds-input-font-size: var(--font-size-lg);
+  --ds-input-border-radius: var(--radius-none);
+  --ds-question-font-size-min: var(--font-size-2xl);
+  --ds-question-font-size-max: var(--font-size-4xl);
+  --ds-question-text: var(--ds-text-primary);
+  --ds-question-margin-bottom: var(--ds-space-layout-md);
+  --ds-question-line-height: var(--line-height-tight);
+  --ds-feedback-success-color: var(--ds-feedback-success);
+  --ds-feedback-error-color: var(--ds-feedback-error);
+  --ds-feedback-font-size: var(--font-size-xl);
+  --ds-feedback-min-height: 1.5em;
+  --ds-feedback-margin-top: var(--ds-space-component-sm);
+} 

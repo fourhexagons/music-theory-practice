@@ -1,0 +1,78 @@
+/*
+ * Design System Input Component
+ */
+
+.ds-input {
+  background-color: var(--ds-input-bg);
+  color: var(--ds-input-text);
+  border: 1px solid var(--ds-input-border);
+  border-radius: var(--ds-input-border-radius);
+  padding: var(--ds-input-padding-y) var(--ds-input-padding-x);
+  font-size: var(--ds-input-font-size);
+  font-family: inherit;
+  font-weight: 400;
+  line-height: var(--line-height-normal);
+  outline: none;
+  width: 25rem;
+  transition: border-color var(--transition-fast);
+}
+
+.ds-input::placeholder {
+  color: var(--ds-input-placeholder);
+  opacity: 1;
+}
+
+.ds-input:focus {
+  border-color: var(--ds-input-border-focus);
+  outline: 2px solid var(--ds-input-border-focus);
+  outline-offset: 2px;
+}
+
+.ds-input:invalid,
+.ds-input[aria-invalid="true"] {
+  border-color: var(--ds-feedback-error);
+}
+
+.ds-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--color-gray-300);
+}
+
+.ds-input--small {
+  padding: var(--ds-space-component-sm) var(--ds-space-component-md);
+  font-size: var(--font-size-base);
+  width: 20rem;
+}
+
+.ds-input--large {
+  padding: var(--ds-space-component-lg) var(--space-8);
+  font-size: var(--font-size-xl);
+  width: 30rem;
+}
+
+#answer-input {
+  background-color: var(--ds-input-bg);
+  color: var(--ds-input-text);
+  border: 1px solid var(--ds-input-border);
+  border-radius: var(--ds-input-border-radius);
+  padding: var(--ds-input-padding-y) var(--ds-input-padding-x);
+  font-size: var(--ds-input-font-size);
+  font-family: inherit;
+  font-weight: 400;
+  line-height: var(--line-height-normal);
+  outline: none;
+  width: 25rem;
+  transition: border-color var(--transition-fast);
+}
+
+#answer-input::placeholder {
+  color: var(--ds-input-placeholder);
+  opacity: 1;
+}
+
+#answer-input:focus {
+  border-color: var(--ds-input-border-focus);
+  outline: 2px solid var(--ds-input-border-focus);
+  outline-offset: 2px;
+} 

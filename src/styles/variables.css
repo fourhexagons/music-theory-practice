@@ -1,0 +1,53 @@
+/**
+ * Music Theory Practice - CSS Variables
+ * 
+ * Centralized design tokens and variables for consistent theming.
+ * All colors, spacing, typography, and layout values are defined here.
+ */
+
+:root {
+  /* Colors */
+  --bg-primary: #555;
+  --bg-secondary: #666;
+  --text-primary: #fff;
+  --text-secondary: #111;
+  --input-bg: #ddd;
+  --input-placeholder: #555;
+  --button-bg: #4D4D4D;
+  --button-hover: #3A3A3A;
+  --feedback-correct: #89ff89;
+  --feedback-incorrect: #ff8989;
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.625rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.25rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 2.5rem;
+  --spacing-4xl: 5rem;
+  
+  /* Layout */
+  --max-width-container: 75rem;
+  --max-width-content: 50rem;
+  
+  /* Typography */
+  --font-family-primary: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-base: 16px;
+  --line-height-base: 1.6;
+  --line-height-heading: 1.2;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  
+  /* Z-index */
+  --z-index-logo: 10;
+  
+  /* Border radius */
+  --border-radius-none: 0;
+  
+  /* Shadows */
+  --shadow-none: none;
+} 

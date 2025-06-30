@@ -145,5 +145,16 @@ uploads/
 # Ignore Cursor chat logs
 cursor/chats/
 
-# Ignore all Firebase hosting cache files
-.firebase/*.cache
+# Build output
+dist/
+.vite/
+
+# Dependencies
+node_modules/
+
+# Development
+.eslintcache
+*.log
+
+# macOS system files
+*.DS_Store
