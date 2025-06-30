@@ -34,6 +34,30 @@ The learning path logic is working correctly and follows a predictable pattern:
 - **Version**: Displayed in top-right corner of app
 - **Feedback**: Include version number when reporting issues
 
+## Development Commands (Phase 1+)
+
+### Development
+- `npm run dev` - Start Vite development server (new system)
+- `npm run serve:old` - Start Firebase development server (old system)
+- `npm run serve:new` - Build and preview new system
+
+### Testing
+- `npm test` - Run all tests
+- `npm run test:unit` - Run unit tests only
+- `npm run test:integration` - Run integration tests only
+- `npm run test:accessibility` - Run accessibility tests only
+- `npm run test:performance` - Run performance tests only
+
+### Building
+- `npm run build` - Build for production
+- `npm run preview` - Preview built version
+- `npm run verify` - Verify everything works (lint + test + build)
+
+### Code Quality
+- `npm run lint` - Check code quality
+- `npm run lint:fix` - Fix auto-fixable issues
+- `npm run format` - Format code with Prettier
+
 ## Development
 
 ```bash
