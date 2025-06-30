@@ -144,3 +144,14 @@ uploads/
 
 # Ignore Cursor chat logs
 cursor/chats/
+
+# Build output
+dist/
+.vite/
+
+# Dependencies
+node_modules/
+
+# Development
+.eslintcache
+*.log
