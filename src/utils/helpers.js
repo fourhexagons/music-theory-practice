@@ -169,12 +169,12 @@ function generateQuestion() {
     const state = window.getLearningState();
     const currentGroup = window.getCurrentGroup();
     if (!currentGroup || !currentGroup.chapters || !currentGroup.keys || currentGroup.chapters.length === 0 || currentGroup.keys.length === 0) {
-        handleError("No more groups or chapters. All levels complete.", { state, currentGroup });
+        window.handleError("No more groups or chapters. All levels complete.", { state, currentGroup });
         return null;
     }
     const currentChapter = window.getCurrentChapter(state.mode, window.quizData);
     if (!currentChapter) {
-        handleError("Chapter not found!", { state });
+        window.handleError("Chapter not found!", { state });
         return null;
     }
     const currentKey = currentGroup.keys[state.currentKeyIndex];
@@ -186,20 +186,23 @@ function generateQuestion() {
         expectedAnswer: null
     };
     switch (currentChapter.id) {
-        case 'accCount':
+        case 'accCount': {
             question.questionText = `How many accidentals are in the key of ${currentKey}?`;
             question.expectedAnswer = keyData ? keyData.accidentals : null;
             break;
-        case 'accNotes':
+        }
+        case 'accNotes': {
             question.questionText = `Name the accidentals in the key of ${currentKey}.`;
             question.expectedAnswer = keyData ? keyData.notes : null;
             break;
-        case 'scale':
+        }
+        case 'scale': {
             question.questionText = `Spell the major scale for ${currentKey}.`;
             question.expectedAnswer = keyData ? keyData.scale : null;
             break;
+        }
         case 'triads':
-        case 'sevenths':
+        case 'sevenths': {
             // Pick a random degree (1-7) not in usedDegrees
             const degrees = [1,2,3,4,5,6,7];
             let availableDegrees = degrees.filter(d => !state.usedDegrees.includes(d));
@@ -213,9 +216,11 @@ function generateQuestion() {
             question.questionText = `What is the ${window.ordinal(degree)} degree ${currentChapter.id === 'triads' ? 'triad' : 'seventh chord'} in the key of ${currentKey}?`;
             question.expectedAnswer = keyData && keyData[currentChapter.id] ? keyData[currentChapter.id][degree.toString()] : null;
             break;
-        default:
-            handleError(`Unknown chapter id: ${currentChapter.id}`);
+        }
+        default: {
+            window.handleError(`Unknown chapter id: ${currentChapter.id}`);
             return null;
+        }
     }
     return question;
 }

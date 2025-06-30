@@ -44,7 +44,7 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
     return false;
   }
   // Validate key exists and is a non-null object
-  if (!quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+  if (!Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
     console.log('checkAnswer: invalid or missing key', {key, quizDataKey: quizData[key]});
     return false;
   }
@@ -94,7 +94,6 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
     console.log('checkAnswer: caught error', e);
     return false;
   }
-  return false;
 }
 
 /**
@@ -108,7 +107,7 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
  */
 function checkChordAnswer(userAnswer, questionType, key, degree, quizData) {
   // Defensive: validate all parameters and structure
-  if (!quizData || typeof quizData !== 'object' || !quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+  if (!quizData || typeof quizData !== 'object' || !Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
     return false;
   }
   const chordObj = quizData[key][questionType];
@@ -136,7 +135,7 @@ function checkChordAnswer(userAnswer, questionType, key, degree, quizData) {
  */
 function checkScaleSpelling(userAnswer, key, quizData) {
   // Defensive: validate all parameters and structure
-  if (!quizData || typeof quizData !== 'object' || !quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+  if (!quizData || typeof quizData !== 'object' || !Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
     return false;
   }
   if (!quizData[key].scale || !Array.isArray(quizData[key].scale)) {
@@ -167,10 +166,10 @@ function checkScaleSpelling(userAnswer, key, quizData) {
  */
 function checkAccidentalsCount(userAnswer, key, quizData) {
   // Defensive: validate all parameters and structure
-  if (!quizData || typeof quizData !== 'object' || !quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+  if (!quizData || typeof quizData !== 'object' || !Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
     return false;
   }
-  if (!quizData[key].hasOwnProperty('accidentals')) return false;
+  if (!Object.prototype.hasOwnProperty.call(quizData[key], 'accidentals')) return false;
   if (typeof userAnswer !== 'string' && typeof userAnswer !== 'number') return false;
   const userCount = parseInt(String(userAnswer).trim(), 10);
   const correctCount = parseInt(quizData[key].accidentals, 10);
@@ -189,7 +188,7 @@ function checkAccidentalsCount(userAnswer, key, quizData) {
  */
 function checkChordSpelling(userAnswer, key, degree, quizData, spellingType) {
   console.log('checkChordSpelling ENTRY', { userAnswer, key, degree, spellingType });
-  if (!quizData || typeof quizData !== 'object' || !quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+  if (!quizData || typeof quizData !== 'object' || !Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
     console.log('checkChordSpelling: quizData/key invalid', {quizData, key});
     return false;
   }
@@ -230,10 +229,10 @@ function checkChordSpelling(userAnswer, key, degree, quizData, spellingType) {
  * @returns {boolean} - Whether the accidentals names are correct (order-insensitive)
  */
 function checkAccidentalsNames(userAnswer, key, quizData) {
-  if (!quizData || typeof quizData !== 'object' || !quizData.hasOwnProperty(key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
+  if (!quizData || typeof quizData !== 'object' || !Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
     return false;
   }
-  if (!quizData[key].hasOwnProperty('notes') || !Array.isArray(quizData[key].notes)) return false;
+  if (!Object.prototype.hasOwnProperty.call(quizData[key], 'notes') || !Array.isArray(quizData[key].notes)) return false;
   // Accept string or array
   let userNotes;
   if (typeof userAnswer === 'string') {

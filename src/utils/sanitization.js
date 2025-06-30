@@ -5,7 +5,7 @@ export class InputSanitizer {
     // Remove potentially harmful characters while preserving musical notation
     const cleaned = input
       .replace(/[<>'"]/g, '') // Remove HTML/JS injection chars
-      .replace(/[^\w\s♭♯𝄪𝄫#b,.\-]/g, '') // Allow only musical notation
+      .replace(/[^\w\s♭♯𝄪𝄫#b,.-]/gu, '') // Allow only musical notation, with 'u' flag and no unnecessary escape
       .trim()
       .substring(0, 100); // Limit length
     return cleaned;

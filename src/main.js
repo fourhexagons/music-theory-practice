@@ -220,7 +220,11 @@ function askQuestion() {
   
   // Determine the chapter for the question
   if (group.mode === MODES.RANDOM_ALL) {
-      chapter = group.chapters[Math.floor(Math.random() * group.chapters.length)];
+      const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
+        chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
+        chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
+      );
+      chapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
   } else { // Linear and Random_Keys_Linear_Chapters use the linear chapter progression
       chapter = group.chapters[window.learningState.currentChapterIndex];
   }
@@ -242,7 +246,7 @@ function askQuestion() {
       break;
     case QUESTION_TYPES.TRIADS:
     case QUESTION_TYPES.SEVENTHS:
-    case QUESTION_TYPES.SEVENTH_SPELLING:
+    case QUESTION_TYPES.SEVENTH_SPELLING: {
       const allDegrees = [2, 3, 4, 5, 6, 7];
       let availableDegrees = allDegrees.filter(d => !window.learningState.usedDegrees.includes(d));
       
@@ -263,6 +267,7 @@ function askQuestion() {
       const action = chapter.id === QUESTION_TYPES.SEVENTH_SPELLING ? 'Spell' : 'Name';
       text = `${action} the ${ordinal(degree)} ${chordType} in ${key} major.`;
       break;
+    }
   }
   
   updateQuestionUI(text);
@@ -405,18 +410,18 @@ function checkAnswer(answer) {
   
   if (chapterId === QUESTION_TYPES.SEVENTHS) {
     console.log('  Expected (sevenths):', data.sevenths[degree]);
-    console.log('  Normalized Input:', normalizeChord(answer));
-    console.log('  Normalized Expected:', normalizeChord(data.sevenths[degree]));
-    console.log('  Match:', normalizeChord(answer).toUpperCase() === normalizeChord(data.sevenths[degree]).toUpperCase());
+    console.log('  Normalized Input:', window.normalizeChord(answer));
+    console.log('  Normalized Expected:', window.normalizeChord(data.sevenths[degree]));
+    console.log('  Match:', window.normalizeChord(answer).toUpperCase() === window.normalizeChord(data.sevenths[degree]).toUpperCase());
   } else if (chapterId === QUESTION_TYPES.TRIADS) {
     console.log('  Expected (triads):', data.triads[degree]);
-    console.log('  Normalized Input:', normalizeChord(answer));
-    console.log('  Normalized Expected:', normalizeChord(data.triads[degree]));
-    console.log('  Match:', normalizeChord(answer).toUpperCase() === normalizeChord(data.triads[degree]).toUpperCase());
+    console.log('  Normalized Input:', window.normalizeChord(answer));
+    console.log('  Normalized Expected:', window.normalizeChord(data.triads[degree]));
+    console.log('  Match:', window.normalizeChord(answer).toUpperCase() === window.normalizeChord(data.triads[degree]).toUpperCase());
   }
 
   switch(chapterId) {
-    case QUESTION_TYPES.ACCIDENTALS_COUNT:
+    case QUESTION_TYPES.ACCIDENTALS_COUNT: {
       const normalizedAnswer = answer.trim().toLowerCase();
       if (data.accidentals === 0) {
         return ['0', 'zero', 'none'].includes(normalizedAnswer);
@@ -425,27 +430,28 @@ function checkAnswer(answer) {
       if (digitAnswer === data.accidentals) return true;
       const wordAnswer = wordToNumber(normalizedAnswer);
       return wordAnswer === data.accidentals;
-
-    case QUESTION_TYPES.ACCIDENTALS_NAMES:
+    }
+    case QUESTION_TYPES.ACCIDENTALS_NAMES: {
       if (data.accidentals === 0) return answer.trim() === '';
       return normalizeAccList(answer) === normalizeAccList(data.notes);
-
-    case QUESTION_TYPES.SCALE_SPELLING:
+    }
+    case QUESTION_TYPES.SCALE_SPELLING: {
       const correctScale = data.scale.map(n => n.toUpperCase()).join('');
       const userScale = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
       return userScale === correctScale;
-
-    case QUESTION_TYPES.TRIADS:
-      return normalizeChord(answer).toUpperCase() === normalizeChord(data.triads[degree]).toUpperCase();
-
-    case QUESTION_TYPES.SEVENTHS:
-      return normalizeChord(answer).toUpperCase() === normalizeChord(data.sevenths[degree]).toUpperCase();
-
-    case QUESTION_TYPES.SEVENTH_SPELLING:
+    }
+    case QUESTION_TYPES.TRIADS: {
+      return window.normalizeChord(answer).toUpperCase() === window.normalizeChord(data.triads[degree]).toUpperCase();
+    }
+    case QUESTION_TYPES.SEVENTHS: {
+      return window.normalizeChord(answer).toUpperCase() === window.normalizeChord(data.sevenths[degree]).toUpperCase();
+    }
+    case QUESTION_TYPES.SEVENTH_SPELLING: {
       // For seventh spelling, normalize both expected and user input with accidentalToUnicode
       const correctSpelling = data.seventhSpelling[degree].map(accidentalToUnicode).map(n => n.toUpperCase()).join('');
       const userSpelling = answer.trim().split(/\s+/).map(accidentalToUnicode).join('').toUpperCase();
       return userSpelling === correctSpelling;
+    }
   }
   return false;
 }
@@ -465,14 +471,11 @@ function startAdvancedPractice(mode) {
     // For random practice, we'll use a simple approach
     // Pick a random key and random chapter
     const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
-    let randomChapter;
-    
-    // Pick a random chapter, but exclude accidentals naming and seventh spelling
     const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
       chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
       chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
     );
-    randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
+    const randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
     
     // Select key once and reuse it
     const selectedKey = randomKey[Math.floor(Math.random() * randomKey.length)];
@@ -482,21 +485,23 @@ function startAdvancedPractice(mode) {
     let degree;
 
     switch (randomChapter.id) {
-      case QUESTION_TYPES.ACCIDENTALS_COUNT:
+      case QUESTION_TYPES.ACCIDENTALS_COUNT: {
         text = `How many accidentals are in ${selectedKey} major?`;
         break;
-      case QUESTION_TYPES.SCALE_SPELLING:
+      }
+      case QUESTION_TYPES.SCALE_SPELLING: {
         text = `Spell the ${selectedKey} major scale.`;
         break;
+      }
       case QUESTION_TYPES.TRIADS:
-      case QUESTION_TYPES.SEVENTHS:
-        degree = [2, 3, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
+      case QUESTION_TYPES.SEVENTHS: {
+        const degree = [2, 3, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
         window.learningState.currentQuestion.degree = degree;
-        
         const chordType = randomChapter.id === QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
         const action = 'Name';
         text = `${action} the ${ordinal(degree)} ${chordType} in ${selectedKey} major.`;
         break;
+      }
     }
     
     updateQuestionUI(text);

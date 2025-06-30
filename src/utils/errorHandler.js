@@ -27,7 +27,7 @@ window.ErrorHandler = {
    * Custom error class for application errors
    */
   AppError: class AppError extends Error {
-    constructor(message, type, severity = ErrorHandler.ERROR_SEVERITY.MEDIUM, details = {}) {
+    constructor(message, type, severity = window.ErrorHandler.ERROR_SEVERITY.MEDIUM, details = {}) {
       super(message);
       this.name = 'AppError';
       this.type = type;

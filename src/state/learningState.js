@@ -113,11 +113,6 @@ function initLearningState() {
     }
   }
   validateLearningState();
-  // Development mode - set to true to always start fresh for testing
-  if (false) {
-    console.log("DEV MODE: Resetting learning state.");
-    resetLearningState();
-  }
   // Reset transient states that shouldn't persist across sessions
   learningState.lastAnswerIncorrect = false;
   if (!Array.isArray(learningState.usedDegrees)) {
