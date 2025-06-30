@@ -204,4 +204,81 @@ export class AppController {
       this.generateAndDisplayQuestion();
     };
   }
+
+  renderAppLayout() {
+    const appContainer = document.getElementById('app-container');
+    appContainer.innerHTML = `
+      <header class="app-header">
+        <a href="/" class="logo-link">
+          <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
+        </a>
+      </header>
+      <div class="main-content">
+        <div class="quiz-section">
+          <div class="question-display" id="question-display"></div>
+          <div class="answer-container">
+            <form id="answer-form">
+              <input type="text" id="answer-input" placeholder="Your answer..." autocomplete="off">
+              <button type="submit" id="submit-btn" class="btn">Submit</button>
+            </form>
+            <div class="feedback" id="feedback"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    // Advanced practice section
+    const advancedRoot = document.getElementById('advanced-practice-root');
+    if (advancedRoot) {
+      advancedRoot.innerHTML = `
+        <div class="advanced-practice">
+          <h3>Advanced Practice</h3>
+          <div class="practice-controls">
+            <button id="advanced1-btn" class="btn">Randomize</button>
+            <button id="advanced2-btn" class="btn">Sevenths</button>
+          </div>
+        </div>
+      `;
+    }
+    this.attachEventListeners();
+  }
+
+  attachEventListeners() {
+    const form = document.getElementById('answer-form');
+    const submitBtn = document.getElementById('submit-btn');
+    if (form) {
+      form.addEventListener('submit', (e) => this.handleAnswerSubmit(e));
+    }
+    if (submitBtn) {
+      submitBtn.addEventListener('click', (e) => this.handleAnswerSubmit(e));
+    }
+    const advanced1Btn = document.getElementById('advanced1-btn');
+    const advanced2Btn = document.getElementById('advanced2-btn');
+    if (advanced1Btn) {
+      advanced1Btn.addEventListener('click', () => window.startAdvancedPractice('random_all'));
+    }
+    if (advanced2Btn) {
+      advanced2Btn.addEventListener('click', () => window.startAdvancedPractice('sevenths_only'));
+    }
+  }
+
+  updateQuestionUI(text, clearInput = true) {
+    const questionDisplay = document.getElementById('question-display');
+    const answerInput = document.getElementById('answer-input');
+    const feedback = document.getElementById('feedback');
+    if (window.getCurrentLevel().mode === window.MODES.COMPLETE) {
+      questionDisplay.textContent = 'Congratulations! You have completed all levels.';
+      document.getElementById('answer-form').style.display = 'none';
+    } else {
+      document.getElementById('answer-form').style.display = 'flex';
+      questionDisplay.textContent = text;
+      if (clearInput && answerInput) {
+        answerInput.value = '';
+      }
+      if (feedback) {
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+      }
+      if (answerInput) answerInput.focus();
+    }
+  }
 } 
