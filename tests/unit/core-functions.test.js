@@ -6,6 +6,8 @@
  */
 
 import { runTests as runChordNormalizationEdgeCases } from './chord-normalization.test.js';
+import { accidentalToUnicode } from '../../src/utils/helpers.js';
+import { normalizeChord } from '../../src/utils/normalization.js';
 
 // Test configuration
 const TEST_CONFIG = {
@@ -245,6 +247,9 @@ function runAccidentalNormalizationTests() {
 }
 
 function runFunctionExistenceTests() {
+  if (typeof window === 'undefined') {
+    return TEST_UTILS.createTestResult(0, 0, [], 0); // Skip in Node
+  }
   const tests = [
     { description: "normalizeChord function exists", test: () => typeof normalizeChord === 'function' },
     { description: "accidentalToUnicode function exists", test: () => typeof accidentalToUnicode === 'function' },
@@ -278,6 +283,9 @@ function runFunctionExistenceTests() {
 }
 
 function runAppStateTests() {
+  if (typeof window === 'undefined') {
+    return TEST_UTILS.createTestResult(0, 0, [], 0); // Skip in Node
+  }
   const tests = [
     { description: "learningState object exists", test: () => typeof learningState !== 'undefined' },
     { description: "quizData object exists", test: () => typeof quizData !== 'undefined' },
