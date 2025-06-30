@@ -5,6 +5,8 @@ import './styles/style.css';
 // Import utilities and error handling
 import './utils/errorHandler.js';
 import './utils/accessibility.js';
+import './utils/performance.js';
+import './utils/lazyLoader.js';
 import { AppLayout } from './modules/ui/components/AppLayout.js';
 
 // --- 1. Constants and Data ---

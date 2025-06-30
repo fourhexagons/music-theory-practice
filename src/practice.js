@@ -9,6 +9,8 @@ import './utils/helpers.js';
 import './utils/normalization.js';
 import './utils/validation.js';
 import './utils/accessibility.js';
+import './utils/performance.js';
+import './utils/lazyLoader.js';
 
 // Import data
 import './data/quizData.js';
