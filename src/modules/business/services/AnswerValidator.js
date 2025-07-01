@@ -69,7 +69,11 @@ export class AnswerValidator {
   }
 
   validateScaleSpelling(userAnswer, keyData) {
-    const correctScale = keyData.scale.map(n => n.toUpperCase()).join('');
+    // Apply accidentalToUnicode to BOTH correct scale and user input for consistent comparison
+    const correctScale = keyData.scale
+      .map(window.accidentalToUnicode)
+      .join('')
+      .toUpperCase();
     
     // Handle both spaced input ("c d e f g a b") and unspaced input ("cdefgab")
     let userNotes;
