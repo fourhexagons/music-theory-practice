@@ -33,7 +33,10 @@ C → G → D → A → E → B → F# → C#
 ### **Advancement Rules**
 - **a-levels**: accCount, accNotes, scale advance immediately; triads require 3 correct
 - **b-levels**: All 10 questions are triads, requiring 10 correct total
-- **Question generation**: Degrees selected randomly from unused pool
+- **Randomization**: 
+  - **Triad degrees**: Always randomly selected from available degrees (2-7)
+  - **Keys in b-levels**: Randomly selected from the current group
+  - **Keys in a-levels**: Follow linear progression (not random)
 
 ## Special Behaviors
 

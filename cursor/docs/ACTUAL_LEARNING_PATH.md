@@ -2,7 +2,13 @@
 
 ## Overview
 
-This document shows the **exact** question and answer pairs that a user encounters when progressing through the complete learning path from "Start Over" to completion.
+This document shows examples of question and answer pairs that a user encounters when progressing through the complete learning path from "Start Over" to completion.
+
+**🎲 RANDOMIZATION NOTICE**: This learning path uses randomization in several ways:
+- **Triad degrees**: Always randomly selected from available degrees (2-7) 
+- **Keys in b-levels**: Randomly selected from the current group keys
+- **Keys in a-levels**: Follow linear progression, but triad degrees are still random
+- **Every practice session will be different** - the examples below show possible sequences, not fixed ones
 
 **Important Notes:**
 - **LINEAR mode**: One question per chapter, but triads require 3 correct answers per key before advancing
@@ -25,9 +31,9 @@ This document shows the **exact** question and answer pairs that a user encounte
 1. **Q1:** "How many accidentals are in C major?" → **Answer:** `0`
 2. **Q2:** *(Skipped - C major has no accidentals to name)*
 3. **Q3:** "Spell the C major scale." → **Answer:** `C D E F G A B`
-4. **Q4:** "Name the 3rd triad in C major." → **Answer:** `Em`
-5. **Q5:** "Name the 6th triad in C major." → **Answer:** `Am`  
-6. **Q6:** "Name the 2nd triad in C major." → **Answer:** `Dm`
+4. **Q4:** "Name the 3rd triad in C major." → **Answer:** `Em` *(degree randomly selected)*
+5. **Q5:** "Name the 6th triad in C major." → **Answer:** `Am` *(degree randomly selected)*
+6. **Q6:** "Name the 2nd triad in C major." → **Answer:** `Dm` *(degree randomly selected)*
 
 *Note: Triads use random degrees from [2,3,4,5,6,7] and require 3 correct answers before advancing to next level.*
 
@@ -76,7 +82,9 @@ This document shows the **exact** question and answer pairs that a user encounte
 ### Question Sequence:
 *Note: All 10 questions are randomized triad questions from the current group keys (G, D, A). No accidentals or scales - pure triad reinforcement practice.*
 
-**Example Progression (10 correct answers needed):**
+**⚠️ IMPORTANT**: Both the keys and chord degrees are randomly selected each time. Every practice session will have a completely different sequence.
+
+**Sample of Possible Random Questions:**
 1. **Q25:** "Name the 4th triad in D major." → **Answer:** `G` *(1st correct)*
 2. **Q26:** "Name the 2nd triad in A major." → **Answer:** `Bm` *(2nd correct)*
 3. **Q27:** "Name the 6th triad in G major." → **Answer:** `Em` *(3rd correct)*
@@ -102,9 +110,9 @@ This document shows the **exact** question and answer pairs that a user encounte
 1. **Q37:** "How many accidentals are in F major?" → **Answer:** `1`
 2. **Q38:** "Name the accidentals in F major." → **Answer:** `Bb`
 3. **Q39:** "Spell the F major scale." → **Answer:** `F G A Bb C D E`
-4. **Q40:** "Name the 3rd triad in F major." → **Answer:** `Am`
-5. **Q41:** "Name the 6th triad in F major." → **Answer:** `Dm`
-6. **Q42:** "Name the 7th triad in F major." → **Answer:** `E°`
+4. **Q40:** "Name the 3rd triad in F major." → **Answer:** `Am` *(degree randomly selected)*
+5. **Q41:** "Name the 6th triad in F major." → **Answer:** `Dm` *(degree randomly selected)*
+6. **Q42:** "Name the 7th triad in F major." → **Answer:** `E°` *(degree randomly selected)*
 
 **B♭ Major (3 questions + 3 triads):**
 7. **Q43:** "How many accidentals are in Bb major?" → **Answer:** `2`
@@ -133,7 +141,9 @@ This document shows the **exact** question and answer pairs that a user encounte
 ### Question Sequence:
 *Note: All 10 questions are randomized triad questions from the current group keys (F, B♭, E♭). No accidentals or scales - pure triad reinforcement practice.*
 
-**Example Progression (10 correct answers needed):**
+**⚠️ IMPORTANT**: Both the keys and chord degrees are randomly selected each time. Every practice session will have a completely different sequence.
+
+**Sample of Possible Random Questions:**
 1. **Q55:** "Name the 3rd triad in F major." → **Answer:** `Am` *(1st correct)*
 2. **Q56:** "Name the 2nd triad in Bb major." → **Answer:** `Cm` *(2nd correct)*
 3. **Q57:** "Name the 6th triad in Eb major." → **Answer:** `Cm` *(3rd correct)*
@@ -190,7 +200,9 @@ This document shows the **exact** question and answer pairs that a user encounte
 ### Question Sequence:
 *Note: All 10 questions are randomized triad questions from the current group keys (E, B, F♯). No accidentals or scales - pure triad reinforcement practice.*
 
-**Example Progression (10 correct answers needed):**
+**⚠️ IMPORTANT**: Both the keys and chord degrees are randomly selected each time. Every practice session will have a completely different sequence.
+
+**Sample of Possible Random Questions:**
 1. **Q86:** "Name the 3rd triad in B major." → **Answer:** `D#m` *(1st correct)*
 2. **Q87:** "Name the 6th triad in F# major." → **Answer:** `D#m` *(2nd correct)*
 3. **Q88:** "Name the 2nd triad in E major." → **Answer:** `F#m` *(3rd correct)*
@@ -247,7 +259,9 @@ This document shows the **exact** question and answer pairs that a user encounte
 ### Question Sequence:
 *Note: All 10 questions are randomized triad questions from the current group keys (A♭, D♭, G♭). No accidentals or scales - pure triad reinforcement practice.*
 
-**Example Progression (10 correct answers needed):**
+**⚠️ IMPORTANT**: Both the keys and chord degrees are randomly selected each time. Every practice session will have a completely different sequence.
+
+**Sample of Possible Random Questions:**
 1. **Q117:** "Name the 2nd triad in Gb major." → **Answer:** `Abm` *(1st correct)*
 2. **Q118:** "Name the 5th triad in Ab major." → **Answer:** `Eb` *(2nd correct)*
 3. **Q119:** "Name the 3rd triad in Db major." → **Answer:** `Fm` *(3rd correct)*
