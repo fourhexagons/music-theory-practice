@@ -1,22 +1,29 @@
 /*
  * Music Theory Practice - Design System
- * Design tokens and component-based CSS architecture
+ * PURE NEUTRAL GRAYS ONLY - Fixed to match actual colors
  */
 
-/* Design Tokens - Level 1 (Core Values) */
+/* Design Tokens - Level 1 (PURE NEUTRAL GRAYS) */
 :root {
-  --color-gray-100: #f8f9fa;
-  --color-gray-200: #e9ecef;
-  --color-gray-300: #dee2e6;
-  --color-gray-400: #ced4da;
-  --color-gray-500: #adb5bd;
-  --color-gray-600: #6c757d;
-  --color-gray-700: #495057;
-  --color-gray-800: #343a40;
-  --color-gray-900: #212529;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #dddddd;
+  --color-gray-400: #cccccc;
+  --color-gray-500: #aaaaaa;
+  --color-gray-600: #555555;
+  --color-gray-700: #666666;
+  --color-gray-800: #4d4d4d;
+  --color-gray-900: #333333;
+  
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-near-black: #111111;
+  
+  /* Feedback colors (only these should have color) */
   --color-green-400: #89ff89;
   --color-red-400: #ff8989;
-  --color-blue-400: #007acc;
+  
+  /* Spacing */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -28,6 +35,8 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
+  
+  /* Typography */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -36,14 +45,14 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
   --font-size-4xl: 2.25rem;
+  
   --line-height-tight: 1.2;
   --line-height-snug: 1.4;
   --line-height-normal: 1.6;
   --line-height-relaxed: 1.8;
+  
+  /* Other */
   --radius-none: 0;
-  --radius-sm: 0.125rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -52,22 +61,26 @@
   --transition-slow: 500ms ease-in-out;
 }
 
-/* Semantic Tokens - Level 2 (Component Meanings) */
+/* Semantic Tokens - Level 2 (NEUTRAL GRAYS ONLY) */
 :root {
-  --ds-bg-primary: var(--color-gray-600);
-  --ds-bg-secondary: var(--color-gray-700);
-  --ds-bg-surface: var(--color-gray-200);
+  --ds-bg-primary: #555555;
+  --ds-bg-secondary: #666666;
+  --ds-bg-surface: #dddddd;
   --ds-bg-overlay: rgba(0, 0, 0, 0.5);
-  --ds-text-primary: var(--color-gray-100);
-  --ds-text-secondary: var(--color-gray-900);
-  --ds-text-muted: var(--color-gray-600);
-  --ds-interactive-primary: var(--color-gray-800);
-  --ds-interactive-primary-hover: var(--color-gray-900);
-  --ds-interactive-secondary: var(--color-gray-300);
-  --ds-interactive-secondary-hover: var(--color-gray-400);
-  --ds-feedback-success: var(--color-green-400);
-  --ds-feedback-error: var(--color-red-400);
-  --ds-feedback-focus: var(--color-blue-400);
+  
+  --ds-text-primary: #ffffff;
+  --ds-text-secondary: #111111;
+  --ds-text-muted: #aaaaaa;
+  
+  --ds-interactive-primary: #4d4d4d;
+  --ds-interactive-primary-hover: #3a3a3a;
+  --ds-interactive-secondary: #e5e5e5;
+  --ds-interactive-secondary-hover: #cccccc;
+  
+  --ds-feedback-success: #89ff89;
+  --ds-feedback-error: #ff8989;
+  --ds-feedback-focus: #ffffff;
+  
   --ds-space-component-xs: var(--space-2);
   --ds-space-component-sm: var(--space-3);
   --ds-space-component-md: var(--space-4);
@@ -79,33 +92,69 @@
   --ds-space-layout-xl: var(--space-20);
 }
 
-/* Component Tokens - Level 3 (Specific Components) */
+/* Component Tokens - Level 3 (NEUTRAL COMPONENTS) */
 :root {
-  --ds-button-bg: var(--ds-interactive-primary);
-  --ds-button-bg-hover: var(--ds-interactive-primary-hover);
-  --ds-button-text: var(--ds-text-primary);
-  --ds-button-padding-x: var(--space-12);
-  --ds-button-padding-y: var(--ds-space-component-md);
-  --ds-button-font-size: var(--font-size-lg);
-  --ds-button-border-radius: var(--radius-none);
+  --ds-button-bg: #4d4d4d;
+  --ds-button-bg-hover: #3a3a3a;
+  --ds-button-text: #ffffff;
+  --ds-button-padding-x: 3.5rem;
+  --ds-button-padding-y: 1rem;
+  --ds-button-font-size: 1.125rem;
+  --ds-button-border-radius: 0;
   --ds-button-transition: var(--transition-fast);
-  --ds-input-bg: var(--ds-bg-surface);
-  --ds-input-text: var(--ds-text-secondary);
-  --ds-input-placeholder: var(--ds-text-muted);
+  
+  --ds-input-bg: #dddddd;
+  --ds-input-text: #111111;
+  --ds-input-placeholder: #555555;
   --ds-input-border: transparent;
-  --ds-input-border-focus: var(--ds-feedback-focus);
-  --ds-input-padding-x: var(--ds-space-component-lg);
-  --ds-input-padding-y: var(--ds-space-component-md);
-  --ds-input-font-size: var(--font-size-lg);
-  --ds-input-border-radius: var(--radius-none);
-  --ds-question-font-size-min: var(--font-size-2xl);
-  --ds-question-font-size-max: var(--font-size-4xl);
-  --ds-question-text: var(--ds-text-primary);
-  --ds-question-margin-bottom: var(--ds-space-layout-md);
-  --ds-question-line-height: var(--line-height-tight);
-  --ds-feedback-success-color: var(--ds-feedback-success);
-  --ds-feedback-error-color: var(--ds-feedback-error);
-  --ds-feedback-font-size: var(--font-size-xl);
-  --ds-feedback-min-height: 1.5em;
-  --ds-feedback-margin-top: var(--ds-space-component-sm);
+  --ds-input-border-focus: #ffffff;
+  --ds-input-padding-x: 1.25rem;
+  --ds-input-padding-y: 1rem;
+  --ds-input-font-size: 1.125rem;
+  --ds-input-border-radius: 0;
+  
+  --ds-question-font-size-min: 1.5rem;
+  --ds-question-font-size-max: 2.25rem;
+  --ds-question-text: #ffffff;
+  --ds-question-margin-bottom: 3rem;
+  --ds-question-line-height: 1.2;
+  
+  --ds-feedback-success-color: #89ff89;
+  --ds-feedback-error-color: #ff8989;
+  --ds-feedback-font-size: 1.3rem;
+  --ds-feedback-min-height: 1.3125rem;
+  --ds-feedback-margin-top: 0.5rem;
+}
+
+/* ACCESSIBILITY FIX: Pure neutral focus styles */
+*:focus {
+  outline: none !important;
+}
+
+button:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+input:focus,
+input:focus-visible {
+  border-color: #ffffff !important;
+  outline: 2px solid #ffffff !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+.practice-menu-link:focus,
+.practice-menu-option:focus {
+  outline: 2px solid #111111 !important;
+  outline-offset: 2px !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+a:focus-visible {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 2px !important;
 } 

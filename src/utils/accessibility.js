@@ -1,10 +1,11 @@
-// Accessibility utilities
+// Accessibility utilities - FIXED to remove blue outline override
 export class AccessibilityManager {
   constructor() {
     this.setupKeyboardNavigation();
     this.createScreenReaderAnnouncer();
     this.setupFocusManagement();
   }
+
   setupKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
       // Escape key handling
@@ -17,6 +18,7 @@ export class AccessibilityManager {
       }
     });
   }
+
   createScreenReaderAnnouncer() {
     const announcer = document.createElement('div');
     announcer.setAttribute('aria-live', 'assertive');
@@ -35,6 +37,7 @@ export class AccessibilityManager {
     document.body.appendChild(announcer);
     this.announcer = announcer;
   }
+
   announce(message) {
     if (this.announcer) {
       this.announcer.textContent = message;
@@ -43,21 +46,21 @@ export class AccessibilityManager {
       }, 1000);
     }
   }
+
   setupFocusManagement() {
-    // Ensure focus is visible
-    document.addEventListener('focusin', (e) => {
-      if (e.target.matches('input, button, select, textarea, [tabindex]')) {
-        e.target.style.outline = '2px solid #007acc';
-        e.target.style.outlineOffset = '2px';
+    // REMOVED: Blue outline override - CSS now handles focus styles
+    // Keep focus visible for keyboard users
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        document.body.classList.add('keyboard-navigation');
       }
     });
-    document.addEventListener('focusout', (e) => {
-      if (e.target.matches('input, button, select, textarea, [tabindex]')) {
-        e.target.style.outline = '';
-        e.target.style.outlineOffset = '';
-      }
+
+    document.addEventListener('mousedown', () => {
+      document.body.classList.remove('keyboard-navigation');
     });
   }
+
   handleEscapeKey(e) {
     // Close any open modals or menus
     const openMenu = document.querySelector('.practice-menu-overlay.open');
@@ -67,9 +70,11 @@ export class AccessibilityManager {
     }
   }
 }
+
 // Initialize accessibility features
 document.addEventListener('DOMContentLoaded', () => {
   window.accessibilityManager = new AccessibilityManager();
 });
+
 // Make available globally
 window.AccessibilityManager = AccessibilityManager; 

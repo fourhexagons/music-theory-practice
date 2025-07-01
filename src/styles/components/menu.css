@@ -1,12 +1,12 @@
-/* --- Practice Menu Overlay and Bar Refactor --- */
+/* Practice Menu - PURE NEUTRAL GRAYS */
 .practice-menu-bar {
   position: fixed;
   top: 0;
   left: 0;
   width: 72px;
   height: 100vh;
-  background-color: #4D4D4D;
-  color: #fff;
+  background-color: #4d4d4d;
+  color: #ffffff;
   z-index: 1001;
   display: flex;
   flex-direction: column;
@@ -17,8 +17,8 @@
 }
 
 .practice-menu-open .practice-menu-bar {
-  background-color: #B3B3B3;
-  color: #222;
+  background-color: #cccccc;
+  color: #111111;
 }
 
 /* Remove Practice title */
@@ -54,7 +54,11 @@
 .hamburger-line {
   width: 100%;
   height: 2px;
-  background-color: var(--text-primary);
+  background-color: #ffffff;
+}
+
+.practice-menu-open .hamburger-line {
+  background-color: #111111;
 }
 
 .menu-icon-x {
@@ -68,7 +72,7 @@
   position: absolute;
   width: 100%;
   height: 2px;
-  background-color: var(--text-primary);
+  background-color: #111111;
   top: 50%;
   left: 0;
   transform: translateY(-50%);
@@ -97,7 +101,7 @@
   width: calc(100vw - 72px);
   height: 100vh;
   background: #e5e5e5;
-  color: #111;
+  color: #111111;
   z-index: 1000;
   display: none;
   font-family: 'Jost', sans-serif;
@@ -150,7 +154,7 @@
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5;
-  color: #222;
+  color: #111111;
   background: none;
   border: none;
   cursor: pointer;
@@ -164,7 +168,6 @@
 
 .practice-menu-link.active,
 .practice-menu-link:focus {
-  /* Remove font-weight change */
   font-weight: 500;
 }
 
@@ -175,7 +178,7 @@
 .practice-menu-option.current-selection:focus,
 .practice-menu-option.current-selection:active {
   border: none;
-  border-bottom: 2px solid #111;
+  border-bottom: 2px solid #111111;
   background: none;
   color: inherit;
   box-shadow: none;
@@ -212,6 +215,7 @@
   margin-bottom: 1.5rem;
   cursor: pointer;
   display: none;
+  color: #111111;
 }
 
 .practice-menu-options-area.show-back-nav .practice-menu-back-nav {
@@ -283,6 +287,7 @@ a.practice-menu-option {
   background: none;
   border: none;
   text-decoration: none;
+  color: #111111;
 }
 
 a.practice-menu-link:focus,
@@ -294,6 +299,7 @@ a.practice-menu-option:active {
   background: none;
   border: none;
   text-decoration: none;
+  color: #111111;
 }
 
 .accidental {
@@ -301,6 +307,7 @@ a.practice-menu-option:active {
   vertical-align: super;
   position: relative;
   font-family: Arial, 'Jost', sans-serif;
+  color: inherit;
 }
 
 /* Sharp symbol needs different positioning than flat */
