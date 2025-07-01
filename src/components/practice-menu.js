@@ -293,6 +293,11 @@ class PracticeMenu {
     // Start the practice
     if (selectedMode.mode === 'random_all' || selectedMode.mode === 'sevenths_only') {
       if (window.startAdvancedPractice) {
+        // For sevenths_only mode, override the custom group chapters
+        if (selectedMode.mode === 'sevenths_only') {
+          state.customGroup.chapters = [{ id: 'seventhSpelling', name: 'Seventh Spelling' }];
+          window.saveLearningState();
+        }
         window.startAdvancedPractice(selectedMode.mode);
       } else {
         console.error('startAdvancedPractice function not available');
