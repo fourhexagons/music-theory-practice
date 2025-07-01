@@ -29,7 +29,7 @@ export class PerformanceMonitor {
     };
     
     // Use centralized logger for performance metrics
-    import('../utils/logger.js').then(({ logger }) => {
+    import('./logger.js').then(({ logger }) => {
       logger.performance(name, value);
     }).catch(() => {
       // Fallback if logger not available
