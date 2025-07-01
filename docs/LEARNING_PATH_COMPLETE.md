@@ -17,16 +17,22 @@ This document consolidates all learning path information into a single, authorit
 ### **Key Sequence (Linear Mode)**
 C → G → D → A → E → B → F# → C#
 
-### **Chapter Sequence (Per Key)**
+### **Chapter Sequence (Per Key - a-levels)**
 1. **accCount** - "How many accidentals are in [Key] major?"
 2. **accNotes** - "Name the accidentals in [Key] major." *(skipped for C major)*
 3. **scale** - "Spell the [Key] major scale."
 4. **triads** - "Name the [degree] triad in [Key] major." *(3 questions)*
 5. **sevenths** - "Name the [degree] seventh chord in [Key] major." *(varies)*
 
+### **b-level Behavior (Triads-Only Practice)**
+- **All b-levels** (1b Sharps, 1b Flats, 2b Sharps, 2b Flats): **TRIADS ONLY**
+- **Questions 1-10**: Random triad questions from the current group keys
+- **No accidentals or scales** - focused triad reinforcement practice
+- **Mode**: `RANDOM_KEYS_LINEAR_CHAPTERS` with `TRIADS_ONLY_CHAPTERS`
+
 ### **Advancement Rules**
-- **accCount, accNotes, scale**: Advance immediately on correct answer
-- **triads, sevenths**: Require 3 correct answers (configured by `requiredStreak`)
+- **a-levels**: accCount, accNotes, scale advance immediately; triads require 3 correct
+- **b-levels**: All 10 questions are triads, requiring 10 correct total
 - **Question generation**: Degrees selected randomly from unused pool
 
 ## Special Behaviors

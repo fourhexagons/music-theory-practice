@@ -22,8 +22,10 @@
 - **Others**: Advance immediately on correct answer
 
 ## 🔄 Mode Behaviors
-- **LINEAR**: Sequential key/chapter progression
-- **RANDOM_KEYS_LINEAR_CHAPTERS**: Random keys, sequential chapters
+- **LINEAR**: Sequential key/chapter progression (a-levels)
+- **RANDOM_KEYS_LINEAR_CHAPTERS**: 
+  - **a-levels**: Random keys, sequential chapters (CORE_CHAPTERS)
+  - **b-levels**: Random keys, triads-only practice (TRIADS_ONLY_CHAPTERS)
 - **RANDOM_ALL**: Random keys and chapters
 - **COMPLETE**: End state
 
@@ -34,9 +36,10 @@
 - Working correctly warning
 
 ## 📊 Streak Requirements
-- **Linear modes**: 3 correct answers
-- **Random modes**: 5 correct answers
-- **Triads/Sevenths**: Always 3 per key regardless of mode
+- **a-levels (LINEAR)**: 3 correct answers
+- **b-levels (TRIADS_ONLY)**: 10 correct triad answers
+- **Level 3 (RANDOM_ALL)**: 5 correct answers
+- **Triads/Sevenths in a-levels**: Always 3 per key regardless of mode
 
 ---
 
