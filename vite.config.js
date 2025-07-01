@@ -12,8 +12,8 @@ export default defineConfig({
     sourcemap: true, // Enable for debugging
     rollupOptions: {
       input: {
-        main: 'src/index.html',
-        practice: 'src/practice.html'
+        'index': 'src/index.html',
+        'practice': 'src/practice.html'
       },
       output: {
         // Optimize chunk splitting
@@ -57,6 +57,12 @@ export default defineConfig({
     hmr: {
       overlay: true
     }
+  },
+  
+  // Preview server settings  
+  preview: {
+    port: 4173,
+    open: false
   },
   
   // Plugins for modern features
