@@ -27,10 +27,7 @@
   transform: translateY(1px);
 }
 
-.ds-button:focus-visible {
-  outline: 2px solid var(--ds-feedback-focus);
-  outline-offset: 2px;
-}
+/* Focus styles now handled by unified design system */
 
 .ds-button:active {
   transform: translateY(2px);
@@ -96,7 +93,4 @@
   transform: translateY(1px);
 }
 
-.btn:focus-visible {
-  outline: 2px solid var(--ds-feedback-focus);
-  outline-offset: 2px;
-} 
+/* Focus styles now handled by unified design system */ 

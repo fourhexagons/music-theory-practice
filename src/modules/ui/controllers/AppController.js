@@ -78,16 +78,10 @@ export class AppController {
 
   async initializePerformanceFeatures() {
     try {
-      // Preload modules that might be needed soon
-      if (window.lazyLoader) {
-        const modulesToPreload = [
-          './src/modules/business/services/QuestionGenerator.js',
-          './src/modules/business/services/AnswerValidator.js'
-        ];
-        await window.lazyLoader.preloadModules(modulesToPreload);
-      }
       // Start performance monitoring for app initialization
       window.performanceMonitor.startTiming('app-initialization');
+      // Skip module preloading since Vite bundles everything
+      console.log('📦 Using Vite bundled modules - no preloading needed');
     } catch (error) {
       console.warn('Performance features failed to initialize:', error);
     }

@@ -70,11 +70,28 @@ export class AnswerValidator {
 
   validateScaleSpelling(userAnswer, keyData) {
     const correctScale = keyData.scale.map(n => n.toUpperCase()).join('');
-    const userScale = userAnswer.trim()
-      .split(/\s+/)
+    
+    // Handle both spaced input ("c d e f g a b") and unspaced input ("cdefgab")
+    let userNotes;
+    if (userAnswer.trim().includes(' ')) {
+      // Space-separated input
+      userNotes = userAnswer.trim().split(/\s+/);
+    } else {
+      // Continuous input - split into individual characters for natural notes
+      userNotes = userAnswer.trim().split('').filter(c => /[a-gA-G]/.test(c));
+    }
+    
+    const userScale = userNotes
       .map(window.accidentalToUnicode)
       .join('')
       .toUpperCase();
+    
+    console.log('🎼 Scale Validation:', {
+      correctScale,
+      userScale,
+      userAnswer,
+      userNotes
+    });
     
     return userScale === correctScale;
   }

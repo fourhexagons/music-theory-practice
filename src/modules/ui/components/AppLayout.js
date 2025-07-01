@@ -39,7 +39,7 @@ export class AppLayout {
                       id="submit-btn" 
                       class="btn"
                       aria-describedby="answer-input">
-                Submit Answer
+                Submit
               </button>
             </form>
             <div class="feedback" 

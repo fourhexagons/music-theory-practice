@@ -28,10 +28,7 @@
   border-color: var(--button-hover);
 }
 
-.btn:focus {
-  outline: 2px solid var(--text-primary);
-  outline-offset: 2px;
-}
+/* Focus styles now handled by unified design system */
 
 .btn:active {
   transform: translateY(1px);

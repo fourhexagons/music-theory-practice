@@ -22,11 +22,7 @@
   opacity: 1;
 }
 
-.ds-input:focus {
-  border-color: var(--ds-input-border-focus);
-  outline: 2px solid var(--ds-input-border-focus);
-  outline-offset: 2px;
-}
+/* All focus styles removed - handled by design system */
 
 .ds-input:invalid,
 .ds-input[aria-invalid="true"] {
@@ -71,8 +67,4 @@
   opacity: 1;
 }
 
-#answer-input:focus {
-  border-color: var(--ds-input-border-focus);
-  outline: 2px solid var(--ds-input-border-focus);
-  outline-offset: 2px;
-} 
+/* All focus styles removed - handled by design system */ 

@@ -107,7 +107,7 @@
   --ds-input-text: #111111;
   --ds-input-placeholder: #555555;
   --ds-input-border: transparent;
-  --ds-input-border-focus: #ffffff;
+  --ds-input-border-focus: #cccccc;
   --ds-input-padding-x: 1.25rem;
   --ds-input-padding-y: 1rem;
   --ds-input-font-size: 1.125rem;
@@ -126,35 +126,58 @@
   --ds-feedback-margin-top: 0.5rem;
 }
 
-/* ACCESSIBILITY FIX: Pure neutral focus styles */
-*:focus {
-  outline: none !important;
+/* FALLBACK VARIABLES - Ensure compatibility with old variable names */
+:root {
+  /* Make sure old variable names point to design system values */
+  --bg-primary: var(--ds-bg-primary);
+  --bg-secondary: var(--ds-bg-secondary);
+  --input-bg: var(--ds-input-bg);
+  --text-secondary: var(--ds-text-secondary);
+  --button-bg: var(--ds-button-bg);
+  --button-hover: var(--ds-button-bg-hover);
+  --text-primary: var(--ds-text-primary);
+  --input-placeholder: var(--ds-input-placeholder);
+  --feedback-correct: var(--ds-feedback-success);
+  --feedback-incorrect: var(--ds-feedback-error);
 }
 
+/* FORCE BODY BACKGROUND - Multiple fallbacks to prevent white flash */
+html {
+  background-color: #555555 !important;
+}
+
+body {
+  background-color: var(--ds-bg-primary, #555555) !important;
+}
+
+/* COMPLETE FOCUS OUTLINE REMOVAL - No accessibility indicators */
+*:focus, 
+*:focus-visible, 
+*:focus-within, 
+input:focus, 
+input:focus-visible,
+button:focus, 
 button:focus-visible,
-.btn:focus-visible {
-  outline: 2px solid #ffffff !important;
-  outline-offset: 2px !important;
-  box-shadow: none !important;
-}
-
-input:focus,
-input:focus-visible {
-  border-color: #ffffff !important;
-  outline: 2px solid #ffffff !important;
-  outline-offset: 2px !important;
-  box-shadow: none !important;
-}
-
+a:focus, 
+a:focus-visible,
+.btn:focus,
+.btn:focus-visible,
 .practice-menu-link:focus,
-.practice-menu-option:focus {
-  outline: 2px solid #111111 !important;
-  outline-offset: 2px !important;
-  background: none !important;
+.practice-menu-link:focus-visible,
+.practice-menu-option:focus,
+.practice-menu-option:focus-visible,
+[role]:focus, 
+[role]:focus-visible,
+[tabindex]:focus,
+[tabindex]:focus-visible {
+  outline: none !important;
   box-shadow: none !important;
+  border-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
 }
 
-a:focus-visible {
-  outline: 2px solid #ffffff !important;
-  outline-offset: 2px !important;
+/* FORCE INPUT BACKGROUND ON FOCUS - Prevent white background */
+#answer-input:focus,
+input:focus {
+  background-color: var(--ds-input-bg) !important;
 } 

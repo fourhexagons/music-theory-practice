@@ -26,8 +26,8 @@
 
 /* Input styles */
 #answer-input {
-  background-color: var(--input-bg);
-  color: var(--text-secondary);
+  background-color: var(--ds-input-bg) !important;
+  color: var(--ds-text-secondary) !important;
   border: 1px solid transparent;
   border-radius: var(--border-radius-none);
   padding: var(--spacing-md) var(--spacing-lg);
@@ -41,15 +41,11 @@
 }
 
 #answer-input::placeholder {
-  color: var(--input-placeholder);
+  color: var(--ds-input-placeholder);
   opacity: 1;
 }
 
-#answer-input:focus {
-  border-color: var(--text-primary);
-  outline: 2px solid var(--text-primary);
-  outline-offset: 2px;
-}
+/* Focus styles now handled by unified design system */
 
 #answer-input:invalid {
   border-color: var(--feedback-incorrect);
@@ -96,7 +92,4 @@ input[type="text"][aria-invalid="true"] {
   box-shadow: none !important;
 }
 
-input[type="text"]:focus,
-select:focus {
-  border-color: var(--color-accent);
-}
+/* Focus styles now handled by unified design system */

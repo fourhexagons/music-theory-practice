@@ -6,17 +6,8 @@
  */
 
 :root {
-  /* Colors */
-  --bg-primary: #555;
-  --bg-secondary: #666;
-  --text-primary: #fff;
-  --text-secondary: #111;
-  --input-bg: #ddd;
-  --input-placeholder: #555;
-  --button-bg: #4D4D4D;
-  --button-hover: #3A3A3A;
-  --feedback-correct: #89ff89;
-  --feedback-incorrect: #ff8989;
+  /* REMOVED OLD VARIABLES - Using design system variables instead */
+  /* Colors will be provided by design-system.css */
   
   /* Spacing Scale */
   --spacing-xs: 0.5rem;
