@@ -1,5 +1,26 @@
 # Development Guide
 
+## 🔍 **MANDATORY: Systematic Research Methodology**
+
+**ALL development work involving existing code MUST follow the [Systematic Research Methodology](SYSTEMATIC_RESEARCH_METHODOLOGY.md).**
+
+### Quick Start
+1. **Use the [Research Template](RESEARCH_TEMPLATE.md)** for any task involving existing code
+2. **Never make assumptions** - always verify with actual code first
+3. **Research systematically** - break problems into specific questions and investigate each one
+4. **Document findings** - capture evidence and reasoning for future reference
+
+### Why This Matters
+This methodology successfully identified and fixed complex bugs that traditional debugging missed:
+- Architecture conflicts between old and new systems
+- Test configuration issues masking real problems  
+- Root cause vs. symptom confusion
+- Integration points that weren't obvious
+
+**Bottom line: Research first, implement second. Always verify through code.**
+
+---
+
 ## 🚨 CRITICAL: LEARNING PATH LOGIC PROTECTION PROTOCOL 🚨
 
 **BEFORE making ANY changes to learning path logic, you MUST follow this protocol:**
