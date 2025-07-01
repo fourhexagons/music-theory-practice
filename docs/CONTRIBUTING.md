@@ -59,7 +59,27 @@ git checkout -b feature/your-feature-name
 3. **Make targeted changes** addressing root causes (not symptoms)
 4. **Add tests** for new functionality
 5. **Run the test suite** to ensure everything works
-6. **Update documentation** with findings and rationale
+6. **🚨 MANDATORY: Update documentation** - Follow [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)
+
+### **📝 Documentation Requirements (MANDATORY)**
+
+**Every contribution MUST include documentation updates. Following the [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md):**
+
+#### **Pre-Commit Documentation Checklist**
+- [ ] **Research findings documented** - Key insights captured for future developers
+- [ ] **Decision rationale recorded** - Why this approach was chosen over alternatives
+- [ ] **Code documentation updated** - Comments, README, function docs as needed
+- [ ] **User guides updated** - Any behavior changes reflected in user documentation
+- [ ] **Examples verified** - All documentation examples still work correctly
+- [ ] **Cross-references checked** - Links and references are still accurate
+
+#### **Documentation Quality Standards**
+- ✅ **Accurate** - Reflects actual current behavior
+- ✅ **Complete** - No missing steps or information
+- ✅ **Clear** - Understandable by intended audience  
+- ✅ **Current** - Updated with every relevant change
+
+**Remember: Documentation updates are NOT optional. They're as required as tests passing.**
 
 ### Testing Your Changes
 ```bash
@@ -125,6 +145,33 @@ Brief description of the changes
 - [ ] Researched existing code before making changes
 - [ ] Identified root cause (not just symptoms)
 - [ ] Documented findings and rationale
+
+## 🚨 MANDATORY: Documentation Updates
+Following [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md):
+
+### Research Documentation
+- [ ] Key findings documented for future reference
+- [ ] Decision rationale captured with evidence
+- [ ] Alternative solutions considered and documented
+- [ ] Architectural insights noted in appropriate guides
+
+### Code Documentation  
+- [ ] Function/method comments updated for changed behavior
+- [ ] Inline comments added for complex logic
+- [ ] README updated if interface or setup changed
+- [ ] Architecture documentation updated for structural changes
+
+### User Documentation
+- [ ] User guides updated for behavior changes
+- [ ] Examples updated and verified to work
+- [ ] Testing procedures updated if needed
+- [ ] Cross-references checked and updated
+
+### Documentation Quality
+- [ ] Examples work when followed exactly
+- [ ] Information is consistent across documents
+- [ ] New team member could understand updates
+- [ ] Links and references are accurate
 
 ## Type of Change
 - [ ] Bug fix

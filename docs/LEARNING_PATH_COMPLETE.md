@@ -108,27 +108,47 @@ Follow the same pattern: accCount → accNotes → scale → triads → sevenths
 
 ## Testing and Verification
 
-### **Automated Testing**
-Use `test_headless_learning_path.js` to verify learning path progression:
+### **Enhanced Automated Testing**
+Use `test_headless_learning_path.js` to verify learning path progression and validate b-level behavior:
 
 ```bash
 # Ensure dev server is running
 npm run dev
 
-# Run headless test
+# Run enhanced headless test with b-level validation
 npm run test:headless
 ```
 
+**Test Capabilities (Enhanced 2024)**:
+- ✅ **Level Progression Tracking**: Monitors transitions (1 → 1a → 1b → 2a → 2b)
+- ✅ **B-Level Compliance Validation**: Ensures b-levels ask ONLY triads questions
+- ✅ **Question Type Analysis**: Validates each level's allowed question types
+- ✅ **Key Usage Verification**: Confirms appropriate keys for each level
+- ✅ **Comprehensive Reporting**: Detailed level behavior analysis with pass/fail status
+
 **Expected Results**:
-- Q1-5: C major (accCount → scale → 3 triads)
-- Q6-8: G major (accCount → accNotes → scale)  
-- Q9-10: G major triads
-- 100% pass rate
+- **Level 1** (Introduction): Mixed content (accCount, scale, triads) ✅
+- **Level 1a** (Sharps): Mixed content (accCount, accNotes, scale, triads) ✅
+- **Level 1b** (Sharps b-level): **TRIADS ONLY** - validates new UX improvement ✅
+- **B-Level Compliance**: All b-levels show "✅ TRIADS ONLY" status
+- **Success Rate**: 100% with comprehensive behavior validation
+
+**Sample Test Output**:
+```
+🎯 B-Level Validation Summary:
+   B-Levels Tested: 1b
+   All B-Levels Valid: ✅ YES
+   🎉 B-levels successfully use triads-only behavior!
+
+🏆 Final Verdict:
+🎉 ALL TESTS PASSED! Learning path and b-level behavior working correctly.
+```
 
 ### **Manual Testing**
 1. Start dev server: `npm run dev`
 2. Navigate to: `http://localhost:5173/practice`
 3. Reset app and verify progression matches expected behavior
+4. **Verify b-levels**: When reaching level 1b, confirm all questions are triads only
 
 ## Research History
 

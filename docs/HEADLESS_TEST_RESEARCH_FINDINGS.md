@@ -288,6 +288,71 @@ This bug was only discovered because I:
 
 ---
 
+## 🚀 **Major Enhancement Update (2024): B-Level Validation Capabilities**
+
+### **Enhancement Overview**
+Building on the systematic research foundation documented above, the headless test has been significantly enhanced to validate the **critical UX improvement** where b-levels now provide focused triad practice instead of confusing mixed content.
+
+### **New Capabilities Added**
+1. **Level Progression Tracking**: Monitors transitions (1 → 1a → 1b → 2a → 2b)
+2. **B-Level Compliance Validation**: Ensures b-levels ask ONLY triads questions  
+3. **Question Type Analysis**: Validates each level's allowed question types per level expectations
+4. **Key Usage Verification**: Confirms appropriate keys for each level
+5. **Comprehensive Reporting**: Detailed level behavior analysis with clear pass/fail status
+
+### **Technical Implementation**
+The enhanced test adds sophisticated validation logic:
+
+```javascript
+// Level behavior expectations with b-level identification
+const LEVEL_EXPECTATIONS = {
+    '1b': { // Level 1b Sharps/Flats - triads only
+        allowedQuestionTypes: ['triads'],
+        allowedKeys: ['G', 'D', 'A', 'F', 'Bb', 'Eb'],
+        isB_Level: true,
+        expectedStreak: 10
+    }
+    // ... other levels
+};
+
+// B-level compliance validation
+if (expectations.isB_Level && !expectations.allowedQuestionTypes.includes(questionType)) {
+    logResult('fail', `❌ B-Level Violation: Level ${currentLevel} asked ${questionType}, but should only ask: ${expectations.allowedQuestionTypes.join(', ')}`);
+}
+```
+
+### **Real Test Results**
+The enhanced test successfully validated the b-level UX improvement:
+
+```
+📋 Level 1b:
+   Questions Asked: 26
+   Question Types: triads
+   Keys Used: G
+   B-Level Compliance: ✅ TRIADS ONLY
+   Behavior Valid: ✅
+
+🎯 B-Level Validation Summary:
+   B-Levels Tested: 1b
+   All B-Levels Valid: ✅ YES
+   🎉 B-levels successfully use triads-only behavior!
+```
+
+### **Impact and Value**
+This enhancement transforms the headless test from a basic progression checker into a **comprehensive learning path behavior validator** that:
+
+- **Prevents UX regressions** by automatically detecting if b-levels revert to mixed content
+- **Validates architectural changes** like switching from `CORE_CHAPTERS` to `TRIADS_ONLY_CHAPTERS`
+- **Provides confidence** that the core UX improvement is working correctly
+- **Enables systematic validation** of learning path modifications
+
+### **Future-Proofing**
+The enhanced test is designed to easily accommodate additional levels and validation rules as the learning path evolves, maintaining the systematic research methodology that made the original implementation successful.
+
+**This enhancement demonstrates how systematic research methodology enables building robust, maintainable testing infrastructure that grows with the application's complexity.**
+
+---
+
 ## Code Reference Map
 
 | Feature | Primary Location | Notes |
@@ -296,4 +361,5 @@ This bug was only discovered because I:
 | Learning State | `src/state/learningState.js` | Current implementation |
 | Quiz Data | `src/data/quizData.js` | Current data structure |
 | C Major Logic | `src/state/learningState.js:288-290` | Skipping logic documented in line 22 |
-| Progression Rules | `cursor/docs/ACTUAL_LEARNING_PATH.md` | User's personal archive | 
+| Progression Rules | `cursor/docs/ACTUAL_LEARNING_PATH.md` | User's personal archive |
+| **Enhanced Test** | `test_headless_learning_path.js` | **B-level validation capabilities** | 

@@ -10,10 +10,11 @@ const CONFIG = {
     timeout: 30000,
     viewport: { width: 1280, height: 720 },
     waitDelay: 500, // Increased: More time for automatic progression
-    showDetails: true
+    showDetails: true,
+    maxQuestionsPerLevel: 25 // Max questions to test per level before timing out
 };
 
-// Dynamic progression test - no hardcoded expectations, just track what happens
+// Enhanced progression test - validates b-level triads-only behavior and level progression
 
 // Color codes for CLI output
 const colors = {
@@ -33,11 +34,47 @@ const testState = {
     browser: null,
     page: null,
     results: [],
+    levelTests: {}, // Track test results per level
     stats: {
         total: 0,
         passed: 0,
         failed: 0,
-        startTime: Date.now()
+        startTime: Date.now(),
+        levelsCompleted: 0
+    }
+};
+
+// Level behavior expectations
+const LEVEL_EXPECTATIONS = {
+    '1': { // Introduction - C Major only
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
+        allowedKeys: ['C'],
+        isB_Level: false,
+        expectedStreak: 3
+    },
+    '1a': { // Level 1a Sharps - G, D, A keys
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
+        allowedKeys: ['G', 'D', 'A'],
+        isB_Level: false,
+        expectedStreak: 3
+    },
+    '1b': { // Level 1b Sharps/Flats - triads only
+        allowedQuestionTypes: ['triads'],
+        allowedKeys: ['G', 'D', 'A', 'F', 'Bb', 'Eb'], // Both sharps and flats
+        isB_Level: true,
+        expectedStreak: 10
+    },
+    '2a': { // Level 2a Sharps/Flats - more advanced keys
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
+        allowedKeys: ['E', 'B', 'F#', 'Ab', 'Db', 'Gb'],
+        isB_Level: false,
+        expectedStreak: 3
+    },
+    '2b': { // Level 2b Sharps/Flats - triads only
+        allowedQuestionTypes: ['triads'],
+        allowedKeys: ['E', 'B', 'F#', 'Ab', 'Db', 'Gb'],
+        isB_Level: true,
+        expectedStreak: 10
     }
 };
 
@@ -139,13 +176,62 @@ async function resetApp() {
     }
 }
 
-async function testNextQuestion(questionNumber) {
+async function getCurrentLevel() {
+    return await testState.page.evaluate(() => {
+        if (window.getCurrentLevel) {
+            const groupObj = window.getCurrentLevel();
+            if (groupObj && groupObj.name) {
+                // Extract level identifier from name like "3. Level 1b Sharps" → "1b"
+                const match = groupObj.name.match(/Level (\w+)/);
+                if (match) {
+                    return match[1]; // Returns "1b", "2a", etc.
+                }
+                // Handle simple cases like "1. Introduction" → "1"
+                const simpleMatch = groupObj.name.match(/^(\d+)\./);
+                if (simpleMatch) {
+                    return simpleMatch[1]; // Returns "1"
+                }
+            }
+        }
+        return 'unknown';
+    });
+}
+
+async function validateLevelBehavior(currentLevel, questionKey, questionType) {
+    const expectations = LEVEL_EXPECTATIONS[currentLevel];
+    if (!expectations) {
+        logResult('fail', `Unknown level: ${currentLevel}`);
+        return false;
+    }
+    
+    let isValid = true;
+    
+    // Validate question type for b-levels
+    if (expectations.isB_Level && !expectations.allowedQuestionTypes.includes(questionType)) {
+        logResult('fail', `❌ B-Level Violation: Level ${currentLevel} asked ${questionType}, but should only ask: ${expectations.allowedQuestionTypes.join(', ')}`);
+        isValid = false;
+    }
+    
+    // Validate key is appropriate for level
+    if (!expectations.allowedKeys.includes(questionKey)) {
+        logResult('fail', `❌ Key Violation: Level ${currentLevel} used key ${questionKey}, but should only use: ${expectations.allowedKeys.join(', ')}`);
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+async function testNextQuestion(questionNumber, expectedLevel = null) {
     const startTime = Date.now();
     testState.stats.total++;
     
     log(`\n📝 Testing Q${questionNumber}`, 'bright');
     
     try {
+        // Get current level before generating question
+        const currentLevel = await getCurrentLevel();
+        log(`   Current Level: ${currentLevel}`, 'cyan');
+        
         // Generate question
         await testState.page.evaluate(() => {
             if (window.askQuestion) {
@@ -175,6 +261,26 @@ async function testNextQuestion(questionNumber) {
         
         log(`   Key: ${currentKey}, Type: ${questionType}`, 'cyan');
         log(`   Question: "${actualQuestion}"`, 'yellow');
+        
+        // Validate level behavior (especially b-level triads-only requirement)
+        const levelValid = await validateLevelBehavior(currentLevel, currentKey, questionType);
+        
+        // Track level testing
+        if (!testState.levelTests[currentLevel]) {
+            testState.levelTests[currentLevel] = {
+                questionsAsked: 0,
+                questionTypes: new Set(),
+                keys: new Set(),
+                behaviorValid: true
+            };
+        }
+        
+        testState.levelTests[currentLevel].questionsAsked++;
+        testState.levelTests[currentLevel].questionTypes.add(questionType);
+        testState.levelTests[currentLevel].keys.add(currentKey);
+        if (!levelValid) {
+            testState.levelTests[currentLevel].behaviorValid = false;
+        }
         
         // Get correct answer based on question type and key
         let correctAnswer = 'unknown';
@@ -229,35 +335,78 @@ async function testNextQuestion(questionNumber) {
                            feedback.toLowerCase().includes('wrong') ||
                            feedback.trim().length > 0;
         
-        if (!isIncorrect) {
+        if (!isIncorrect && levelValid) {
             const duration = Date.now() - startTime;
             logResult('pass', `Q${questionNumber}: ✅ ${currentKey} ${questionType} (${duration}ms)`);
             testState.stats.passed++;
-            return true;
+            return { success: true, level: currentLevel };
         } else {
-            logResult('fail', `Q${questionNumber}: ❌ ${currentKey} ${questionType} - ${feedback}`);
+            const error = !levelValid ? 'Level behavior violation' : `App feedback: ${feedback}`;
+            logResult('fail', `Q${questionNumber}: ❌ ${currentKey} ${questionType} - ${error}`);
             testState.stats.failed++;
-            return false;
+            return { success: false, level: currentLevel };
         }
         
     } catch (error) {
         logResult('fail', `Q${questionNumber}: Error - ${error.message}`);
         testState.stats.failed++;
-        return false;
+        return { success: false, level: 'error' };
     }
 }
 
-async function runTestSequence() {
-    log('\n🎵 Starting Learning Path Test Sequence', 'bright');
-    log('='.repeat(50), 'cyan');
+async function testLevelProgression() {
+    log('\n🎵 Starting Level Progression Test', 'bright');
+    log('='.repeat(60), 'cyan');
     
-    // Simple progression test: just answer 10 questions and track key progression
-    for (let i = 0; i < 10; i++) {
-        await testNextQuestion(i + 1);
+    let questionCount = 0;
+    let lastLevel = null;
+    const maxQuestions = 100; // Prevent infinite loops - increased to reach b-levels
+    
+    while (questionCount < maxQuestions) {
+        questionCount++;
+        
+        const result = await testNextQuestion(questionCount);
+        if (!result.success) {
+            logResult('fail', `Test failed at question ${questionCount}`);
+            break;
+        }
+        
+        // Check for level progression
+        if (lastLevel && lastLevel !== result.level) {
+            log(`\n🚀 LEVEL PROGRESSION: ${lastLevel} → ${result.level}`, 'green');
+            testState.stats.levelsCompleted++;
+            
+            // Validate level progression logic
+            const expectations = LEVEL_EXPECTATIONS[result.level];
+            if (expectations) {
+                log(`   New level ${result.level} expects: ${expectations.allowedQuestionTypes.join(', ')} questions`, 'cyan');
+                if (expectations.isB_Level) {
+                    log(`   ⚠️  B-Level detected - should ask ONLY triads questions`, 'yellow');
+                }
+            }
+        }
+        lastLevel = result.level;
+        
+        // Stop if we've tested enough levels (1, 1b, 2, 2b)
+        if (testState.stats.levelsCompleted >= 3) {
+            log('\n✅ Tested sufficient level progressions', 'green');
+            break;
+        }
+        
+        // Prevent excessive testing on single level
+        const currentLevelData = testState.levelTests[result.level];
+        if (currentLevelData && currentLevelData.questionsAsked > CONFIG.maxQuestionsPerLevel) {
+            log(`\n⚠️  Level ${result.level} tested for ${currentLevelData.questionsAsked} questions without progression`, 'yellow');
+            break;
+        }
         
         // Small delay between questions
         await new Promise(resolve => setTimeout(resolve, CONFIG.waitDelay));
     }
+}
+
+async function runTestSequence() {
+    await testLevelProgression();
 }
 
 async function printResults() {
@@ -265,20 +414,82 @@ async function printResults() {
     const successRate = testState.stats.total > 0 ? 
         Math.round((testState.stats.passed / testState.stats.total) * 100) : 0;
     
-    log('\n' + '='.repeat(60), 'cyan');
-    log('📊 TEST RESULTS SUMMARY', 'bright');
-    log('='.repeat(60), 'cyan');
+    log('\n' + '='.repeat(70), 'cyan');
+    log('📊 COMPREHENSIVE TEST RESULTS', 'bright');
+    log('='.repeat(70), 'cyan');
     
-    log(`Total Questions: ${testState.stats.total}`, 'white');
-    log(`Passed: ${testState.stats.passed}`, 'green');
-    log(`Failed: ${testState.stats.failed}`, 'red');
-    log(`Success Rate: ${successRate}%`, successRate >= 80 ? 'green' : 'red');
-    log(`Duration: ${duration}ms`, 'white');
+    // Overall stats
+    log(`\n📈 Overall Performance:`, 'bright');
+    log(`   Total Questions: ${testState.stats.total}`, 'white');
+    log(`   Passed: ${testState.stats.passed}`, 'green');
+    log(`   Failed: ${testState.stats.failed}`, 'red');
+    log(`   Success Rate: ${successRate}%`, successRate >= 80 ? 'green' : 'red');
+    log(`   Levels Completed: ${testState.stats.levelsCompleted}`, 'white');
+    log(`   Duration: ${duration}ms`, 'white');
     
-    if (testState.stats.failed === 0) {
-        log('\n🎉 ALL TESTS PASSED! Learning path is working correctly.', 'green');
+    // Level-specific analysis
+    log(`\n🎯 Level Behavior Analysis:`, 'bright');
+    
+    let allBLevelsValid = true;
+    
+    for (const [level, data] of Object.entries(testState.levelTests)) {
+        const expectations = LEVEL_EXPECTATIONS[level];
+        log(`\n📋 Level ${level}:`, expectations?.isB_Level ? 'yellow' : 'cyan');
+        log(`   Questions Asked: ${data.questionsAsked}`, 'white');
+        log(`   Question Types: ${Array.from(data.questionTypes).join(', ')}`, 'white');
+        log(`   Keys Used: ${Array.from(data.keys).join(', ')}`, 'white');
+        
+        if (expectations) {
+            // Check b-level compliance
+            if (expectations.isB_Level) {
+                const onlyTriads = data.questionTypes.size === 1 && data.questionTypes.has('triads');
+                const status = onlyTriads && data.behaviorValid ? '✅' : '❌';
+                log(`   B-Level Compliance: ${status} ${onlyTriads ? 'TRIADS ONLY' : 'MIXED CONTENT!'}`, 
+                    onlyTriads && data.behaviorValid ? 'green' : 'red');
+                
+                if (!onlyTriads || !data.behaviorValid) {
+                    allBLevelsValid = false;
+                    if (!onlyTriads) {
+                        log(`      ⚠️  Expected ONLY triads, but got: ${Array.from(data.questionTypes).join(', ')}`, 'red');
+                    }
+                }
+            } else {
+                log(`   A-Level: ✅ Mixed content allowed`, 'green');
+            }
+        }
+        
+        log(`   Behavior Valid: ${data.behaviorValid ? '✅' : '❌'}`, data.behaviorValid ? 'green' : 'red');
+    }
+    
+    // B-level summary
+    log(`\n🎯 B-Level Validation Summary:`, 'bright');
+    const bLevelsTested = Object.keys(testState.levelTests).filter(level => 
+        LEVEL_EXPECTATIONS[level]?.isB_Level
+    );
+    
+    if (bLevelsTested.length > 0) {
+        log(`   B-Levels Tested: ${bLevelsTested.join(', ')}`, 'cyan');
+        log(`   All B-Levels Valid: ${allBLevelsValid ? '✅ YES' : '❌ NO'}`, 
+            allBLevelsValid ? 'green' : 'red');
+        
+        if (allBLevelsValid) {
+            log(`   🎉 B-levels successfully use triads-only behavior!`, 'green');
+        } else {
+            log(`   ⚠️  Some b-levels are not following triads-only requirement!`, 'red');
+        }
     } else {
-        log(`\n⚠️  ${testState.stats.failed} tests failed. Check results above.`, 'red');
+        log(`   ⚠️  No B-levels were tested in this run`, 'yellow');
+    }
+    
+    // Final verdict
+    log(`\n🏆 Final Verdict:`, 'bright');
+    if (testState.stats.failed === 0 && allBLevelsValid) {
+        log(`🎉 ALL TESTS PASSED! Learning path and b-level behavior working correctly.`, 'green');
+    } else {
+        const issues = [];
+        if (testState.stats.failed > 0) issues.push(`${testState.stats.failed} question failures`);
+        if (!allBLevelsValid) issues.push('b-level behavior violations');
+        log(`⚠️  Issues found: ${issues.join(', ')}`, 'red');
     }
 }
 
@@ -293,7 +504,7 @@ async function cleanup() {
 async function main() {
     try {
         log('🎵 AUTOMATED LEARNING PATH TEST', 'bright');
-        log('Testing app progression using Q&A from ACTUAL_LEARNING_PATH.md\n', 'cyan');
+        log('Testing level progression and validating b-level triads-only behavior\n', 'cyan');
         
         await initBrowser();
         await navigateToApp();

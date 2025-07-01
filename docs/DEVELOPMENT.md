@@ -192,6 +192,27 @@ Assistants often make their biggest mistakes when they:
 
 ---
 
+## 📝 **MANDATORY: Documentation Maintenance Protocol**
+
+**Just like systematic research is mandatory, [Documentation Maintenance](DOCUMENTATION_MAINTENANCE_PROTOCOL.md) is mandatory for ALL development work.**
+
+### **Documentation is Part of Every Change**
+- ✅ **Document as you research** - Capture findings in real-time
+- ✅ **Document as you build** - Update guides as you implement  
+- ✅ **Document before you commit** - Documentation quality blocks merge
+
+### **Quick Documentation Checklist**
+Before committing ANY change:
+- [ ] **Research findings captured** for future developers
+- [ ] **Decision rationale documented** with evidence
+- [ ] **Code documentation updated** (comments, README, etc.)
+- [ ] **User guides updated** if behavior changed
+- [ ] **Examples verified** to still work correctly
+
+**See [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md) for complete requirements.**
+
+---
+
 This guide is for developers who want to set up the project locally, contribute to development, or understand the technical architecture.
 
 ## 🛠️ Prerequisites

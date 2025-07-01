@@ -77,6 +77,56 @@ This methodology emerged from successfully identifying and fixing a complex bug 
    - Regression testing for related functionality
    - Document the verification process
 
+### Phase 5: **Documentation and Knowledge Sharing**
+
+**MANDATORY: Follow [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)**
+
+#### Document Everything
+- **Research findings** - Capture insights for future developers
+- **Decision rationale** - Why this approach over alternatives
+- **Code changes** - Comments, README updates, architecture docs
+- **User impact** - Update user-facing guides if behavior changed
+- **Lessons learned** - Common pitfalls and best practices
+
+#### Documentation Quality Standards
+- **Accurate** - Reflects current behavior exactly
+- **Complete** - No missing steps or information
+- **Clear** - Understandable by intended audience
+- **Current** - Updated with every change
+
+**Remember: Documentation updates are as mandatory as code quality and testing.**
+
+---
+
+## ✅ **Research Methodology Checklist**
+
+### **Phase 1: Problem Definition**
+- [ ] Problem clearly defined with specific behaviors
+- [ ] Research questions formulated  
+- [ ] Success criteria established
+
+### **Phase 2: Systematic Investigation**  
+- [ ] Execution flow mapped from entry to problem area
+- [ ] All components in the flow examined
+- [ ] Search strategy documented
+
+### **Phase 3: Evidence Analysis**
+- [ ] Root cause identified with code evidence  
+- [ ] Alternative explanations considered
+- [ ] Solution approach validated
+
+### **Phase 4: Implementation**
+- [ ] Changes target actual root cause
+- [ ] Consistency maintained across codebase
+- [ ] Testing plan covers original issue + regressions
+
+### **Phase 5: Documentation** 
+- [ ] Research findings documented for future reference
+- [ ] Decision rationale captured with evidence
+- [ ] Code documentation updated
+- [ ] User guides updated if needed
+- [ ] Documentation follows [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)
+
 ## Research Tools & Techniques
 
 ### Code Investigation Tools
@@ -235,4 +285,13 @@ This systematic research methodology transforms development from guesswork into 
 - Create shared understanding across the team
 - Continuously improve our codebase knowledge
 
-The key is to always **verify through code** rather than assume, and to **document the journey** so future work can build on these insights. 
+The key is to always **verify through code** rather than assume, and to **document the journey** so future work can build on these insights.
+
+### **Systematic Research Workflow** (Copy this checklist)
+- [ ] Research questions formulated
+- [ ] Execution flow mapped  
+- [ ] All components examined
+- [ ] Root cause identified with evidence
+- [ ] Solution targets root cause
+- [ ] Comprehensive testing completed
+- [ ] **Documentation updated** following [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md) 

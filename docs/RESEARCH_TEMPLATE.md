@@ -143,6 +143,39 @@ read_file: "file:start-end"
 
 ## Documentation Updates
 
+### **🚨 MANDATORY: Documentation Must Be Updated**
+
+**Following the [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md), you MUST update documentation as part of this research. Documentation updates are NOT optional.**
+
+#### **Research Documentation (REQUIRED)**
+- [ ] **Key findings documented** for future reference
+- [ ] **Decision rationale captured** with evidence from research  
+- [ ] **Architectural insights noted** in appropriate guides
+- [ ] **Common pitfalls documented** to help future developers
+- [ ] **Alternative solutions considered** documented with reasoning
+
+#### **Code Documentation (If Implementation Involved)**
+- [ ] **Function/class documentation** updated for any changed behavior
+- [ ] **Inline comments added** for complex logic or workarounds  
+- [ ] **README updated** if public interface or setup changes
+- [ ] **Architecture documentation** updated for any structural changes
+
+#### **User-Facing Documentation (If Behavior Changed)**
+- [ ] **User guides updated** for any behavior changes
+- [ ] **Examples updated** to reflect new patterns
+- [ ] **Testing documentation** updated for new test procedures
+- [ ] **Cross-references checked** and updated as needed
+
+#### **Documentation Quality Check**
+- [ ] **Examples still work** when followed exactly
+- [ ] **Links and references** are still accurate
+- [ ] **Information is consistent** across all affected documents
+- [ ] **New team member could understand** the updated documentation
+
+---
+
+## Research Documentation
+
 ### Code Changes
 - [ ] Implementation documented with comments
 - [ ] Function/class documentation updated

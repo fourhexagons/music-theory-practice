@@ -28,6 +28,7 @@
 | Document | Purpose | When to Use |
 |----------|---------|-------------|
 | **[Systematic Research Methodology](SYSTEMATIC_RESEARCH_METHODOLOGY.md)** | Complete methodology guide | Before any development work |
+| **[Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)** | **MANDATORY documentation workflow** | **With every change - like git commits** |
 | **[Research Template](RESEARCH_TEMPLATE.md)** | Quick-reference checklist | For every task involving existing code |
 | **[Headless Test Research Findings](HEADLESS_TEST_RESEARCH_FINDINGS.md)** | Real case study example | When learning the methodology |
 
@@ -118,6 +119,8 @@
 ## **❓ Quick Questions?**
 
 **"What methodology should I use?"** → [Systematic Research Methodology](SYSTEMATIC_RESEARCH_METHODOLOGY.md)
+
+**"How do I update documentation?"** → [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)
 
 **"How do I start a task?"** → [Research Template](RESEARCH_TEMPLATE.md)
 
