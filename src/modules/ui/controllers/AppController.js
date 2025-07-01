@@ -153,11 +153,6 @@ export class AppController {
     const result = this.stateManager.handleCorrectAnswer();
     
     switch (result.action) {
-      case 'askNaming':
-        this.currentQuestion = window.learningState.currentQuestion;
-        this.questionDisplay.render(result.text, false);
-        break;
-        
       case 'startAdvanced':
         if (window.startAdvancedPractice) {
           window.startAdvancedPractice(window.learningState.advancedModeType);

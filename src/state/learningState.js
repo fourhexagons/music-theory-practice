@@ -229,8 +229,31 @@ function getCurrentChapter(mode, quizData = null) {
         accidentalsPairState.inProgress = false;
         accidentalsPairState.countAnswered = false;
         accidentalsPairState.currentKey = null;
+        // Continue with normal chapter progression
+        return group.chapters[currentChapterIndex];
       }
     }
+  }
+   
+  // APPROACH 1: Chapter Index Detection for RANDOM_KEYS_LINEAR_CHAPTERS
+  if (mode === window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
+    const currentChapter = group.chapters[currentChapterIndex];
+    
+    // If we've reached accCount, start the pairing process
+    if (currentChapter && currentChapter.id === 'accCount' && !accidentalsPairState.inProgress) {
+      // Get a random key for this pair
+      const randomKey = group.keys[Math.floor(Math.random() * group.keys.length)];
+      
+      // Activate pairing state
+      accidentalsPairState.inProgress = true;
+      accidentalsPairState.currentKey = randomKey;
+      accidentalsPairState.countAnswered = false;
+      
+      return currentChapter; // Return accCount
+    }
+    
+    // For all other chapters, return normally
+    return currentChapter;
   }
    
   if (mode === window.MODES.RANDOM_ALL) {

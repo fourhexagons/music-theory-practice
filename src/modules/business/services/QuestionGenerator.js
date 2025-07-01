@@ -14,8 +14,9 @@ export class QuestionGenerator {
       return null;
     }
 
-    const key = this.determineKey(group);
-    const chapter = this.determineChapter(group);
+    // Use global functions that contain pairing logic instead of local methods
+    const key = window.getCurrentKey(group.mode);
+    const chapter = window.getCurrentChapter(group.mode, this.quizData);
     
     if (!key || !chapter) {
       return null;
@@ -24,25 +25,7 @@ export class QuestionGenerator {
     return this.buildQuestion(key, chapter);
   }
 
-  determineKey(group) {
-    if (group.mode === 'linear') {
-      return group.keys[this.learningState.currentKeyIndex];
-    } else {
-      // Random key selection for other modes
-      return group.keys[Math.floor(Math.random() * group.keys.length)];
-    }
-  }
 
-  determineChapter(group) {
-    if (group.mode === 'random_all') {
-      const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
-        chapter.id !== 'accNotes' && chapter.id !== 'seventhSpelling'
-      );
-      return availableChapters[Math.floor(Math.random() * availableChapters.length)];
-    } else {
-      return group.chapters[this.learningState.currentChapterIndex];
-    }
-  }
 
   buildQuestion(key, chapter) {
     const question = {

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Path Simulation</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #222; color: #fff; line-height: 1.4; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #555; border-radius: 5px; }
+        .pass { color: #4f4; }
+        .fail { color: #f44; }
+        .info { color: #4af; }
+        .pair { color: #f84; }
+        button { padding: 10px 20px; margin: 5px; background: #555; color: #fff; border: none; cursor: pointer; border-radius: 3px; }
+        button:hover { background: #777; }
+        .results { background: #333; padding: 15px; margin: 10px 0; border-radius: 3px; max-height: 600px; overflow-y: auto; }
+        .question-item { padding: 8px; margin: 4px 0; border-left: 3px solid #555; padding-left: 12px; }
+        .question-item.accCount { border-left-color: #f84; background: rgba(255, 136, 68, 0.1); }
+        .question-item.accNotes { border-left-color: #f84; background: rgba(255, 136, 68, 0.2); }
+        .question-item.scale { border-left-color: #4af; }
+        .question-item.triads { border-left-color: #4f4; }
+        .streak-info { background: #444; padding: 8px; margin: 5px 0; border-radius: 3px; font-size: 0.9em; }
+        .pair-indicator { background: #663; padding: 5px; margin: 2px 0; border-radius: 3px; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎼 Learning Path Simulation</h1>
+        
+        <div class="test-section">
+            <button onclick="runSimulation()">Run Simulation</button>
+            <button onclick="clearResults()">Clear</button>
+        </div>
+
+        <div class="test-section">
+            <div id="simulation-results"></div>
+        </div>
+    </div>
+
+    <script>
+        const QUESTION_TYPES = {
+            ACCIDENTALS_COUNT: 'accCount',
+            ACCIDENTALS_NAMES: 'accNotes',
+            SCALE_SPELLING: 'scale',
+            TRIADS: 'triads'
+        };
+
+        const MODES = {
+            LINEAR: 'linear',
+            RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters'
+        };
+
+        const CHAPTERS = [
+            { id: QUESTION_TYPES.ACCIDENTALS_COUNT, name: 'Accidentals Count' },
+            { id: QUESTION_TYPES.ACCIDENTALS_NAMES, name: 'Accidentals Naming' },
+            { id: QUESTION_TYPES.SCALE_SPELLING, name: 'Scale Spelling' },
+            { id: QUESTION_TYPES.TRIADS, name: 'Triads' }
+        ];
+
+        const testLevel = {
+            name: '3. Level 1b Sharps',
+            keys: ['G', 'D', 'A'], 
+            mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS,
+            chapters: CHAPTERS,
+            requiredStreak: 5
+        };
+
+        const mockQuizData = {
+            'G': { accidentals: 1, notes: ['F#'] },
+            'D': { accidentals: 2, notes: ['F#', 'C#'] },
+            'A': { accidentals: 3, notes: ['F#', 'C#', 'G#'] }
+        };
+
+        function runSimulation() {
+            const results = [];
+            let state = {
+                currentChapterIndex: 0,
+                correctAnswerStreak: 0,
+                accidentalsPairState: {
+                    inProgress: false,
+                    currentKey: null,
+                    countAnswered: false
+                }
+            };
+
+            results.push(`🎯 Testing: ${testLevel.name}`);
+            results.push(`Keys: [${testLevel.keys.join(', ')}] | Required Streak: ${testLevel.requiredStreak}`);
+            results.push('');
+
+            let questionNum = 1;
+            const maxQuestions = 25;
+
+            while (state.correctAnswerStreak < testLevel.requiredStreak && questionNum <= maxQuestions) {
+                const question = generateQuestion(state);
+                const answer = getCorrectAnswer(question);
+                
+                results.push(`Q${questionNum}: ${question.text}`);
+                results.push(`   Answer: "${answer}" | Key: ${question.key} | Type: ${question.chapterId}`);
+                
+                // Handle correct answer
+                handleCorrectAnswer(state, question);
+                
+                results.push(`   Streak: ${state.correctAnswerStreak}/${testLevel.requiredStreak}`);
+                
+                if (state.accidentalsPairState.inProgress) {
+                    results.push(`   🔗 PAIR: ${state.accidentalsPairState.countAnswered ? 'accNotes next' : 'accCount done'} (locked key: ${state.accidentalsPairState.currentKey})`);
+                }
+                
+                results.push('');
+                questionNum++;
+            }
+
+            results.push(`✅ Completed! Total questions: ${questionNum - 1}`);
+            displayResults(results);
+        }
+
+        function generateQuestion(state) {
+            const key = determineKey(state);
+            const chapter = determineChapter(state, key);
+            
+            return {
+                key,
+                chapterId: chapter.id,
+                text: buildQuestionText(key, chapter)
+            };
+        }
+
+        function determineKey(state) {
+            if (state.accidentalsPairState.inProgress) {
+                return state.accidentalsPairState.currentKey;
+            }
+            return testLevel.keys[Math.floor(Math.random() * testLevel.keys.length)];
+        }
+
+        function determineChapter(state, selectedKey) {
+            // First check if we're in the middle of a pairing
+            if (state.accidentalsPairState.inProgress) {
+                if (!state.accidentalsPairState.countAnswered) {
+                    return testLevel.chapters.find(c => c.id === 'accCount');
+                } else {
+                    return testLevel.chapters.find(c => c.id === 'accNotes');
+                }
+            }
+
+            const currentChapter = testLevel.chapters[state.currentChapterIndex];
+            
+            // If we hit accCount and not in pairing, set up the pairing with the selected key
+            if (currentChapter.id === 'accCount') {
+                state.accidentalsPairState.inProgress = true;
+                state.accidentalsPairState.currentKey = selectedKey;  // Use the key that was chosen
+                state.accidentalsPairState.countAnswered = false;
+            }
+            
+            return currentChapter;
+        }
+
+        function buildQuestionText(key, chapter) {
+            switch (chapter.id) {
+                case 'accCount':
+                    return `How many accidentals are in ${key} major?`;
+                case 'accNotes':
+                    return `Name the accidentals in ${key} major.`;
+                case 'scale':
+                    return `Spell the ${key} major scale.`;
+                case 'triads':
+                    return `Name a triad in ${key} major.`;
+                default:
+                    return `Question in ${key} major`;
+            }
+        }
+
+        function getCorrectAnswer(question) {
+            const data = mockQuizData[question.key];
+            switch (question.chapterId) {
+                case 'accCount':
+                    return data.accidentals.toString();
+                case 'accNotes':
+                    return data.notes.join(' ');
+                case 'scale':
+                    return `${question.key} major scale`;
+                case 'triads':
+                    return `${question.key} major triad`;
+                default:
+                    return 'correct';
+            }
+        }
+
+        function handleCorrectAnswer(state, question) {
+            if (question.chapterId === 'accCount') {
+                state.accidentalsPairState.countAnswered = true;
+                const accNotesIndex = testLevel.chapters.findIndex(ch => ch.id === 'accNotes');
+                if (accNotesIndex !== -1) {
+                    state.currentChapterIndex = accNotesIndex;
+                }
+                return; // Don't advance streak yet
+            } else if (question.chapterId === 'accNotes' && state.accidentalsPairState.inProgress) {
+                state.accidentalsPairState.inProgress = false;
+                state.accidentalsPairState.countAnswered = false;
+                state.accidentalsPairState.currentKey = null;
+            }
+
+            state.correctAnswerStreak++;
+            
+            if (state.correctAnswerStreak < testLevel.requiredStreak) {
+                state.currentChapterIndex++;
+                if (state.currentChapterIndex >= testLevel.chapters.length) {
+                    state.currentChapterIndex = 0;
+                }
+            }
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('simulation-results');
+            let html = '<div class="results">';
+            
+            results.forEach(line => {
+                let className = 'question-item';
+                if (line.includes('accCount')) className += ' accCount';
+                else if (line.includes('accNotes')) className += ' accNotes';
+                else if (line.includes('scale')) className += ' scale';
+                else if (line.includes('triads')) className += ' triads';
+                else if (line.includes('PAIR:')) className = 'pair-indicator';
+                else if (line.includes('Streak:')) className = 'streak-info';
+                
+                html += `<div class="${className}">${line}</div>`;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+
+        function clearResults() {
+            document.getElementById('simulation-results').innerHTML = '';
+        }
+    </script>
+</body>
+</html> 

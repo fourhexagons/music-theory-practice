@@ -141,7 +141,77 @@ export class StateManager {
       } else {
         this.advanceQuestionPointer();
       }
+    } else if (group.mode === 'random_keys_linear_chapters') {
+      // Handle RANDOM_KEYS_LINEAR_CHAPTERS mode with accidentals pairing
+      if (this.learningState.currentQuestion && this.learningState.currentQuestion.chapterId === 'accCount') {
+        const key = this.learningState.currentQuestion.key;
+        
+        // Check if this key has accidentals to name
+        if (window.quizData[key] && window.quizData[key].accidentals > 0) {
+          // Set up pairing state for accNotes question
+          if (this.learningState.accidentalsPairState) {
+            this.learningState.accidentalsPairState.countAnswered = true;
+          }
+          
+          // Move to accNotes chapter and let normal question generation handle it
+          const accNotesChapterIndex = group.chapters.findIndex(ch => ch.id === 'accNotes');
+          if (accNotesChapterIndex !== -1) {
+            this.learningState.currentChapterIndex = accNotesChapterIndex;
+          }
+          
+          // Let normal question generation create the accNotes question
+          return { action: 'askQuestion' };
+        } else {
+          // C major case - no accidentals to name, proceed normally
+          this.learningState.correctAnswerStreak++;
+          if (this.learningState.correctAnswerStreak >= group.requiredStreak) {
+            if (this.learningState.customGroup) {
+              this.learningState.correctAnswerStreak = 0;
+              this.learningState.currentKeyIndex = 0;
+              this.learningState.currentChapterIndex = 0;
+            } else {
+              this.advanceLevel();
+            }
+          } else {
+            this.advanceQuestionPointer();
+          }
+        }
+      } else if (this.learningState.currentQuestion && this.learningState.currentQuestion.chapterId === 'accNotes' && 
+                 this.learningState.accidentalsPairState && this.learningState.accidentalsPairState.inProgress) {
+        // Completing accNotes part of a pair - end the pair and advance normally
+        this.learningState.accidentalsPairState.inProgress = false;
+        this.learningState.accidentalsPairState.countAnswered = false;
+        this.learningState.accidentalsPairState.currentKey = null;
+        
+        this.learningState.correctAnswerStreak++;
+        if (this.learningState.correctAnswerStreak >= group.requiredStreak) {
+          if (this.learningState.customGroup) {
+            this.learningState.correctAnswerStreak = 0;
+            this.learningState.currentKeyIndex = 0;
+            this.learningState.currentChapterIndex = 0;
+          } else {
+            this.advanceLevel();
+          }
+        } else {
+          this.advanceQuestionPointer();
+        }
+      } else {
+        // Normal progression for non-accidental questions
+        this.learningState.correctAnswerStreak++;
+        if (this.learningState.correctAnswerStreak >= group.requiredStreak) {
+          if (this.learningState.customGroup) {
+            this.learningState.correctAnswerStreak = 0;
+            this.learningState.currentKeyIndex = 0;
+            this.learningState.currentChapterIndex = 0;
+          } else {
+            this.advanceLevel();
+          }
+        } else {
+          this.advanceQuestionPointer();
+        }
+      }
     } else {
+      // All other modes (e.g., random_all)
       this.learningState.correctAnswerStreak++;
       if (this.learningState.correctAnswerStreak >= group.requiredStreak) {
         if (this.learningState.customGroup) {
