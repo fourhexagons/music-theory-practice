@@ -43,10 +43,11 @@ You can jump to any stage/key using the `?skip=` URL parameter with the followin
 - `?skip=Ab-7th+` (A♭ major advanced sevenths)  
 
 ## Directory Structure
-- `public/` — Static assets, HTML, CSS, JS, icons  
+- `src/` — Current system: HTML, CSS, JS modules, assets  
 - `cursor/docs/` — Project documentation (this file, etc.)  
 - `cursor/images/` — App images and logos  
-- `cursor/chats/` — AI/agent chat logs (if used)  
+- `cursor/chats/` — AI/agent chat logs (if used)
+- `archive/` — Legacy tests and debug scripts  
 
 ## Progress Tracking
 - Progress is saved in localStorage (unless in Beginner mode, which resets on reload)  
@@ -57,4 +58,4 @@ You can jump to any stage/key using the `?skip=` URL parameter with the followin
 - If you encounter caching issues during development, unregister the service worker and clear site data in DevTools  
 
 ---
-For more details or to extend the app, see the code in `public/js/main.js` and this documentation. 
+For more details or to extend the app, see the code in `src/modules/` and this documentation. 

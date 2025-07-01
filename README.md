@@ -37,9 +37,8 @@ The learning path logic is working correctly and follows a predictable pattern:
 ## Development Commands (Phase 1+)
 
 ### Development
-- `npm run dev` - Start Vite development server (new system)
-- `npm run serve:old` - Start Firebase development server (old system)
-- `npm run serve:new` - Build and preview new system
+- `npm run dev` - Start Vite development server (current system)
+- `npm run serve:new` - Build and preview production version
 
 ### Testing
 - `npm test` - Run all tests
@@ -47,6 +46,8 @@ The learning path logic is working correctly and follows a predictable pattern:
 - `npm run test:integration` - Run integration tests only
 - `npm run test:accessibility` - Run accessibility tests only
 - `npm run test:performance` - Run performance tests only
+- `npm run test:headless` - Run automated learning path test
+- `npm run validate:urls` - Verify clean URLs are working correctly
 
 ### Building
 - `npm run build` - Build for production
@@ -67,8 +68,8 @@ The learning path logic is working correctly and follows a predictable pattern:
 ```bash
 git clone https://github.com/fourhexagons/music-theory-practice.git
 cd music-theory-practice
-npm run dev  # Start development server (port 5003)
-# Visit http://localhost:5003/src/practice.html
+npm run dev  # Start development server (port 5173)
+# Visit http://localhost:5173/practice
 ```
 
 ## Architecture
@@ -77,48 +78,40 @@ npm run dev  # Start development server (port 5003)
 - `learning.lightbath.com/practice` - Music theory practice app
 - `learning.lightbath.com/dashboard` - Future student dashboards
 
-## Local Development: Running the Firebase Server
+## Local Development: Running the Development Server
 
-To ensure you never have multiple Firebase servers running at once (which can cause port conflicts and confusion), **always use the provided script**:
+For local development, use the Vite development server:
 
-### Start or Restart the Server (Best Practice)
+### Start the Development Server
 
 ```sh
-./serve-clean.sh
+npm run dev
 ```
 
-This script will:
-- Kill any running `firebase serve` processes
-- Start a new Firebase hosting server
+This will:
+- Start the Vite development server on port 5173
+- Enable hot module reloading for instant updates
+- Serve the current system from the `src/` directory
 
-### Why?
-- Running multiple servers at once is a common source of bugs and confusion.
-- This script guarantees only one server is running at a time.
-- It works for both human developers and AI agents.
+### Development URLs (OFFICIAL - DO NOT CHANGE)
+- **Practice App**: http://localhost:5173/practice
+- **Landing Page**: http://localhost:5173/
 
-### First Time Setup
-Make the script executable:
-```sh
-chmod +x serve-clean.sh
-```
+**⚠️ CRITICAL**: These are the ONLY correct URLs. Never reference `/src/` paths or `.html` extensions in documentation or tests.
 
 ### Troubleshooting
-- If you ever see errors about ports in use, or the site doesn't load as expected, run:
+- If you see port conflicts, kill any running processes:
   ```sh
-  ./serve-clean.sh
+  pkill -f "vite"
   ```
-- If you want to check for running servers manually:
+- For a clean restart:
   ```sh
-  ps aux | grep firebase
-  ```
-- To kill all running servers manually:
-  ```sh
-  pkill -f "firebase serve"
+  npm run dev
   ```
 
 ### Protocol for Agents and Developers
-- **Always use `./serve-clean.sh` to start or restart the server.**
-- Do not run `firebase serve` directly unless you are sure no other instance is running.
+- **Always use `npm run dev` for development.**
+- The development server automatically handles file changes and updates.
 - This protocol should be followed by all agents and developers working on this project.
 
 ## Testing Strategy
@@ -136,7 +129,7 @@ chmod +x serve-clean.sh
   ```sh
   npm run test:browser
   ```
-- Opens the comprehensive test suite in your browser (via `public/tests/index.html`).
+- Opens the comprehensive test suite in your browser.
 - Includes all integration, accessibility, UI, and DOM-dependent tests.
 
 ### Why this split?

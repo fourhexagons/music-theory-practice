@@ -127,8 +127,8 @@ The app repeated the same question instead of advancing to the next one. After a
 The current app uses a **NEW modular system** (`AppController`) rather than the legacy `QuizService` system.
 
 **Current Entry Points:**
-- **URL**: `http://localhost:4173/practice` 
-- **HTML**: `src/practice.html` 
+- **URL**: `http://localhost:5173/practice` (development server)
+- **HTML**: `practice.html` (clean URL routing)
 - **Script**: `src/practice.js` → creates `PracticeApp` → initializes `AppController`
 
 **Automatic Progression Flow** (from `src/modules/ui/controllers/AppController.js`):
@@ -290,10 +290,10 @@ This bug was only discovered because I:
 
 ## Code Reference Map
 
-| Feature | Primary Location | Alternative Locations |
-|---------|------------------|----------------------|
-| Question Generation | `src/modules/business/services/QuestionGenerator.js` | `src/modules/business/services/QuizService.js`, `src/components/main-app.js` |
-| Learning State | `src/state/learningState.js` | `public/js/state/learningState.js` |
-| Quiz Data | `src/data/quizData.js` | `public/js/data/quizData.js` |
-| C Major Logic | `src/state/learningState.js:288-290` | Documentation in line 22 |
-| Progression Rules | `ACTUAL_LEARNING_PATH.md` | `src/state/learningState.js:275+` | 
+| Feature | Primary Location | Notes |
+|---------|------------------|-------|
+| Question Generation | `src/modules/business/services/QuestionGenerator.js` | Modern modular system |
+| Learning State | `src/state/learningState.js` | Current implementation |
+| Quiz Data | `src/data/quizData.js` | Current data structure |
+| C Major Logic | `src/state/learningState.js:288-290` | Skipping logic documented in line 22 |
+| Progression Rules | `cursor/docs/ACTUAL_LEARNING_PATH.md` | User's personal archive | 

@@ -35,8 +35,9 @@
 | Document | Purpose | Status |
 |----------|---------|---------|
 | **[Development Guide](DEVELOPMENT.md)** | Setup, architecture, best practices | ✅ Updated with methodology |
-| **[Testing Guide](TESTING.md)** | Testing framework and debugging | 🔄 Needs methodology integration |
-| **[Contributing Guide](CONTRIBUTING.md)** | Contribution process | 🔄 Needs methodology integration |
+| **[URL Configuration](URL_CONFIGURATION.md)** | **CRITICAL** Official app URLs (single source of truth) | ✅ Current |
+| **[Testing Guide](TESTING.md)** | Testing framework and debugging | ✅ Updated with methodology |
+| **[Contributing Guide](CONTRIBUTING.md)** | Contribution process | ✅ Updated with methodology |
 
 ### **🎵 Learning Path**
 | Document | Purpose | Status |

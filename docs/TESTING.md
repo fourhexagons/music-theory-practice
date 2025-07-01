@@ -288,7 +288,7 @@ const TEST_CATEGORIES = {
 ## 📝 Test File Structure
 
 ```
-public/js/tests.js          # Main test suite
+tests/runner.js             # Modern test runner
 TESTING.md                  # This documentation
 ```
 

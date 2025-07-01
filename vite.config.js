@@ -52,7 +52,7 @@ export default defineConfig({
   
   // Development server settings
   server: {
-    port: 5003, // Different from Firebase port (5002)
+    port: 5173, // Standard Vite default port
     open: false,
     hmr: {
       overlay: true

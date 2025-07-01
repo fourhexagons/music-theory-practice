@@ -176,7 +176,7 @@ read_file target_file="path" start_line_one_indexed=1 end_line_one_indexed=50
 
 # Testing
 npm run test:headless  # Run automated tests
-npm run dev           # Development server (port 5003)
+npm run dev           # Development server (port 5173)
 npm run preview       # Preview server (port 4173)
 ```
 

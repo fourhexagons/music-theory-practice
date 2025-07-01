@@ -1,6 +1,6 @@
 {
   "name": "music-theory-practice",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "A web-based music theory practice application",
   "type": "module",
   "scripts": {
@@ -31,6 +31,7 @@
     "analyze:bundle": "ANALYZE=true npm run build",
     "test:performance": "npm run build && npm run verify:phase2 && npm run analyze:performance",
     "test:headless": "node test_headless_learning_path.js",
+    "validate:urls": "node scripts/validate-urls.cjs",
     "phase2:complete": "npm run verify:phase2 && npm run analyze:performance && echo '🎉 Phase 2 Complete!'"
   },
   "keywords": [

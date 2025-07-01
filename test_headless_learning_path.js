@@ -4,7 +4,7 @@ import puppeteer from 'puppeteer';
 
 // Test configuration  
 const CONFIG = {
-    appUrl: 'http://localhost:5003/src/practice.html', // Fixed: Use modular system URL
+    appUrl: 'http://localhost:5173/practice', // Clean URL (no /src/ or .html)
     headless: true, // Set to false for debugging
     slowMo: 100, // Increased: More time for app processing
     timeout: 30000,

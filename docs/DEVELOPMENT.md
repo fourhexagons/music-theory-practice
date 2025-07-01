@@ -27,11 +27,11 @@ This methodology successfully identified and fixed complex bugs that traditional
 
 ### Step 1: STOP and READ
 If you're about to modify any of these files/functions, STOP immediately:
-- `public/js/state/learningState.js` - `advanceLearningPath()` function
-- `public/js/state/learningState.js` - `getCurrentChapter()` function  
-- `public/js/state/learningState.js` - `getCurrentKey()` function
-- `public/js/state/learningState.js` - `getCurrentGroup()` function
-- `public/js/utils/helpers.js` - `generateQuestion()` function
+- `src/state/learningState.js` - `advanceLearningPath()` function
+- `src/modules/business/services/StateManager.js` - `getCurrentChapter()` function  
+- `src/modules/business/services/StateManager.js` - `getCurrentKey()` function
+- `src/modules/business/services/StateManager.js` - `getCurrentGroup()` function
+- `src/modules/business/services/QuestionGenerator.js` - Question generation logic
 - Any file containing learning path progression logic
 
 ### Step 2: ASK PERMISSION
@@ -211,37 +211,37 @@ This guide is for developers who want to set up the project locally, contribute 
 
 2. **Start the development server**
    ```bash
-   python3 -m http.server 8000
+   npm run dev
    ```
 
 3. **Open in browser**
    ```
-   http://localhost:8000
+   http://localhost:5173/practice
    ```
 
-### Alternative Ports
-If port 8000 is in use, try a different port:
+### Alternative Servers
+For different development needs:
 ```bash
-python3 -m http.server 8001
+npm run preview      # Production build testing (port 4173)
+npm run serve:old    # Legacy Firebase system (port 5002)
 ```
-Then visit: `http://localhost:8001`
 
 ## 🏗️ Project Structure
 
 ```
 music-theory-practice/
-├── public/
-│   ├── index.html          # Main application
-│   ├── css/
-│   │   └── style.css       # Styling
-│   ├── js/
-│   │   ├── main.js         # Core application logic
-│   │   └── tests.js        # Testing framework
-│   ├── images/             # App assets
-│   └── manifest.json       # PWA configuration
-├── DEVELOPMENT.md          # This file
-├── TESTING.md              # Testing documentation
-├── CONTRIBUTING.md         # Contribution guidelines
+├── src/                    # Current system
+│   ├── practice.html       # Main application
+│   ├── index.html          # Landing page
+│   ├── styles/             # Styling (modern CSS architecture)
+│   ├── modules/            # Modular business logic
+│   │   ├── business/       # Core services and utilities
+│   │   └── ui/             # UI components and controllers
+│   ├── data/               # Quiz data and constants
+│   └── utils/              # Shared utilities
+├── tests/                  # Modern test system
+├── docs/                   # Documentation
+├── archive/                # Legacy files (tests, debug scripts)
 └── README.md               # User-facing documentation
 ```
 
@@ -280,11 +280,11 @@ The project includes a comprehensive testing framework. See [docs/TESTING.md](do
 
 #### Port Already in Use
 ```bash
-# Find and kill process using port 8000
-lsof -ti:8000 | xargs kill -9
+# Find and kill process using port 5173
+lsof -ti:5173 | xargs kill -9
 
-# Or use a different port
-python3 -m http.server 8001
+# Or restart the development server
+npm run dev
 ```
 
 #### Tests Not Running

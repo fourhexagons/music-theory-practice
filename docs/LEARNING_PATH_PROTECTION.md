@@ -9,8 +9,9 @@ This document establishes a **MANDATORY protocol** to prevent accidental changes
 **NEVER modify these without explicit permission:**
 
 ### Core Learning Path Logic
-- `public/js/state/learningState.js`
+- `src/state/learningState.js`
   - `advanceLearningPath()` function
+- `src/modules/business/services/StateManager.js`
   - `getCurrentChapter()` function  
   - `getCurrentKey()` function
   - `getCurrentGroup()` function
@@ -18,8 +19,8 @@ This document establishes a **MANDATORY protocol** to prevent accidental changes
   - `recordIncorrectAnswer()` function
 
 ### Question Generation
-- `public/js/utils/helpers.js`
-  - `generateQuestion()` function
+- `src/modules/business/services/QuestionGenerator.js`
+  - Question generation logic
 
 ### State Management
 - Any function that modifies `learningState.currentGroup`

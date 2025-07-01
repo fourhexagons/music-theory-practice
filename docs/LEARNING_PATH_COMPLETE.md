@@ -94,8 +94,8 @@ Follow the same pattern: accCount → accNotes → scale → triads → sevenths
 - Source of bugs that were systematically identified and fixed
 
 ### **Server Configuration**
-- **Development** (`npm run dev`, port 5003): Uses NEW modular system ✅
-- **Preview** (`npm run preview`, port 4173): Uses OLD bundled system ⚠️
+- **Development** (`npm run dev`, port 5173): Live code with hot reload ✅
+- **Preview** (`npm run preview`, port 4173): Tests production build ✅
 
 ## Testing and Verification
 
@@ -118,7 +118,7 @@ npm run test:headless
 
 ### **Manual Testing**
 1. Start dev server: `npm run dev`
-2. Navigate to: `http://localhost:5003/src/practice.html`
+2. Navigate to: `http://localhost:5173/practice`
 3. Reset app and verify progression matches expected behavior
 
 ## Research History
@@ -164,7 +164,7 @@ window.learningState = {
 ### **Common Issues**
 
 **1. accNotes Questions Not Appearing**
-- **Check**: Are you testing with the dev server (port 5003)?
+- **Check**: Are you testing with the dev server (port 5173)?
 - **Fix**: Use `npm run dev`, not `npm run preview`
 - **Verify**: G major should show accNotes question as Q7
 
