@@ -4,7 +4,7 @@
  * Contains validation functions for checking user answers.
  */
 
-console.log('Loaded validation.js - DEBUG PATCH');
+// Validation utilities loaded
 
 /**
  * Checks if a user answer is correct for a given question type
@@ -40,29 +40,24 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
   // Only allow supported types
   const allowedTypes = ['sevenths', 'triads', 'scale', 'accCount', 'accNotes', 'seventhSpelling', 'triadSpelling'];
   if (!allowedTypes.includes(normalizedType)) {
-    console.log('checkAnswer: invalid type', {questionType, normalizedType});
-    return false;
+    return false; // Invalid type
   }
   // Validate key exists and is a non-null object
   if (!Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
-    console.log('checkAnswer: invalid or missing key', {key, quizDataKey: quizData[key]});
-    return false;
+    return false; // Invalid key
   }
   // For chord questions, validate type and degree structure
   if ((normalizedType === 'sevenths' || normalizedType === 'triads')) {
     const chordObj = quizData[key][normalizedType];
     if (!chordObj || typeof chordObj !== 'object' || chordObj === null) {
-      console.log('checkAnswer: invalid chord object', {key, normalizedType, chordObj});
-      return false;
+      return false; // Invalid chord structure
     }
     if (degree === null || !Object.prototype.hasOwnProperty.call(chordObj, degree.toString())) {
-      console.log('checkAnswer: invalid or missing degree', {degree, chordObj});
-      return false;
+      return false; // Invalid degree
     }
   }
   try {
     let result = false;
-    console.log('checkAnswer: normalizedType', normalizedType);
     switch (normalizedType) {
       case 'sevenths':
       case 'triads':
@@ -79,19 +74,22 @@ function checkAnswer(userAnswer, questionType, key, degree = null, quizData = nu
         result = checkAccidentalsNames(userAnswer, key, quizData);
         break;
       case 'seventhSpelling':
-        console.log('checkAnswer: entering checkChordSpelling for seventhSpelling');
         result = checkChordSpelling(userAnswer, key, degree, quizData, 'seventhSpelling');
         break;
       case 'triadSpelling':
         result = checkChordSpelling(userAnswer, key, degree, quizData, 'triadSpelling');
         break;
       default:
-        console.log('checkAnswer: default case hit', {normalizedType});
-        return false;
+        return false; // Unsupported type
     }
     return result === true;
   } catch (e) {
-    console.log('checkAnswer: caught error', e);
+    // Log validation errors only in development
+    import('./logger.js').then(({ logger }) => {
+      logger.debug('Validation error:', { type: normalizedType, key, degree, error: e.message });
+    }).catch(() => {
+      if (import.meta.env?.DEV) console.warn('Validation error:', e);
+    });
     return false;
   }
 }
@@ -149,7 +147,10 @@ function checkScaleSpelling(userAnswer, key, quizData) {
   };
   const userNotes = userAnswer.split(' ').map(normalizeAndUpper).filter(note => note);
   const correctNotes = quizData[key].scale.map(normalizeAndUpper);
-  console.log('[checkScaleSpelling] userNotes:', userNotes, 'correctNotes:', correctNotes);
+  // Debug scale validation only when needed
+  import('./logger.js').then(({ logger }) => {
+    logger.trace('Scale validation:', { userNotes, correctNotes });
+  }).catch(() => {});
   if (!Array.isArray(userNotes) || !Array.isArray(correctNotes)) return false;
   if (userNotes.length !== correctNotes.length) {
     return false;
@@ -187,34 +188,32 @@ function checkAccidentalsCount(userAnswer, key, quizData) {
  * @returns {boolean} - Whether the spelling is correct
  */
 function checkChordSpelling(userAnswer, key, degree, quizData, spellingType) {
-  console.log('checkChordSpelling ENTRY', { userAnswer, key, degree, spellingType });
   if (!quizData || typeof quizData !== 'object' || !Object.prototype.hasOwnProperty.call(quizData, key) || typeof quizData[key] !== 'object' || quizData[key] === null) {
-    console.log('checkChordSpelling: quizData/key invalid', {quizData, key});
     return false;
   }
   if (!quizData[key][spellingType] || typeof quizData[key][spellingType] !== 'object') {
-    console.log('checkChordSpelling: spellingType invalid', {spellingType, data: quizData[key][spellingType]});
     return false;
   }
   if (degree === null || !Object.prototype.hasOwnProperty.call(quizData[key][spellingType], degree.toString())) {
-    console.log('checkChordSpelling: degree invalid', {degree, spellingData: quizData[key][spellingType]});
     return false;
   }
   if (typeof userAnswer !== 'string') {
-    console.log('checkChordSpelling: userAnswer not string', {userAnswer});
     return false;
   }
   // Normalize and split user input
   const userNotes = userAnswer.trim().split(/\s+/).map(note => window.normalizeRootNote(note)).filter(note => note);
   const correctNotes = quizData[key][spellingType][degree.toString()].map(note => window.normalizeRootNote(note));
-  console.log('checkChordSpelling: Normalized notes', { userNotes, correctNotes });
+  
+  // Debug chord spelling only when needed
+  import('./logger.js').then(({ logger }) => {
+    logger.trace('Chord spelling validation:', { userNotes, correctNotes, spellingType });
+  }).catch(() => {});
+  
   if (userNotes.length !== correctNotes.length) {
-    console.log('checkChordSpelling: length mismatch', { userNotes, correctNotes });
     return false;
   }
   for (let i = 0; i < correctNotes.length; i++) {
     if (userNotes[i] !== correctNotes[i]) {
-      console.log('checkChordSpelling: note mismatch', { i, userNote: userNotes[i], correctNote: correctNotes[i] });
       return false;
     }
   }
@@ -249,7 +248,11 @@ function checkAccidentalsNames(userAnswer, key, quizData) {
   };
   const userNorm = userNotes.map(normalizeAndUpper).filter(Boolean).sort();
   const correctNorm = quizData[key].notes.map(normalizeAndUpper).filter(Boolean).sort();
-  console.log('[checkAccidentalsNames] userNorm:', userNorm, 'correctNorm:', correctNorm);
+  
+  // Debug accidentals validation only when needed
+  import('./logger.js').then(({ logger }) => {
+    logger.trace('Accidentals validation:', { userNorm, correctNorm });
+  }).catch(() => {});
   // Accept empty string/array for keys with no accidentals
   if (correctNorm.length === 0 && userNorm.length === 0) return true;
   if (userNorm.length !== correctNorm.length) return false;

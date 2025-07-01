@@ -35,14 +35,18 @@ class PracticeApp {
 
   async initialize() {
     try {
-      console.log('Music Theory Practice - Practice App Loading...');
+      import('./utils/logger.js').then(({ logger }) => {
+        logger.appState('Practice App Loading...');
+      }).catch(() => console.log('Music Theory Practice - Practice App Loading...'));
       
       // Ensure global functions are available (wait for all imports to complete)
       await this.ensureGlobalFunctions();
       
       // Initialize the app controller
       await this.controller.initialize();
-      console.log('Music Theory Practice - Practice App Loaded Successfully');
+      import('./utils/logger.js').then(({ logger }) => {
+        logger.system('Practice App Loaded Successfully');
+      }).catch(() => console.log('Music Theory Practice - Practice App Loaded Successfully'));
     } catch (error) {
       console.error('Failed to initialize practice app:', error);
       this.showFallbackError();
@@ -62,7 +66,11 @@ class PracticeApp {
       throw new Error(`Required global functions not available: ${missing.join(', ')}`);
     }
     
-    console.log('Global functions verified:', requiredFunctions);
+            import('./utils/logger.js').then(({ logger }) => {
+          logger.debug('Global functions verified:', requiredFunctions);
+        }).catch(() => {
+          if (import.meta.env?.DEV) console.log('Global functions verified:', requiredFunctions);
+        });
   }
 
   showFallbackError() {

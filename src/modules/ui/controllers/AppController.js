@@ -81,7 +81,11 @@ export class AppController {
       // Start performance monitoring for app initialization
       window.performanceMonitor.startTiming('app-initialization');
       // Skip module preloading since Vite bundles everything
-      console.log('📦 Using Vite bundled modules - no preloading needed');
+      import('../../utils/logger.js').then(({ logger }) => {
+        logger.debug('Using Vite bundled modules - no preloading needed');
+      }).catch(() => {
+        if (import.meta.env?.DEV) console.log('📦 Using Vite bundled modules - no preloading needed');
+      });
     } catch (error) {
       console.warn('Performance features failed to initialize:', error);
     }

@@ -28,7 +28,15 @@ export class PerformanceMonitor {
       timestamp: Date.now()
     };
     
-    console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms`);
+    // Use centralized logger for performance metrics
+    import('../utils/logger.js').then(({ logger }) => {
+      logger.performance(name, value);
+    }).catch(() => {
+      // Fallback if logger not available
+      if (import.meta.env?.DEV) {
+        console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms`);
+      }
+    });
   }
   
   startTiming(name) {
