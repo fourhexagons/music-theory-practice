@@ -69,26 +69,24 @@ This document shows the **exact** question and answer pairs that a user encounte
 
 ## Level 3: Level 1b Sharps  
 **Keys:** G, D, A  
-**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS  
-**Chapters:** accCount → accNotes → scale → triads  
+**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS (TRIADS_ONLY)  
+**Chapters:** triads (only)  
 **Required Streak:** 10
 
 ### Question Sequence:
-*Note: Keys are randomized but chapters progress linearly. Accidentals are paired (accCount + accNotes count as ONE correct answer). First 5 correct answers include accidentals and scales, then questions 6-10 are only triad naming.*
+*Note: All 10 questions are randomized triad questions from the current group keys (G, D, A). No accidentals or scales - pure triad reinforcement practice.*
 
 **Example Progression (10 correct answers needed):**
-1. **Q25:** "How many accidentals are in A major?" → **Answer:** `3`
-2. **Q26:** "Name the accidentals in A major." → **Answer:** `F# C# G#` *(paired with Q25 = 1st correct)*
-3. **Q27:** "Spell the D major scale." → **Answer:** `D E F# G A B C#` *(2nd correct)*
-4. **Q28:** "How many accidentals are in G major?" → **Answer:** `1`
-5. **Q29:** "Name the accidentals in G major." → **Answer:** `F#` *(paired with Q28 = 3rd correct)*
-6. **Q30:** "Spell the G major scale." → **Answer:** `G A B C D E F#` *(4th correct)*
-7. **Q31:** "Spell the A major scale." → **Answer:** `A B C# D E F# G#` *(5th correct)*
-8. **Q32:** "Name the 4th triad in D major." → **Answer:** `G` *(6th correct)*
-9. **Q33:** "Name the 2nd triad in A major." → **Answer:** `Bm` *(7th correct)*
-10. **Q34:** "Name the 6th triad in G major." → **Answer:** `Em` *(8th correct)*
-11. **Q35:** "Name the 3rd triad in D major." → **Answer:** `F#m` *(9th correct)*
-12. **Q36:** "Name the 7th triad in A major." → **Answer:** `G#°` *(10th correct)*
+1. **Q25:** "Name the 4th triad in D major." → **Answer:** `G` *(1st correct)*
+2. **Q26:** "Name the 2nd triad in A major." → **Answer:** `Bm` *(2nd correct)*
+3. **Q27:** "Name the 6th triad in G major." → **Answer:** `Em` *(3rd correct)*
+4. **Q28:** "Name the 3rd triad in D major." → **Answer:** `F#m` *(4th correct)*
+5. **Q29:** "Name the 7th triad in A major." → **Answer:** `G#°` *(5th correct)*
+6. **Q30:** "Name the 5th triad in G major." → **Answer:** `D` *(6th correct)*
+7. **Q31:** "Name the 6th triad in A major." → **Answer:** `F#m` *(7th correct)*
+8. **Q32:** "Name the 2nd triad in G major." → **Answer:** `Am` *(8th correct)*
+9. **Q33:** "Name the 5th triad in D major." → **Answer:** `A` *(9th correct)*
+10. **Q34:** "Name the 4th triad in A major." → **Answer:** `D` *(10th correct)*
 
 ---
 
@@ -128,27 +126,24 @@ This document shows the **exact** question and answer pairs that a user encounte
 
 ## Level 5: Level 1b Flats
 **Keys:** F, B♭, E♭  
-**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS  
-**Chapters:** accCount → accNotes → scale → triads  
+**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS (TRIADS_ONLY)  
+**Chapters:** triads (only)  
 **Required Streak:** 10
 
 ### Question Sequence:
-*Note: Accidentals pairing continues - accCount and accNotes count as ONE correct answer. First 5 correct answers include accidentals and scales, then questions 6-10 are only triad naming.*
+*Note: All 10 questions are randomized triad questions from the current group keys (F, B♭, E♭). No accidentals or scales - pure triad reinforcement practice.*
 
 **Example Progression (10 correct answers needed):**
-1. **Q55:** "How many accidentals are in Eb major?" → **Answer:** `3`
-2. **Q56:** "Name the accidentals in Eb major." → **Answer:** `Bb Eb Ab` *(paired with Q55 = 1st correct)*
-3. **Q57:** "Spell the F major scale." → **Answer:** `F G A Bb C D E` *(2nd correct)*
-4. **Q58:** "How many accidentals are in F major?" → **Answer:** `1`
-5. **Q59:** "Name the accidentals in F major." → **Answer:** `Bb` *(paired with Q58 = 3rd correct)*
-6. **Q60:** "Spell the Bb major scale." → **Answer:** `Bb C D Eb F G A` *(4th correct)*
-7. **Q61:** "How many accidentals are in Bb major?" → **Answer:** `2`
-8. **Q62:** "Name the accidentals in Bb major." → **Answer:** `Bb Eb` *(paired with Q61 = 5th correct)*
-9. **Q63:** "Name the 3rd triad in F major." → **Answer:** `Am` *(6th correct)*
-10. **Q64:** "Name the 2nd triad in Bb major." → **Answer:** `Cm` *(7th correct)*
-11. **Q65:** "Name the 6th triad in Eb major." → **Answer:** `Cm` *(8th correct)*
-12. **Q66:** "Name the 7th triad in F major." → **Answer:** `E°` *(9th correct)*
-13. **Q67:** "Name the 5th triad in Bb major." → **Answer:** `F` *(10th correct)*
+1. **Q55:** "Name the 3rd triad in F major." → **Answer:** `Am` *(1st correct)*
+2. **Q56:** "Name the 2nd triad in Bb major." → **Answer:** `Cm` *(2nd correct)*
+3. **Q57:** "Name the 6th triad in Eb major." → **Answer:** `Cm` *(3rd correct)*
+4. **Q58:** "Name the 7th triad in F major." → **Answer:** `E°` *(4th correct)*
+5. **Q59:** "Name the 5th triad in Bb major." → **Answer:** `F` *(5th correct)*
+6. **Q60:** "Name the 4th triad in Eb major." → **Answer:** `Ab` *(6th correct)*
+7. **Q61:** "Name the 6th triad in F major." → **Answer:** `Dm` *(7th correct)*
+8. **Q62:** "Name the 3rd triad in Bb major." → **Answer:** `Dm` *(8th correct)*
+9. **Q63:** "Name the 2nd triad in Eb major." → **Answer:** `Fm` *(9th correct)*
+10. **Q64:** "Name the 5th triad in F major." → **Answer:** `C` *(10th correct)*
 
 ---
 
@@ -188,27 +183,24 @@ This document shows the **exact** question and answer pairs that a user encounte
 
 ## Level 7: Level 2b Sharps
 **Keys:** E, B, F♯  
-**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS  
-**Chapters:** accCount → accNotes → scale → triads  
+**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS (TRIADS_ONLY)  
+**Chapters:** triads (only)  
 **Required Streak:** 10
 
 ### Question Sequence:
-*Note: Accidentals pairing continues. First 5 correct answers include accidentals and scales, then questions 6-10 are only triad naming.*
+*Note: All 10 questions are randomized triad questions from the current group keys (E, B, F♯). No accidentals or scales - pure triad reinforcement practice.*
 
 **Example Progression (10 correct answers needed):**
-1. **Q86:** "How many accidentals are in B major?" → **Answer:** `5`
-2. **Q87:** "Name the accidentals in B major." → **Answer:** `F# C# G# D# A#` *(paired with Q86 = 1st correct)*
-3. **Q88:** "Spell the F# major scale." → **Answer:** `F# G# A# B C# D# E#` *(2nd correct)*
-4. **Q89:** "How many accidentals are in F# major?" → **Answer:** `6`
-5. **Q90:** "Name the accidentals in F# major." → **Answer:** `F# C# G# D# A# E#` *(paired with Q89 = 3rd correct)*
-6. **Q91:** "Spell the E major scale." → **Answer:** `E F# G# A B C# D#` *(4th correct)*
-7. **Q92:** "How many accidentals are in E major?" → **Answer:** `4`
-8. **Q93:** "Name the accidentals in E major." → **Answer:** `F# C# G# D#` *(paired with Q92 = 5th correct)*
-9. **Q94:** "Name the 3rd triad in B major." → **Answer:** `D#m` *(6th correct)*
-10. **Q95:** "Name the 6th triad in F# major." → **Answer:** `D#m` *(7th correct)*
-11. **Q96:** "Name the 2nd triad in E major." → **Answer:** `F#m` *(8th correct)*
-12. **Q97:** "Name the 4th triad in B major." → **Answer:** `E` *(9th correct)*
-13. **Q98:** "Name the 7th triad in F# major." → **Answer:** `E#°` *(10th correct)*
+1. **Q86:** "Name the 3rd triad in B major." → **Answer:** `D#m` *(1st correct)*
+2. **Q87:** "Name the 6th triad in F# major." → **Answer:** `D#m` *(2nd correct)*
+3. **Q88:** "Name the 2nd triad in E major." → **Answer:** `F#m` *(3rd correct)*
+4. **Q89:** "Name the 4th triad in B major." → **Answer:** `E` *(4th correct)*
+5. **Q90:** "Name the 7th triad in F# major." → **Answer:** `E#°` *(5th correct)*
+6. **Q91:** "Name the 5th triad in E major." → **Answer:** `B` *(6th correct)*
+7. **Q92:** "Name the 2nd triad in F# major." → **Answer:** `G#m` *(7th correct)*
+8. **Q93:** "Name the 6th triad in B major." → **Answer:** `G#m` *(8th correct)*
+9. **Q94:** "Name the 3rd triad in E major." → **Answer:** `G#m` *(9th correct)*
+10. **Q95:** "Name the 4th triad in F# major." → **Answer:** `B` *(10th correct)*
 
 ---
 
@@ -248,27 +240,24 @@ This document shows the **exact** question and answer pairs that a user encounte
 
 ## Level 9: Level 2b Flats
 **Keys:** A♭, D♭, G♭  
-**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS  
-**Chapters:** accCount → accNotes → scale → triads  
+**Mode:** RANDOM_KEYS_LINEAR_CHAPTERS (TRIADS_ONLY)  
+**Chapters:** triads (only)  
 **Required Streak:** 10
 
 ### Question Sequence:
-*Note: Accidentals pairing continues. First 5 correct answers include accidentals and scales, then questions 6-10 are only triad naming.*
+*Note: All 10 questions are randomized triad questions from the current group keys (A♭, D♭, G♭). No accidentals or scales - pure triad reinforcement practice.*
 
 **Example Progression (10 correct answers needed):**
-1. **Q117:** "How many accidentals are in Gb major?" → **Answer:** `6`
-2. **Q118:** "Name the accidentals in Gb major." → **Answer:** `Bb Eb Ab Db Gb Cb` *(paired with Q117 = 1st correct)*
-3. **Q119:** "Spell the Ab major scale." → **Answer:** `Ab Bb C Db Eb F G` *(2nd correct)*
-4. **Q120:** "How many accidentals are in Ab major?" → **Answer:** `4`
-5. **Q121:** "Name the accidentals in Ab major." → **Answer:** `Bb Eb Ab Db` *(paired with Q120 = 3rd correct)*
-6. **Q122:** "Spell the Db major scale." → **Answer:** `Db Eb F Gb Ab Bb C` *(4th correct)*
-7. **Q123:** "How many accidentals are in Db major?" → **Answer:** `5`
-8. **Q124:** "Name the accidentals in Db major." → **Answer:** `Bb Eb Ab Db Gb` *(paired with Q123 = 5th correct)*
-9. **Q125:** "Name the 2nd triad in Gb major." → **Answer:** `Abm` *(6th correct)*
-10. **Q126:** "Name the 5th triad in Ab major." → **Answer:** `Eb` *(7th correct)*
-11. **Q127:** "Name the 3rd triad in Db major." → **Answer:** `Fm` *(8th correct)*
-12. **Q128:** "Name the 6th triad in Gb major." → **Answer:** `Ebm` *(9th correct)*
-13. **Q129:** "Name the 7th triad in Ab major." → **Answer:** `G°` *(10th correct)*
+1. **Q117:** "Name the 2nd triad in Gb major." → **Answer:** `Abm` *(1st correct)*
+2. **Q118:** "Name the 5th triad in Ab major." → **Answer:** `Eb` *(2nd correct)*
+3. **Q119:** "Name the 3rd triad in Db major." → **Answer:** `Fm` *(3rd correct)*
+4. **Q120:** "Name the 6th triad in Gb major." → **Answer:** `Ebm` *(4th correct)*
+5. **Q121:** "Name the 7th triad in Ab major." → **Answer:** `G°` *(5th correct)*
+6. **Q122:** "Name the 4th triad in Db major." → **Answer:** `Gb` *(6th correct)*
+7. **Q123:** "Name the 3rd triad in Ab major." → **Answer:** `Cm` *(7th correct)*
+8. **Q124:** "Name the 5th triad in Gb major." → **Answer:** `Db` *(8th correct)*
+9. **Q125:** "Name the 2nd triad in Db major." → **Answer:** `Ebm` *(9th correct)*
+10. **Q126:** "Name the 6th triad in Ab major." → **Answer:** `Fm` *(10th correct)*
 
 ---
 

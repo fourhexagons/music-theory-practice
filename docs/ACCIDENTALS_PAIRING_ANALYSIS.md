@@ -1,5 +1,15 @@
 # Accidentals Pairing Analysis & Solution Testing
 
+## ⚠️ **NOTICE**: B-Levels Now Use Triads-Only Practice
+
+**UPDATE**: As of the latest UX improvements, all b-levels (1b Sharps, 1b Flats, 2b Sharps, 2b Flats) have been changed to use `TRIADS_ONLY_CHAPTERS` configuration. This means:
+
+- **B-levels no longer use accidentals questions** - they only ask triad questions
+- **This accidentals pairing logic is now only relevant for other advanced modes** that still use the full `RANDOM_KEYS_LINEAR_CHAPTERS` behavior
+- **The analysis below remains valid** for any future modes that need accidentals pairing
+
+---
+
 ## 🔍 Current State Analysis
 
 ### ✅ Existing Infrastructure
