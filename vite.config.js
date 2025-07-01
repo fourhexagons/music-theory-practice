@@ -97,6 +97,11 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         maximumFileSizeToCacheInBytes: 3000000,
+        // Add the copied root files to precache manifest
+        additionalManifestEntries: [
+          { url: 'index.html', revision: null },
+          { url: 'practice.html', revision: null }
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
