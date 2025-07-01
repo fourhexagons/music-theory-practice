@@ -461,11 +461,21 @@
                 if (!state.accidentalsPairState.countAnswered) {
                     return scenario.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_COUNT);
                 } else {
-                    return scenario.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
+                    // Check if key has accidentals before returning accNotes
+                    const keyData = mockQuizData[state.accidentalsPairState.currentKey];
+                    if (keyData && keyData.accidentals > 0) {
+                        return scenario.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
+                    } else {
+                        // No accidentals, skip accNotes and end pair
+                        state.accidentalsPairState.inProgress = false;
+                        state.accidentalsPairState.countAnswered = false;
+                        state.accidentalsPairState.currentKey = null;
+                        return scenario.chapters[state.currentChapterIndex];
+                    }
                 }
             }
 
-            let currentChapter;
+            let currentChapter = scenario.chapters[state.currentChapterIndex];
             
             if (scenario.mode === MODES.RANDOM_ALL) {
                 // Filter out accNotes and seventhSpelling for random_all mode
@@ -474,8 +484,10 @@
                     ch.id !== QUESTION_TYPES.SEVENTH_SPELLING
                 );
                 currentChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
-            } else {
-                currentChapter = scenario.chapters[state.currentChapterIndex];
+            } else if (scenario.mode === MODES.LINEAR && currentChapter.id === QUESTION_TYPES.ACCIDENTALS_NAMES) {
+                // In linear mode, skip standalone accNotes (should only appear in pairs)
+                const nextIndex = (state.currentChapterIndex + 1) % scenario.chapters.length;
+                currentChapter = scenario.chapters[nextIndex];
             }
             
             // Set up pairing for accCount in RANDOM_KEYS_LINEAR_CHAPTERS mode
@@ -530,12 +542,19 @@
 
         function handleCorrectAnswer(state, question, scenario) {
             if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT) {
-                // Special handling for C major - skip accNotes if no accidentals
-                if (question.key === 'C') {
-                    // Skip the pairing for C major
+                const keyData = mockQuizData[question.key];
+                
+                if (keyData && keyData.accidentals === 0) {
+                    // C major: skip accNotes since no accidentals to name
+                    state.accidentalsPairState.inProgress = false;
+                    state.accidentalsPairState.countAnswered = false;
+                    state.accidentalsPairState.currentKey = null;
                     state.correctAnswerStreak++;
+                    
+                    // Advance normally (skip accNotes)
+                    advanceToNextQuestion(state, scenario);
                 } else {
-                    // Set up for accNotes question
+                    // Other keys: set up for accNotes question  
                     state.accidentalsPairState.countAnswered = true;
                     const accNotesIndex = scenario.chapters.findIndex(ch => ch.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
                     if (accNotesIndex !== -1) {
@@ -546,32 +565,44 @@
             } else if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_NAMES && state.accidentalsPairState.inProgress) {
                 // Complete the pair
                 state.accidentalsPairState.inProgress = false;
-                state.accidentalsPairState.countAnswer = false;
+                state.accidentalsPairState.countAnswered = false;
                 state.accidentalsPairState.currentKey = null;
                 state.correctAnswerStreak++;
+                
+                // Advance to next question
+                if (state.correctAnswerStreak < scenario.requiredStreak) {
+                    advanceToNextQuestion(state, scenario);
+                }
             } else {
                 // Normal question
                 state.correctAnswerStreak++;
-            }
-
-            // Advance to next question if streak not complete
-            if (state.correctAnswerStreak < scenario.requiredStreak) {
-                if (scenario.mode === MODES.LINEAR) {
-                    state.currentChapterIndex++;
-                    if (state.currentChapterIndex >= scenario.chapters.length) {
-                        state.currentChapterIndex = 0;
-                        state.currentKeyIndex++;
-                        if (state.currentKeyIndex >= scenario.keys.length) {
-                            state.currentKeyIndex = 0;
-                        }
-                    }
-                } else if (scenario.mode !== MODES.RANDOM_ALL) {
-                    state.currentChapterIndex++;
-                    if (state.currentChapterIndex >= scenario.chapters.length) {
-                        state.currentChapterIndex = 0;
-                    }
+                
+                // Advance to next question
+                if (state.correctAnswerStreak < scenario.requiredStreak) {
+                    advanceToNextQuestion(state, scenario);
                 }
             }
+        }
+
+        function advanceToNextQuestion(state, scenario) {
+            if (scenario.mode === MODES.LINEAR) {
+                // Linear mode: complete all chapters in current key, then move to next key
+                state.currentChapterIndex++;
+                if (state.currentChapterIndex >= scenario.chapters.length) {
+                    state.currentChapterIndex = 0;
+                    state.currentKeyIndex++;
+                    if (state.currentKeyIndex >= scenario.keys.length) {
+                        state.currentKeyIndex = 0; // Loop back to first key
+                    }
+                }
+            } else if (scenario.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
+                // Random keys linear chapters: advance chapter, key stays random per question
+                state.currentChapterIndex++;
+                if (state.currentChapterIndex >= scenario.chapters.length) {
+                    state.currentChapterIndex = 0;
+                }
+            }
+            // RANDOM_ALL mode doesn't need advancement since everything is random
         }
 
         function runAccidentalsPairingTest() {
