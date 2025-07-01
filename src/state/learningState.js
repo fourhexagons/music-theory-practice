@@ -282,7 +282,17 @@ window.getCurrentChapter = getCurrentChapter;
 function advanceLearningPath(quizData = null) {
   const group = getCurrentGroup();
   const key = getCurrentKey(learningState.mode);
-  const chapter = getCurrentChapter(learningState.mode, quizData);
+  // ✅ Use correct logic: only skip accNotes for C major (accidentals === 0)
+  const currentChapterIndex = learningState.currentChapterIndex;
+  const currentChapter = group.chapters[currentChapterIndex];
+  let chapter = currentChapter;
+  
+  if (currentChapter && currentChapter.id === 'accNotes') {
+    if (key && quizData && quizData[key] && quizData[key].accidentals === 0) {
+      // Skip accNotes only for C major
+      chapter = group.chapters[currentChapterIndex + 1] || group.chapters[0];
+    }
+  }
   
   learningState.correctAnswersInChapter = 0;
   learningState.usedDegrees = [];

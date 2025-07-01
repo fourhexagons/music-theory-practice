@@ -33,9 +33,9 @@ export class AppController {
       await this.initializePerformanceFeatures();
       
       // Initialize services
-      this.questionGenerator = new QuestionGenerator(window.quizData, window.learningState);
-      this.answerValidator = new AnswerValidator(window.quizData);
       this.stateManager = new StateManager(window.learningState);
+      this.questionGenerator = new QuestionGenerator(window.quizData, window.learningState, this.stateManager);
+      this.answerValidator = new AnswerValidator(window.quizData);
       
       // Setup UI
       this.setupUI();

@@ -5,6 +5,7 @@
 export class StateManager {
   constructor(learningState) {
     this.learningState = learningState;
+    this.quizData = window.quizData; // Access to quiz data for C major logic
   }
 
   getCurrentLevel() {
@@ -13,6 +14,37 @@ export class StateManager {
 
   getCurrentGroup() {
     return window.getCurrentGroup();
+  }
+
+  getCurrentKey(mode) {
+    const group = this.getCurrentGroup();
+    if (!group) return null;
+    
+    if (mode === 'linear') {
+      return group.keys[this.learningState.currentKeyIndex];
+    } else {
+      // For random modes, use global logic
+      return window.getCurrentKey(mode);
+    }
+  }
+
+  getCurrentChapter() {
+    const group = this.getCurrentGroup();
+    if (!group) return null;
+    
+    const currentChapterIndex = this.learningState.currentChapterIndex;
+    const currentChapter = group.chapters[currentChapterIndex];
+    
+    // ✅ CORRECT LOGIC: Only skip accNotes for C major (accidentals === 0)
+    if (currentChapter && currentChapter.id === 'accNotes') {
+      const key = this.getCurrentKey(group.mode);
+      if (key && this.quizData[key] && this.quizData[key].accidentals === 0) {
+        // Skip accNotes only for C major
+        return group.chapters[currentChapterIndex + 1] || group.chapters[0];
+      }
+    }
+    
+    return currentChapter;
   }
 
   advanceQuestionPointer() {

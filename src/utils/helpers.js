@@ -159,7 +159,7 @@ if (typeof window !== 'undefined') {
   window.ordinal = window.MusicTheoryHelpers.ordinal;
   window.wordToNumber = window.MusicTheoryHelpers.wordToNumber;
   window.accidentalToUnicode = window.MusicTheoryHelpers.accidentalToUnicode;
-  window.generateQuestion = generateQuestion;
+  // REMOVED: window.generateQuestion = generateQuestion; // Use new QuestionGenerator instead
 }
 
 function generateQuestion() {

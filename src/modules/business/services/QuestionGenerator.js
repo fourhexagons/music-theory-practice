@@ -3,20 +3,21 @@
  * Handles generating questions based on learning state and mode
  */
 export class QuestionGenerator {
-  constructor(quizData, learningState) {
+  constructor(quizData, learningState, stateManager) {
     this.quizData = quizData;
     this.learningState = learningState;
+    this.stateManager = stateManager;
   }
 
   generateQuestion() {
-    const group = window.getCurrentGroup();
+    const group = this.stateManager.getCurrentGroup();
     if (!group || group.mode === 'complete') {
       return null;
     }
 
-    // Use global functions that contain pairing logic instead of local methods
-    const key = window.getCurrentKey(group.mode);
-    const chapter = window.getCurrentChapter(group.mode, this.quizData);
+    // Use StateManager methods with correct C-major-only accNotes skipping logic
+    const key = this.stateManager.getCurrentKey(group.mode);
+    const chapter = this.stateManager.getCurrentChapter();
     
     if (!key || !chapter) {
       return null;
