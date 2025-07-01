@@ -60,11 +60,15 @@ The learning path logic is working correctly and follows a predictable pattern:
 
 ## Development
 
+**🔍 ALL development work must follow our [Systematic Research Methodology](docs/SYSTEMATIC_RESEARCH_METHODOLOGY.md)**
+
+**Quick Start**: See [Documentation Index](docs/DOCUMENTATION_INDEX.md) for organized guides by role.
+
 ```bash
 git clone https://github.com/fourhexagons/music-theory-practice.git
 cd music-theory-practice
-python3 -m http.server 8000
-# Visit http://localhost:8000/practice
+npm run dev  # Start development server (port 5003)
+# Visit http://localhost:5003/src/practice.html
 ```
 
 ## Architecture

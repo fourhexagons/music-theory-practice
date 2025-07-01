@@ -2,6 +2,27 @@
 
 Thank you for your interest in contributing to the Music Theory Practice App! This guide will help you get started.
 
+## 🔍 **MANDATORY: Systematic Research Methodology**
+
+**ALL contributions involving existing code MUST follow our [Systematic Research Methodology](SYSTEMATIC_RESEARCH_METHODOLOGY.md).**
+
+### Before You Start ANY Task
+1. **Use the [Research Template](RESEARCH_TEMPLATE.md)** - Copy it and fill it out as you work
+2. **Never make assumptions** - Always verify behavior through actual code
+3. **Research systematically** - Break problems into specific questions and investigate each one
+4. **Document your findings** - Capture evidence and reasoning for future contributors
+
+### Why This Matters
+This methodology successfully identified complex bugs that traditional approaches missed. It ensures:
+- ✅ **Root causes addressed** (not just symptoms)
+- ✅ **Architectural consistency maintained**
+- ✅ **No unintended side effects**
+- ✅ **Knowledge shared with team**
+
+**Bottom line: Research first, contribute second. Always verify through code.**
+
+---
+
 ## 🤝 How to Contribute
 
 ### Types of Contributions
@@ -33,10 +54,12 @@ git checkout -b feature/your-feature-name
 - **Read the existing code** to understand patterns
 
 ### Making Changes
-1. **Make your changes** following the coding standards
-2. **Add tests** for new functionality
-3. **Run the test suite** to ensure everything works
-4. **Update documentation** if needed
+1. **Follow systematic research methodology** - Use [Research Template](RESEARCH_TEMPLATE.md)
+2. **Research existing code** before making any modifications
+3. **Make targeted changes** addressing root causes (not symptoms)
+4. **Add tests** for new functionality
+5. **Run the test suite** to ensure everything works
+6. **Update documentation** with findings and rationale
 
 ### Testing Your Changes
 ```bash
@@ -97,9 +120,15 @@ python3 -m http.server 8000
 ## Description
 Brief description of the changes
 
+## Systematic Research Applied
+- [ ] Used [Research Template](RESEARCH_TEMPLATE.md) for investigation
+- [ ] Researched existing code before making changes
+- [ ] Identified root cause (not just symptoms)
+- [ ] Documented findings and rationale
+
 ## Type of Change
 - [ ] Bug fix
-- [ ] New feature
+- [ ] New feature  
 - [ ] Documentation update
 - [ ] Test improvement
 
@@ -107,6 +136,13 @@ Brief description of the changes
 - [ ] All tests pass
 - [ ] Tested on multiple browsers
 - [ ] Added tests for new functionality
+- [ ] Verified no regressions in related functionality
+
+## Research Documentation
+*Include key findings from your systematic research:*
+- **Root cause identified:** 
+- **Code locations examined:** 
+- **Alternative solutions considered:**
 
 ## Screenshots (if applicable)
 Add screenshots for UI changes

@@ -1,5 +1,25 @@
 # Music Theory Practice - Testing Guide
 
+## 🔍 **MANDATORY: Systematic Research Methodology for Testing**
+
+**ALL testing and debugging MUST follow our [Systematic Research Methodology](SYSTEMATIC_RESEARCH_METHODOLOGY.md).**
+
+### Before Any Testing Work
+1. **Use the [Research Template](RESEARCH_TEMPLATE.md)** for investigation
+2. **Research systematically** - Understand the system before testing
+3. **Never assume test failures** - Investigate root causes thoroughly
+4. **Document findings** - Share insights with the team
+
+### Testing with Research Methodology
+- **Phase 1: Problem Decomposition** - What exactly is failing and why?
+- **Phase 2: Systematic Code Research** - Investigate implementation and test logic
+- **Phase 3: Evidence-Based Analysis** - Compare expected vs actual behavior
+- **Phase 4: Targeted Resolution** - Fix root causes, not symptoms
+
+**See [Headless Test Research Findings](HEADLESS_TEST_RESEARCH_FINDINGS.md) for a real example of this methodology successfully identifying complex testing issues.**
+
+---
+
 ## 🧪 Comprehensive Test Suite
 
 This app includes a comprehensive test suite that can be run at any time during development to ensure code quality and catch regressions.
