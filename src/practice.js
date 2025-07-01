@@ -21,6 +21,9 @@ import './state/learningState.js';
 // Import components
 import './components/practice-menu.js';
 
+// Import business modules to ensure global functions are available
+import { MusicUtils } from './modules/business/utils/MusicUtils.js';
+
 // Import the new modular architecture
 import { AppController } from './modules/ui/controllers/AppController.js';
 
@@ -33,6 +36,10 @@ class PracticeApp {
   async initialize() {
     try {
       console.log('Music Theory Practice - Practice App Loading...');
+      
+      // Ensure global functions are available (wait for all imports to complete)
+      await this.ensureGlobalFunctions();
+      
       // Initialize the app controller
       await this.controller.initialize();
       console.log('Music Theory Practice - Practice App Loaded Successfully');
@@ -40,6 +47,22 @@ class PracticeApp {
       console.error('Failed to initialize practice app:', error);
       this.showFallbackError();
     }
+  }
+
+  async ensureGlobalFunctions() {
+    // Wait a tick to ensure all imports have executed
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
+    // Verify required global functions are available
+    const requiredFunctions = ['normalizeChord', 'wordToNumber', 'accidentalToUnicode', 'normalizeAccList'];
+    const missing = requiredFunctions.filter(fn => typeof window[fn] !== 'function');
+    
+    if (missing.length > 0) {
+      console.error('Missing global functions:', missing);
+      throw new Error(`Required global functions not available: ${missing.join(', ')}`);
+    }
+    
+    console.log('Global functions verified:', requiredFunctions);
   }
 
   showFallbackError() {
