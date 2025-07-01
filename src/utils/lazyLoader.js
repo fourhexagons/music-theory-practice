@@ -38,11 +38,11 @@ export class LazyLoader {
     try {
       const module = await import(/* @vite-ignore */ modulePath);
       window.performanceMonitor.endTiming(`load-${modulePath}`);
-              import('./logger.js').then(({ logger }) => {
-          logger.debug(`Lazy loaded: ${modulePath}`);
-        }).catch(() => {
-          if (import.meta.env?.DEV) console.log(`📦 Lazy loaded: ${modulePath}`);
-        });
+      import('./logger.js').then(({ logger }) => {
+        logger.debug(`Lazy loaded: ${modulePath}`);
+      }).catch(() => {
+        if (import.meta.env?.DEV) console.log(`📦 Lazy loaded: ${modulePath}`);
+      });
       return module;
     } catch (error) {
       console.error(`❌ Failed to lazy load: ${modulePath}`, error);
