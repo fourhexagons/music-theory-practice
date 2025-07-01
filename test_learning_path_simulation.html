@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎼 Comprehensive Learning Path Test Suite</title>
+    <title>🎓 Learning Path Progression Test</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -65,26 +65,20 @@
             margin-top: 20px;
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
-            max-height: 600px;
+            max-height: 700px;
             overflow-y: auto;
         }
         
-        .test-scenario {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            border-left: 4px solid #4CAF50;
-        }
-        
-        .scenario-title {
-            font-size: 1.3rem;
+        .level-header { 
+            color: #4fc3f7; 
+            font-size: 1.2rem; 
             font-weight: bold;
-            margin-bottom: 10px;
-            color: #4CAF50;
+            background: rgba(79, 195, 247, 0.2);
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 10px 0;
         }
-        
-        .question-item { margin: 5px 0; padding: 8px; border-radius: 5px; }
+        .question-item { margin: 3px 0; padding: 6px; border-radius: 5px; }
         .accCount { background: rgba(255, 87, 87, 0.2); border-left: 3px solid #ff5757; }
         .accNotes { background: rgba(255, 193, 7, 0.2); border-left: 3px solid #ffc107; }
         .scale { background: rgba(76, 175, 80, 0.2); border-left: 3px solid #4caf50; }
@@ -92,7 +86,8 @@
         .sevenths { background: rgba(156, 39, 176, 0.2); border-left: 3px solid #9c27b0; }
         .pair-indicator { background: rgba(255, 152, 0, 0.3); border: 1px solid #ff9800; }
         .streak-info { color: #81c784; font-weight: bold; }
-        .scenario-header { color: #4fc3f7; font-size: 1.1rem; font-weight: bold; }
+        .level-complete { color: #4caf50; font-weight: bold; background: rgba(76, 175, 80, 0.3); padding: 5px; border-radius: 3px; }
+        .progression-info { color: #ffeb3b; font-weight: bold; }
         .error { color: #ff5757; font-weight: bold; }
         .success { color: #4caf50; font-weight: bold; }
         
@@ -104,7 +99,7 @@
             margin-top: 20px;
             font-family: 'Courier New', monospace;
             font-size: 12px;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
         
@@ -133,12 +128,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎼 Comprehensive Learning Path Test Suite</h1>
+        <h1>🎓 Learning Path Progression Test</h1>
+        <p style="text-align: center; font-style: italic; margin-bottom: 30px;">
+            Tests the complete learning path progression from fresh start to completion<br>
+            Simulates the actual user experience of "Start Over" → Complete All 12 Levels
+        </p>
         
         <div class="controls">
-            <button onclick="runFullSuite()">🚀 Run Full Test Suite</button>
-            <button onclick="runAccidentalsPairingTest()">🔗 Test Accidentals Pairing</button>
-            <button onclick="runModeComparisonTest()">📊 Compare All Modes</button>
+            <button onclick="runFullLearningPath()">🚀 Run Complete Learning Path</button>
+            <button onclick="runFirstThreeLevels()">🎯 Test First 3 Levels</button>
+            <button onclick="runAccidentalsPairingLevels()">🔗 Test Pairing Levels</button>
             <button onclick="clearResults()">🗑️ Clear Results</button>
         </div>
         
@@ -159,67 +158,37 @@
         const MODES = {
             LINEAR: 'linear',
             RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
-            RANDOM_ALL: 'random_all'
+            RANDOM_ALL: 'random_all',
+            COMPLETE: 'complete'
         };
 
-        const ALL_CHAPTERS = [
+        const CORE_CHAPTERS = [
             { id: QUESTION_TYPES.ACCIDENTALS_COUNT, name: 'Accidentals Count' },
             { id: QUESTION_TYPES.ACCIDENTALS_NAMES, name: 'Accidentals Naming' },
             { id: QUESTION_TYPES.SCALE_SPELLING, name: 'Scale Spelling' },
             { id: QUESTION_TYPES.TRIADS, name: 'Triads' },
-            { id: QUESTION_TYPES.SEVENTHS, name: 'Sevenths' },
+            { id: QUESTION_TYPES.SEVENTHS, name: 'Sevenths' }
+        ];
+
+        const ALL_CHAPTERS = [
+            ...CORE_CHAPTERS,
             { id: QUESTION_TYPES.SEVENTH_SPELLING, name: 'Seventh Spelling' }
         ];
 
-        const TEST_SCENARIOS = [
-            {
-                name: '1. Beginner: C Major Only',
-                keys: ['C'],
-                mode: MODES.LINEAR,
-                chapters: ALL_CHAPTERS,
-                requiredStreak: 3,
-                expectedBehavior: 'C major should ask accCount but skip accNotes (no accidentals to name)'
-            },
-            {
-                name: '2. Linear Progression: Basic Sharps',
-                keys: ['C', 'G', 'D'],
-                mode: MODES.LINEAR,
-                chapters: ALL_CHAPTERS,
-                requiredStreak: 4,
-                expectedBehavior: 'Linear progression through keys, all chapters in sequence'
-            },
-            {
-                name: '3. Pairing Test: Random Keys with Accidentals',
-                keys: ['G', 'D', 'A'],
-                mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS,
-                chapters: ALL_CHAPTERS,
-                requiredStreak: 5,
-                expectedBehavior: 'accCount+accNotes should be paired with same key, random key selection'
-            },
-            {
-                name: '4. Random All: No Pairing Mode',
-                keys: ['F', 'Bb', 'Eb'],
-                mode: MODES.RANDOM_ALL,
-                chapters: ALL_CHAPTERS,
-                requiredStreak: 4,
-                expectedBehavior: 'Random questions, accNotes filtered out, no pairing'
-            },
-            {
-                name: '5. Complex Pairing: Many Keys',
-                keys: ['G', 'D', 'A', 'E', 'B'],
-                mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS,
-                chapters: ALL_CHAPTERS,
-                requiredStreak: 8,
-                expectedBehavior: 'Multiple pairing opportunities, each pair uses same key'
-            },
-            {
-                name: '6. Mixed Keys: Sharps and Flats',
-                keys: ['F#', 'Db', 'Ab', 'C#'],
-                mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS,
-                chapters: ALL_CHAPTERS,
-                requiredStreak: 6,
-                expectedBehavior: 'Complex keys with proper pairing behavior'
-            }
+        // Real Learning Path (matches the actual app)
+        const LEARNING_PATH = [
+            { name: '1. Introduction', keys: ['C'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+            { name: '2. Level 1a Sharps', keys: ['G', 'D', 'A'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+            { name: '3. Level 1b Sharps', keys: ['G', 'D', 'A'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
+            { name: '4. Level 1a Flats', keys: ['F', 'Bb', 'Eb'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+            { name: '5. Level 1b Flats', keys: ['F', 'Bb', 'Eb'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
+            { name: '6. Level 2a Sharps', keys: ['E', 'B', 'F#'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+            { name: '7. Level 2b Sharps', keys: ['E', 'B', 'F#'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
+            { name: '8. Level 2a Flats', keys: ['Ab', 'Db', 'Gb'], mode: MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+            { name: '9. Level 2b Flats', keys: ['Ab', 'Db', 'Gb'], mode: MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: CORE_CHAPTERS, requiredStreak: 5 },
+            { name: '10. Level 3 Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#'], mode: MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
+            { name: '11. Level 3 Flats', keys: ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'], mode: MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
+            { name: 'Complete!', keys: [], mode: MODES.COMPLETE, chapters: [], requiredStreak: Infinity }
         ];
 
         const mockQuizData = {
@@ -240,104 +209,67 @@
             'Cb': { accidentals: 7, notes: ['Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] }
         };
 
-        let fullResults = {
+        let testResults = {
             timestamp: new Date().toISOString(),
-            testSuite: 'Comprehensive Learning Path Test',
-            scenarios: [],
+            testType: 'Full Learning Path Progression',
+            levels: [],
             summary: {
-                totalScenarios: 0,
-                passedScenarios: 0,
-                failedScenarios: 0,
-                totalQuestions: 0,
-                pairingTestsPassed: 0,
-                pairingTestsFailed: 0
-            }
-        };
-
-        function runFullSuite() {
-            fullResults = {
-                timestamp: new Date().toISOString(),
-                testSuite: 'Comprehensive Learning Path Test',
-                scenarios: [],
-                summary: {
-                    totalScenarios: 0,
-                    passedScenarios: 0,
-                    failedScenarios: 0,
-                    totalQuestions: 0,
-                    pairingTestsPassed: 0,
-                    pairingTestsFailed: 0
-                }
-            };
-
-            const results = [];
-            results.push('🚀 COMPREHENSIVE LEARNING PATH TEST SUITE');
-            results.push('=' .repeat(60));
-            results.push(`📅 Test Run: ${new Date().toLocaleString()}`);
-            results.push(`📋 Total Scenarios: ${TEST_SCENARIOS.length}`);
-            results.push('');
-
-            TEST_SCENARIOS.forEach((scenario, index) => {
-                results.push(`\n🎯 SCENARIO ${index + 1}: ${scenario.name}`);
-                results.push('-'.repeat(50));
-                results.push(`🔑 Keys: [${scenario.keys.join(', ')}]`);
-                results.push(`🎮 Mode: ${scenario.mode}`);
-                results.push(`🎲 Required Streak: ${scenario.requiredStreak}`);
-                results.push(`📝 Expected: ${scenario.expectedBehavior}`);
-                results.push('');
-
-                const scenarioResult = runScenario(scenario);
-                results.push(...scenarioResult.output);
-                
-                fullResults.scenarios.push(scenarioResult);
-                fullResults.summary.totalScenarios++;
-                fullResults.summary.totalQuestions += scenarioResult.totalQuestions;
-                
-                if (scenarioResult.passed) {
-                    fullResults.summary.passedScenarios++;
-                } else {
-                    fullResults.summary.failedScenarios++;
-                }
-                
-                fullResults.summary.pairingTestsPassed += scenarioResult.pairingTestsPassed;
-                fullResults.summary.pairingTestsFailed += scenarioResult.pairingTestsFailed;
-            });
-
-            // Add summary
-            results.push('\n📊 TEST SUITE SUMMARY');
-            results.push('=' .repeat(40));
-            results.push(`✅ Passed Scenarios: ${fullResults.summary.passedScenarios}/${fullResults.summary.totalScenarios}`);
-            results.push(`❌ Failed Scenarios: ${fullResults.summary.failedScenarios}/${fullResults.summary.totalScenarios}`);
-            results.push(`🎯 Total Questions: ${fullResults.summary.totalQuestions}`);
-            results.push(`🔗 Pairing Tests Passed: ${fullResults.summary.pairingTestsPassed}`);
-            results.push(`💥 Pairing Tests Failed: ${fullResults.summary.pairingTestsFailed}`);
-            
-            const successRate = ((fullResults.summary.passedScenarios / fullResults.summary.totalScenarios) * 100).toFixed(1);
-            results.push(`📈 Success Rate: ${successRate}%`);
-
-            displayResults(results);
-            displayJsonOutput();
-        }
-
-        function runScenario(scenario) {
-            const scenarioResults = {
-                name: scenario.name,
-                mode: scenario.mode,
-                keys: scenario.keys,
-                requiredStreak: scenario.requiredStreak,
-                questions: [],
-                pairingTests: [],
+                totalLevels: 0,
+                completedLevels: 0,
                 totalQuestions: 0,
                 pairingTestsPassed: 0,
                 pairingTestsFailed: 0,
-                passed: false,
-                errors: [],
-                output: []
+                errors: []
+            }
+        };
+
+        function runFullLearningPath() {
+            runLearningPathProgression(LEARNING_PATH.length - 1); // All levels except "Complete!"
+        }
+
+        function runFirstThreeLevels() {
+            runLearningPathProgression(3); // First 3 levels only
+        }
+
+        function runAccidentalsPairingLevels() {
+            // Test levels with RANDOM_KEYS_LINEAR_CHAPTERS mode
+            const pairingLevels = LEARNING_PATH.slice(2, 5); // Levels 3, 4, 5 
+            runLearningPathProgression(pairingLevels.length, pairingLevels);
+        }
+
+        function runLearningPathProgression(maxLevels, customPath = null) {
+            testResults = {
+                timestamp: new Date().toISOString(),
+                testType: customPath ? 'Partial Learning Path' : 'Full Learning Path Progression',
+                levels: [],
+                summary: {
+                    totalLevels: 0,
+                    completedLevels: 0,
+                    totalQuestions: 0,
+                    pairingTestsPassed: 0,
+                    pairingTestsFailed: 0,
+                    errors: []
+                }
             };
 
-            let state = {
-                currentChapterIndex: 0,
-                currentKeyIndex: 0,
-                correctAnswerStreak: 0,
+            const pathToTest = customPath || LEARNING_PATH;
+            const results = [];
+            
+            results.push('🎓 LEARNING PATH PROGRESSION TEST');
+            results.push('=' .repeat(60));
+            results.push(`📅 Test Run: ${new Date().toLocaleString()}`);
+            results.push(`🎯 Testing: ${customPath ? 'Custom Path' : 'Complete Learning Path'}`);
+            results.push(`📚 Levels to Complete: ${Math.min(maxLevels, pathToTest.length - 1)}`);
+            results.push('');
+
+            // Initialize learning state (fresh start)
+            let learningState = {
+                currentGroup: 0,      // Start at first level
+                currentKeyIndex: 0,   // Start at first key
+                currentChapterIndex: 0, // Start at first chapter
+                correctAnswersInChapter: 0,
+                requiredAnswersPerChapter: 3,
+                usedDegrees: [],
                 accidentalsPairState: {
                     inProgress: false,
                     currentKey: null,
@@ -345,160 +277,238 @@
                 }
             };
 
-            let questionNum = 1;
-            const maxQuestions = 30;
+            let totalQuestions = 0;
+            const maxTotalQuestions = 2000; // Safety limit
 
-            while (state.correctAnswerStreak < scenario.requiredStreak && questionNum <= maxQuestions) {
+            // Progress through each level
+            for (let levelIndex = 0; levelIndex < Math.min(maxLevels, pathToTest.length - 1); levelIndex++) {
+                const level = pathToTest[levelIndex];
+                
+                results.push(`\n📖 LEVEL ${levelIndex + 1}: ${level.name}`);
+                results.push('-'.repeat(50));
+                results.push(`🔑 Keys: [${level.keys.join(', ')}]`);
+                results.push(`🎮 Mode: ${level.mode}`);
+                results.push(`🎯 Required Streak: ${level.requiredStreak}`);
+                results.push('');
+
+                const levelResult = simulateLevel(level, learningState, totalQuestions);
+                results.push(...levelResult.output);
+                
+                testResults.levels.push(levelResult);
+                testResults.summary.totalLevels++;
+                testResults.summary.totalQuestions += levelResult.totalQuestions;
+                totalQuestions += levelResult.totalQuestions;
+                
+                if (levelResult.completed) {
+                    testResults.summary.completedLevels++;
+                } else {
+                    testResults.summary.errors.push(`Level ${levelIndex + 1} failed to complete`);
+                    break;
+                }
+
+                testResults.summary.pairingTestsPassed += levelResult.pairingTestsPassed;
+                testResults.summary.pairingTestsFailed += levelResult.pairingTestsFailed;
+
+                // Safety check
+                if (totalQuestions >= maxTotalQuestions) {
+                    results.push(`⚠️ SAFETY LIMIT REACHED: ${maxTotalQuestions} questions`);
+                    break;
+                }
+
+                // Advance to next level (simulate automatic progression)
+                learningState.currentGroup++;
+                learningState.currentKeyIndex = 0;
+                learningState.currentChapterIndex = 0;
+                learningState.correctAnswersInChapter = 0;
+                learningState.usedDegrees = [];
+                learningState.accidentalsPairState = {
+                    inProgress: false,
+                    currentKey: null,
+                    countAnswered: false
+                };
+
+                results.push(`🎉 LEVEL COMPLETE! Auto-advancing to next level...`);
+                results.push('');
+            }
+
+            // Add final summary
+            results.push('\n🏆 LEARNING PATH PROGRESSION SUMMARY');
+            results.push('=' .repeat(50));
+            results.push(`✅ Levels Completed: ${testResults.summary.completedLevels}/${testResults.summary.totalLevels}`);
+            results.push(`📊 Total Questions: ${testResults.summary.totalQuestions}`);
+            results.push(`🔗 Pairing Tests Passed: ${testResults.summary.pairingTestsPassed}`);
+            results.push(`💥 Pairing Tests Failed: ${testResults.summary.pairingTestsFailed}`);
+            
+            const successRate = testResults.summary.totalLevels > 0 ? 
+                ((testResults.summary.completedLevels / testResults.summary.totalLevels) * 100).toFixed(1) : 0;
+            results.push(`📈 Success Rate: ${successRate}%`);
+
+            if (testResults.summary.errors.length > 0) {
+                results.push(`❌ Errors: ${testResults.summary.errors.length}`);
+                testResults.summary.errors.forEach(error => results.push(`  - ${error}`));
+            }
+
+            displayResults(results);
+            displayJsonOutput();
+        }
+
+        function simulateLevel(level, state, questionOffset) {
+            const levelResults = {
+                name: level.name,
+                mode: level.mode,
+                keys: level.keys,
+                requiredStreak: level.requiredStreak,
+                questions: [],
+                pairingTests: [],
+                totalQuestions: 0,
+                pairingTestsPassed: 0,
+                pairingTestsFailed: 0,
+                completed: false,
+                output: []
+            };
+
+            let questionNum = 1;
+            let streak = 0;
+            const maxQuestionsPerLevel = 200; // Safety limit per level
+
+            while (streak < level.requiredStreak && questionNum <= maxQuestionsPerLevel) {
                 try {
-                    const question = generateQuestion(state, scenario);
+                    const question = generateQuestion(level, state);
                     const answer = getCorrectAnswer(question);
                     
                     const questionData = {
-                        number: questionNum,
+                        number: questionOffset + questionNum,
                         text: question.text,
                         key: question.key,
                         type: question.chapterId,
                         answer: answer,
-                        streak: state.correctAnswerStreak
+                        streak: streak
                     };
 
-                    scenarioResults.questions.push(questionData);
-                    scenarioResults.output.push(`Q${questionNum}: ${question.text}`);
-                    scenarioResults.output.push(`   Answer: "${answer}" | Key: ${question.key} | Type: ${question.chapterId}`);
+                    levelResults.questions.push(questionData);
+                    levelResults.output.push(`Q${questionNum}: ${question.text}`);
+                    levelResults.output.push(`   Answer: "${answer}" | Key: ${question.key} | Type: ${question.chapterId}`);
                     
-                    // Check for pairing violations
-                    if (scenario.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
-                        validatePairing(state, question, scenarioResults);
+                    // Validate pairing for RANDOM_KEYS_LINEAR_CHAPTERS mode
+                    if (level.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
+                        validatePairing(state, question, levelResults);
                     }
                     
-                    // Handle correct answer
-                    handleCorrectAnswer(state, question, scenario);
+                    // Handle correct answer and advance state
+                    const advancement = handleCorrectAnswer(state, question, level);
+                    if (advancement.streakAdvanced) {
+                        streak++;
+                    }
                     
-                    scenarioResults.output.push(`   Streak: ${state.correctAnswerStreak}/${scenario.requiredStreak}`);
+                    levelResults.output.push(`   Streak: ${streak}/${level.requiredStreak}`);
                     
                     if (state.accidentalsPairState.inProgress) {
                         const pairStatus = state.accidentalsPairState.countAnswered ? 'accNotes next' : 'accCount done';
-                        scenarioResults.output.push(`   🔗 PAIR: ${pairStatus} (locked key: ${state.accidentalsPairState.currentKey})`);
+                        levelResults.output.push(`   🔗 PAIR: ${pairStatus} (locked key: ${state.accidentalsPairState.currentKey})`);
                     }
                     
-                    scenarioResults.output.push('');
+                    levelResults.output.push('');
                     questionNum++;
 
                 } catch (error) {
-                    scenarioResults.errors.push(`Q${questionNum}: ${error.message}`);
-                    scenarioResults.output.push(`❌ ERROR Q${questionNum}: ${error.message}`);
+                    levelResults.output.push(`❌ ERROR Q${questionNum}: ${error.message}`);
                     break;
                 }
             }
 
-            scenarioResults.totalQuestions = questionNum - 1;
-            scenarioResults.passed = state.correctAnswerStreak >= scenario.requiredStreak && scenarioResults.errors.length === 0;
+            levelResults.totalQuestions = questionNum - 1;
+            levelResults.completed = streak >= level.requiredStreak;
             
-            const status = scenarioResults.passed ? '✅ PASSED' : '❌ FAILED';
-            scenarioResults.output.push(`${status} | Total questions: ${scenarioResults.totalQuestions}`);
-            
-            if (scenarioResults.errors.length > 0) {
-                scenarioResults.output.push(`Errors: ${scenarioResults.errors.length}`);
-                scenarioResults.errors.forEach(error => scenarioResults.output.push(`  - ${error}`));
-            }
+            const status = levelResults.completed ? '✅ LEVEL COMPLETED' : '❌ LEVEL FAILED';
+            levelResults.output.push(status);
 
-            return scenarioResults;
+            return levelResults;
         }
 
-        function validatePairing(state, question, scenarioResults) {
-            if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT) {
-                // Start of potential pair
-                const pairTest = {
-                    accCountKey: question.key,
-                    accNotesKey: null,
-                    passed: false,
-                    error: null
-                };
-                scenarioResults.pairingTests.push(pairTest);
-            } else if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_NAMES && state.accidentalsPairState.inProgress) {
-                // Should be second part of pair
-                const lastPairTest = scenarioResults.pairingTests[scenarioResults.pairingTests.length - 1];
-                if (lastPairTest) {
-                    lastPairTest.accNotesKey = question.key;
-                    if (lastPairTest.accCountKey === question.key) {
-                        lastPairTest.passed = true;
-                        scenarioResults.pairingTestsPassed++;
-                    } else {
-                        lastPairTest.passed = false;
-                        lastPairTest.error = `Key mismatch: accCount(${lastPairTest.accCountKey}) != accNotes(${question.key})`;
-                        scenarioResults.pairingTestsFailed++;
-                    }
-                }
-            }
-        }
-
-        function generateQuestion(state, scenario) {
-            const key = determineKey(state, scenario);
-            const chapter = determineChapter(state, scenario, key);
+        function generateQuestion(level, state) {
+            const key = determineKey(level, state);
+            const chapter = determineChapter(level, state, key);
             
             return {
                 key,
                 chapterId: chapter.id,
-                text: buildQuestionText(key, chapter)
+                text: buildQuestionText(key, chapter),
+                degree: chapter.id === QUESTION_TYPES.TRIADS || chapter.id === QUESTION_TYPES.SEVENTHS ? 
+                    getRandomDegree(state) : null
             };
         }
 
-        function determineKey(state, scenario) {
+        function determineKey(level, state) {
             if (state.accidentalsPairState.inProgress) {
                 return state.accidentalsPairState.currentKey;
             }
             
-            if (scenario.mode === MODES.LINEAR) {
-                return scenario.keys[state.currentKeyIndex];
+            if (level.mode === MODES.LINEAR) {
+                return level.keys[state.currentKeyIndex];
             } else {
-                return scenario.keys[Math.floor(Math.random() * scenario.keys.length)];
+                // Random key for other modes
+                return level.keys[Math.floor(Math.random() * level.keys.length)];
             }
         }
 
-        function determineChapter(state, scenario, selectedKey) {
+        function determineChapter(level, state, selectedKey) {
             // Handle pairing state
             if (state.accidentalsPairState.inProgress) {
                 if (!state.accidentalsPairState.countAnswered) {
-                    return scenario.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_COUNT);
+                    return level.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_COUNT);
                 } else {
-                    // Check if key has accidentals before returning accNotes
+                    // Check if key has accidentals
                     const keyData = mockQuizData[state.accidentalsPairState.currentKey];
                     if (keyData && keyData.accidentals > 0) {
-                        return scenario.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
+                        return level.chapters.find(c => c.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
                     } else {
-                        // No accidentals, skip accNotes and end pair
+                        // No accidentals, end pair
                         state.accidentalsPairState.inProgress = false;
                         state.accidentalsPairState.countAnswered = false;
                         state.accidentalsPairState.currentKey = null;
-                        return scenario.chapters[state.currentChapterIndex];
+                        return level.chapters[state.currentChapterIndex];
                     }
                 }
             }
 
-            let currentChapter = scenario.chapters[state.currentChapterIndex];
+            let currentChapter = level.chapters[state.currentChapterIndex];
             
-            if (scenario.mode === MODES.RANDOM_ALL) {
-                // Filter out accNotes and seventhSpelling for random_all mode
-                const availableChapters = scenario.chapters.filter(ch => 
+            if (level.mode === MODES.RANDOM_ALL) {
+                // Filter chapters for random_all mode
+                const availableChapters = level.chapters.filter(ch => 
                     ch.id !== QUESTION_TYPES.ACCIDENTALS_NAMES && 
                     ch.id !== QUESTION_TYPES.SEVENTH_SPELLING
                 );
                 currentChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
-            } else if (scenario.mode === MODES.LINEAR && currentChapter.id === QUESTION_TYPES.ACCIDENTALS_NAMES) {
-                // In linear mode, skip standalone accNotes (should only appear in pairs)
-                const nextIndex = (state.currentChapterIndex + 1) % scenario.chapters.length;
-                currentChapter = scenario.chapters[nextIndex];
+            } else if (level.mode === MODES.LINEAR && currentChapter.id === QUESTION_TYPES.ACCIDENTALS_NAMES) {
+                // Skip standalone accNotes in linear mode
+                const nextIndex = (state.currentChapterIndex + 1) % level.chapters.length;
+                currentChapter = level.chapters[nextIndex];
             }
             
             // Set up pairing for accCount in RANDOM_KEYS_LINEAR_CHAPTERS mode
             if (currentChapter.id === QUESTION_TYPES.ACCIDENTALS_COUNT && 
-                scenario.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
+                level.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
                 state.accidentalsPairState.inProgress = true;
                 state.accidentalsPairState.currentKey = selectedKey;
                 state.accidentalsPairState.countAnswered = false;
             }
             
             return currentChapter;
+        }
+
+        function getRandomDegree(state) {
+            const allDegrees = [2, 3, 4, 5, 6, 7];
+            let availableDegrees = allDegrees.filter(d => !state.usedDegrees.includes(d));
+            
+            if (availableDegrees.length === 0) {
+                state.usedDegrees = [];
+                availableDegrees = allDegrees;
+            }
+            
+            const degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
+            state.usedDegrees.push(degree);
+            return degree;
         }
 
         function buildQuestionText(key, chapter) {
@@ -540,116 +550,96 @@
             }
         }
 
-        function handleCorrectAnswer(state, question, scenario) {
+        function handleCorrectAnswer(state, question, level) {
+            let streakAdvanced = false;
+
             if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT) {
                 const keyData = mockQuizData[question.key];
                 
                 if (keyData && keyData.accidentals === 0) {
-                    // C major: skip accNotes since no accidentals to name
+                    // C major: skip accNotes 
                     state.accidentalsPairState.inProgress = false;
                     state.accidentalsPairState.countAnswered = false;
                     state.accidentalsPairState.currentKey = null;
-                    state.correctAnswerStreak++;
-                    
-                    // Advance normally (skip accNotes)
-                    advanceToNextQuestion(state, scenario);
+                    streakAdvanced = true;
+                    advanceToNextQuestion(state, level);
                 } else {
-                    // Other keys: set up for accNotes question  
+                    // Other keys: set up for accNotes
                     state.accidentalsPairState.countAnswered = true;
-                    const accNotesIndex = scenario.chapters.findIndex(ch => ch.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
+                    const accNotesIndex = level.chapters.findIndex(ch => ch.id === QUESTION_TYPES.ACCIDENTALS_NAMES);
                     if (accNotesIndex !== -1) {
                         state.currentChapterIndex = accNotesIndex;
                     }
-                    return; // Don't advance streak yet
+                    // Don't advance streak yet
                 }
             } else if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_NAMES && state.accidentalsPairState.inProgress) {
                 // Complete the pair
                 state.accidentalsPairState.inProgress = false;
                 state.accidentalsPairState.countAnswered = false;
                 state.accidentalsPairState.currentKey = null;
-                state.correctAnswerStreak++;
-                
-                // Advance to next question
-                if (state.correctAnswerStreak < scenario.requiredStreak) {
-                    advanceToNextQuestion(state, scenario);
+                streakAdvanced = true;
+                advanceToNextQuestion(state, level);
+            } else if (question.chapterId === QUESTION_TYPES.TRIADS || question.chapterId === QUESTION_TYPES.SEVENTHS) {
+                // Chord questions require 3 correct answers
+                state.correctAnswersInChapter++;
+                if (state.correctAnswersInChapter >= state.requiredAnswersPerChapter) {
+                    state.correctAnswersInChapter = 0;
+                    streakAdvanced = true;
+                    advanceToNextQuestion(state, level);
                 }
             } else {
-                // Normal question
-                state.correctAnswerStreak++;
-                
-                // Advance to next question
-                if (state.correctAnswerStreak < scenario.requiredStreak) {
-                    advanceToNextQuestion(state, scenario);
-                }
+                // Normal questions advance immediately
+                streakAdvanced = true;
+                advanceToNextQuestion(state, level);
             }
+
+            return { streakAdvanced };
         }
 
-        function advanceToNextQuestion(state, scenario) {
-            if (scenario.mode === MODES.LINEAR) {
-                // Linear mode: complete all chapters in current key, then move to next key
+        function advanceToNextQuestion(state, level) {
+            if (level.mode === MODES.LINEAR) {
+                // Linear: complete all chapters in current key, then next key
                 state.currentChapterIndex++;
-                if (state.currentChapterIndex >= scenario.chapters.length) {
+                if (state.currentChapterIndex >= level.chapters.length) {
                     state.currentChapterIndex = 0;
                     state.currentKeyIndex++;
-                    if (state.currentKeyIndex >= scenario.keys.length) {
-                        state.currentKeyIndex = 0; // Loop back to first key
+                    if (state.currentKeyIndex >= level.keys.length) {
+                        state.currentKeyIndex = 0; // Loop back
                     }
                 }
-            } else if (scenario.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
-                // Random keys linear chapters: advance chapter, key stays random per question
+            } else if (level.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
+                // Random keys, linear chapters
                 state.currentChapterIndex++;
-                if (state.currentChapterIndex >= scenario.chapters.length) {
+                if (state.currentChapterIndex >= level.chapters.length) {
                     state.currentChapterIndex = 0;
                 }
             }
-            // RANDOM_ALL mode doesn't need advancement since everything is random
+            // RANDOM_ALL doesn't need state advancement
         }
 
-        function runAccidentalsPairingTest() {
-            const pairingScenarios = TEST_SCENARIOS.filter(s => 
-                s.mode === MODES.RANDOM_KEYS_LINEAR_CHAPTERS
-            );
-            
-            const results = [];
-            results.push('🔗 ACCIDENTALS PAIRING FOCUSED TEST');
-            results.push('=' .repeat(50));
-            
-            pairingScenarios.forEach(scenario => {
-                const result = runScenario(scenario);
-                results.push(...result.output);
-                results.push('');
-            });
-            
-            displayResults(results);
-        }
-
-        function runModeComparisonTest() {
-            const results = [];
-            results.push('📊 MODE COMPARISON TEST');
-            results.push('=' .repeat(40));
-            
-            const testKeys = ['G', 'D', 'A'];
-            const modes = [MODES.LINEAR, MODES.RANDOM_KEYS_LINEAR_CHAPTERS, MODES.RANDOM_ALL];
-            
-            modes.forEach(mode => {
-                results.push(`\n🎮 Testing Mode: ${mode}`);
-                results.push('-'.repeat(30));
-                
-                const scenario = {
-                    name: `Mode Test: ${mode}`,
-                    keys: testKeys,
-                    mode: mode,
-                    chapters: ALL_CHAPTERS,
-                    requiredStreak: 3,
-                    expectedBehavior: `Standard behavior for ${mode} mode`
+        function validatePairing(state, question, levelResults) {
+            if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT) {
+                const pairTest = {
+                    accCountKey: question.key,
+                    accNotesKey: null,
+                    passed: false,
+                    error: null
                 };
-                
-                const result = runScenario(scenario);
-                results.push(...result.output.slice(0, 15)); // Show first 15 lines
-                results.push('...');
-            });
-            
-            displayResults(results);
+                levelResults.pairingTests.push(pairTest);
+            } else if (question.chapterId === QUESTION_TYPES.ACCIDENTALS_NAMES && state.accidentalsPairState.inProgress) {
+                const lastPairTest = levelResults.pairingTests[levelResults.pairingTests.length - 1];
+                if (lastPairTest) {
+                    lastPairTest.accNotesKey = question.key;
+                    if (lastPairTest.accCountKey === question.key) {
+                        lastPairTest.passed = true;
+                        levelResults.pairingTestsPassed++;
+                    } else {
+                        lastPairTest.passed = false;
+                        lastPairTest.error = `Key mismatch: accCount(${lastPairTest.accCountKey}) != accNotes(${question.key})`;
+                        levelResults.pairingTestsFailed++;
+                    }
+                }
+            }
         }
 
         function displayResults(results) {
@@ -658,16 +648,17 @@
             
             results.forEach(line => {
                 let className = 'question-item';
-                if (line.includes('accCount')) className += ' accCount';
+                if (line.includes('LEVEL ') && line.includes(':')) className = 'level-header';
+                else if (line.includes('accCount')) className += ' accCount';
                 else if (line.includes('accNotes')) className += ' accNotes';
                 else if (line.includes('scale')) className += ' scale';
                 else if (line.includes('triads')) className += ' triads';
                 else if (line.includes('sevenths')) className += ' sevenths';
                 else if (line.includes('PAIR:')) className = 'pair-indicator';
                 else if (line.includes('Streak:')) className = 'streak-info';
-                else if (line.includes('SCENARIO')) className = 'scenario-header';
+                else if (line.includes('COMPLETED')) className = 'level-complete';
+                else if (line.includes('Auto-advancing')) className = 'progression-info';
                 else if (line.includes('ERROR') || line.includes('FAILED')) className = 'error';
-                else if (line.includes('PASSED')) className = 'success';
                 
                 html += `<div class="${className}">${line}</div>`;
             });
@@ -678,22 +669,21 @@
 
         function displayJsonOutput() {
             const jsonDiv = document.getElementById('json-output');
-            const jsonString = JSON.stringify(fullResults, null, 2);
+            const jsonString = JSON.stringify(testResults, null, 2);
             
             jsonDiv.innerHTML = `
-                <h3>📋 Test Results JSON (Copy & Share)</h3>
+                <h3>📋 Learning Path Test Results JSON (Copy & Share)</h3>
                 <div class="json-output">${jsonString}</div>
                 <button class="copy-button" onclick="copyToClipboard()">📋 Copy JSON to Clipboard</button>
             `;
         }
 
         function copyToClipboard() {
-            const jsonString = JSON.stringify(fullResults, null, 2);
+            const jsonString = JSON.stringify(testResults, null, 2);
             navigator.clipboard.writeText(jsonString).then(function() {
                 alert('✅ Test results copied to clipboard!');
             }).catch(function(err) {
                 console.error('Failed to copy: ', err);
-                // Fallback for older browsers
                 const textArea = document.createElement('textarea');
                 textArea.value = jsonString;
                 document.body.appendChild(textArea);
