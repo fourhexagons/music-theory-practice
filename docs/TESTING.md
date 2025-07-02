@@ -28,7 +28,7 @@ This app includes a comprehensive test suite that can be run at any time during 
 
 **Purpose**: Validates learning path progression and b-level behavior compliance.
 
-**Key Features (Enhanced 2024)**:
+**Key Features**:
 - **Level Progression Tracking**: Monitors transitions through multiple levels
 - **B-Level Compliance Validation**: Ensures b-levels ask ONLY triads questions  
 - **Question Type Analysis**: Validates each level's allowed question types

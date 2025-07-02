@@ -11,9 +11,18 @@
 7. **Level 2b Sharps**: E, B, F♯ (TRIADS_ONLY, streak: 10)
 8. **Level 2a Flats**: A♭, D♭, G♭ (LINEAR, streak: 3)
 9. **Level 2b Flats**: A♭, D♭, G♭ (TRIADS_ONLY, streak: 10)
-10. **Level 3 Sharps**: All sharp keys (RANDOM_ALL, streak: 5)
-11. **Level 3 Flats**: All flat keys (RANDOM_ALL, streak: 5)
+10. **Level 10: Full Random**: All 15 keys (RANDOM_ALL, streak: 10) - **Scale + Triads Only**
+11. **Level 11: Infinite Sevenths**: All keys (sevenths_only mode)
 12. **Complete!**: End of path
+
+## 🎯 **Full Random Pedagogical Enhancement (v1.6.3)**
+
+### **Level 10 Behavior Updated**
+- **Previous**: 4 question types (accCount, scale, triads, sevenths)
+- **Current**: 2 question types (scale, triads) - **Pedagogically optimized**
+- **Rationale**: Scale spelling subsumes accidental knowledge, eliminating redundancy
+- **Distribution**: 50% scale questions, 50% triad questions
+- **Key Coverage**: All 15 major keys with true randomization
 
 ## 🎯 Chapter Progression (CORE_CHAPTERS)
 - `accCount` → `accNotes` → `scale` → `triads` → `sevenths`

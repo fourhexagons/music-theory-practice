@@ -273,12 +273,15 @@ class PracticeMenu {
       name: selectedMode.description,
       keys: selectedMode.keys,
       mode: selectedMode.mode,
-      chapters: window.CORE_CHAPTERS || [
+      chapters: selectedMode.mode === 'random_all' ? [
+        window.CHAPTERS.SCALE_SPELLING,
+        window.CHAPTERS.TRIADS
+      ] : (window.CORE_CHAPTERS || [
         window.CHAPTERS.ACCIDENTALS_COUNT,
         window.CHAPTERS.ACCIDENTALS_NAMES,
         window.CHAPTERS.SCALE_SPELLING,
         window.CHAPTERS.TRIADS
-      ],
+      ]),
       requiredStreak: 3
     };
     

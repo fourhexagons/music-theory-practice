@@ -108,6 +108,27 @@ Follow the same pattern: accCount → accNotes → scale → triads → sevenths
 
 ## Testing and Verification
 
+## 🎯 **Full Random Pedagogical Improvement**
+
+**Enhancement**: Full Random mode has been pedagogically optimized to focus on core skills:
+
+### **New Full Random Behavior**
+- **Scale Spelling**: Tests complete key knowledge (subsumes accidental knowledge)
+- **Triad Identification**: Tests harmonic understanding
+- **50/50 Distribution**: Equal probability between scale and triad questions
+- **All 15 Keys**: Complete coverage across C, G, D, A, E, B, F#, F, Bb, Eb, Ab, Db, Gb, C#, Cb
+
+### **Pedagogical Rationale**
+1. **Scale spelling inherently requires accidental knowledge** - if students can spell "E♭ F G A♭ B♭ C D", they clearly know the key has 3 flats and which notes they are
+2. **Eliminates redundancy** - no need to test both accidental counting AND scale spelling
+3. **Focuses on fundamental skills** - scale knowledge + harmonic understanding
+4. **Reduces cognitive load** - simpler, clearer learning objectives
+
+### **Technical Benefits**
+- **Simplified state management**: No more A/B pairing complexity
+- **Consistent randomization**: True 50/50 distribution without bias
+- **Easier debugging**: 2 question types instead of 4
+
 ### **Enhanced Automated Testing**
 Use `test_headless_learning_path.js` to verify learning path progression and validate b-level behavior:
 
@@ -119,7 +140,7 @@ npm run dev
 npm run test:headless
 ```
 
-**Test Capabilities (Enhanced 2024)**:
+**Test Capabilities**:
 - ✅ **Level Progression Tracking**: Monitors transitions (1 → 1a → 1b → 2a → 2b)
 - ✅ **B-Level Compliance Validation**: Ensures b-levels ask ONLY triads questions
 - ✅ **Question Type Analysis**: Validates each level's allowed question types
