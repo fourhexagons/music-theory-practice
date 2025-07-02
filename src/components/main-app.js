@@ -559,12 +559,15 @@ window.resetQuiz = function() {
     if (window.resetLearningState) {
         window.resetLearningState();
     }
-    // Explicitly clear any custom group and set mode to default
+    // Explicitly clear any custom group and advanced mode state
     if (window.learningState) {
         window.learningState.customGroup = null;
         window.learningState.mode = window.MODES ? window.MODES.LINEAR : 'linear';
         window.learningState.currentKeyIndex = 0;
         window.learningState.currentChapterIndex = 0;
+        // Clear advanced mode flags
+        window.learningState.isAdvancedMode = false;
+        window.learningState.advancedModeType = null;
     }
     if (window.saveLearningState) {
         window.saveLearningState();

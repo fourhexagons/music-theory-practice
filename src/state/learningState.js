@@ -343,8 +343,18 @@ window.advanceLearningPath = advanceLearningPath;
  */
 function startAdvancedPractice(mode) {
   learningState.mode = mode;
-  const groupName = mode === window.MODES.RANDOM_ALL ? 'Randomize' : 'Seventh Spelling';
-  learningState.currentGroup = window.learningPath.findIndex(g => g.name === groupName);
+  
+  // Advanced practice modes don't use the standard learning path groups
+  // Set up custom group for advanced practice
+  learningState.customGroup = {
+    name: mode === 'random_all' ? 'Random Practice' : 'Seventh Spelling Practice',
+    mode: mode,
+    keys: Object.keys(window.quizData), // All keys for both modes
+    chapters: mode === 'sevenths_only' ? [window.CHAPTERS.SEVENTH_SPELLING] : Object.values(window.CHAPTERS),
+    requiredStreak: Infinity
+  };
+  
+  // Don't modify currentGroup for advanced practice - use customGroup instead
   learningState.currentChapterIndex = 0;
   learningState.correctAnswersInChapter = 0;
   learningState.usedDegrees = [];
@@ -354,6 +364,10 @@ function startAdvancedPractice(mode) {
     currentKey: null,
     countAnswered: false
   };
+  
+  // Mark as advanced mode
+  learningState.isAdvancedMode = true;
+  learningState.advancedModeType = mode;
 }
 window.startAdvancedPractice = startAdvancedPractice;
 

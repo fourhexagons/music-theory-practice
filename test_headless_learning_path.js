@@ -172,13 +172,47 @@ async function resetApp() {
     log('🔄 Resetting app to start...', 'cyan');
     
     try {
+        // Wait for app to be fully loaded before resetting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Validate state before reset
+        const stateBeforeReset = await testState.page.evaluate(() => {
+            return {
+                learningStateAvailable: !!window.learningState,
+                resetQuizAvailable: typeof window.resetQuiz === 'function',
+                learningPathAvailable: !!window.learningPath,
+                currentGroup: window.learningState?.currentGroup
+            };
+        });
+        
+        log(`   📊 Pre-reset state: ${JSON.stringify(stateBeforeReset)}`, 'cyan');
+        
+        if (!stateBeforeReset.resetQuizAvailable) {
+            log('   ⚠️  resetQuiz function not available, waiting longer...', 'yellow');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        
+        // Perform reset
         await testState.page.evaluate(() => {
             if (window.resetQuiz) {
                 window.resetQuiz();
             }
         });
         
-        await new Promise(resolve => setTimeout(resolve, CONFIG.waitDelay));
+        // Wait longer for reset to complete
+        await new Promise(resolve => setTimeout(resolve, CONFIG.waitDelay * 2));
+        
+        // Validate state after reset
+        const stateAfterReset = await testState.page.evaluate(() => {
+            return {
+                currentGroup: window.learningState?.currentGroup,
+                currentQuestion: document.getElementById('question-display')?.textContent?.substring(0, 50) + '...'
+            };
+        });
+        
+        log(`   📊 Post-reset state: currentGroup=${stateAfterReset.currentGroup}`, 'cyan');
+        log(`   📊 Current question: "${stateAfterReset.currentQuestion}"`, 'cyan');
+        
         logResult('pass', 'App reset successfully');
         
     } catch (error) {
@@ -242,6 +276,22 @@ async function testNextQuestion(questionNumber, expectedLevel = null) {
         const currentLevel = await getCurrentLevel();
         log(`   Current Level: ${currentLevel}`, 'cyan');
         
+        // Get question BEFORE calling askQuestion to compare
+        const questionBefore = await testState.page.$eval('#question-display', el => el.textContent.trim());
+        
+        // Check state before askQuestion call
+        const stateBefore = await testState.page.evaluate(() => {
+            return {
+                currentGroup: window.learningState?.currentGroup,
+                isAdvancedMode: window.learningState?.isAdvancedMode,
+                customGroup: !!window.learningState?.customGroup,
+                mode: window.learningState?.mode
+            };
+        });
+        
+        log(`   📊 Before askQuestion: ${JSON.stringify(stateBefore)}`, 'cyan');
+        log(`   📊 Question before: "${questionBefore}"`, 'cyan');
+        
         // Generate question
         await testState.page.evaluate(() => {
             if (window.askQuestion) {
@@ -251,8 +301,50 @@ async function testNextQuestion(questionNumber, expectedLevel = null) {
         
         await new Promise(resolve => setTimeout(resolve, CONFIG.waitDelay));
         
+        // Check state after askQuestion call
+        const stateAfter = await testState.page.evaluate(() => {
+            return {
+                currentGroup: window.learningState?.currentGroup,
+                isAdvancedMode: window.learningState?.isAdvancedMode,
+                customGroup: !!window.learningState?.customGroup,
+                mode: window.learningState?.mode
+            };
+        });
+        
         // Get actual question text and extract key/type info
         const actualQuestion = await testState.page.$eval('#question-display', el => el.textContent.trim());
+        
+        log(`   📊 After askQuestion: ${JSON.stringify(stateAfter)}`, 'cyan');
+        log(`   📊 Question after: "${actualQuestion}"`, 'cyan');
+        
+        // Check for completion state and handle it properly
+        if (actualQuestion.includes('Congratulations') || actualQuestion.includes('completed all levels')) {
+            log(`   ⚠️  Completion state detected: "${actualQuestion}"`, 'yellow');
+            
+            // Get detailed state information for debugging
+            const stateInfo = await testState.page.evaluate(() => {
+                return {
+                    currentGroup: window.learningState?.currentGroup,
+                    learningPathLength: window.learningPath?.length,
+                    currentLevel: window.getCurrentLevel ? window.getCurrentLevel() : 'function unavailable',
+                    getCurrentGroup: window.getCurrentGroup ? window.getCurrentGroup() : 'function unavailable'
+                };
+            });
+            
+            log(`   📊 State Debug: currentGroup=${stateInfo.currentGroup}, pathLength=${stateInfo.learningPathLength}`, 'cyan');
+            
+            // If we're at the end of the learning path (Level 12), this is expected
+            if (stateInfo.currentGroup >= 11) { // Level 12 is index 11
+                log(`   ✅ Reached end of learning path - this is expected!`, 'green');
+                testState.stats.passed++;
+                return { success: true, level: '12', isComplete: true };
+            } else {
+                // Unexpected completion state - this is the bug
+                log(`   ❌ Unexpected completion state at group ${stateInfo.currentGroup}`, 'red');
+                testState.stats.failed++;
+                return { success: false, level: currentLevel, error: 'Unexpected completion state' };
+            }
+        }
         
         // Extract key using research-based regex patterns
         let keyMatch = actualQuestion.match(/in ([A-G][b#]?) major/);
@@ -510,8 +602,8 @@ async function testLevelProgression() {
         }
         lastLevel = result.level;
         
-        // Stop if we've reached Level 12 (infinite sevenths)
-        if (result.level === '12' || (result.level && result.level.includes('12'))) {
+        // Stop if we've reached Level 12 (infinite sevenths) or completion
+        if (result.level === '12' || (result.level && result.level.includes('12')) || result.isComplete) {
             log('\n🎉 REACHED LEVEL 12: Infinite Sevenths Practice!', 'green');
             log('✅ Complete learning path validated successfully', 'green');
             break;
@@ -539,6 +631,10 @@ async function testLevelProgression() {
 async function runTestSequence() {
     // Test menu functionality first
     await testMenuFunctionality();
+    
+    // Reset app state after menu tests to ensure clean state for learning path tests
+    log('\n🔄 Resetting app after menu tests...', 'cyan');
+    await resetApp();
     
     // Then test the complete learning path
     await testLevelProgression();
