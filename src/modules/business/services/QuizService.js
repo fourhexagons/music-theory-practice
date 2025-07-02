@@ -205,53 +205,106 @@ export class QuizService {
   }
 
   startAdvancedPractice(mode) {
+    console.log('🚀 QUIZ SERVICE DEBUG: startAdvancedPractice called with mode:', mode);
+    console.log('🚀 QUIZ SERVICE DEBUG: learningState before:', window.learningState);
+    
     window.learningState.isAdvancedMode = true;
     window.learningState.advancedModeType = mode;
     window.learningState.correctAnswerStreak = 0;
     window.learningState.usedDegrees = [];
     window.learningState.currentQuestion = null;
+    
+    console.log('🚀 QUIZ SERVICE DEBUG: Advanced mode flags set');
+    console.log('🚀 QUIZ SERVICE DEBUG: isAdvancedMode:', window.learningState.isAdvancedMode);
+    console.log('🚀 QUIZ SERVICE DEBUG: advancedModeType:', window.learningState.advancedModeType);
+    
     if (mode === 'random_all') {
+      console.log('🚀 QUIZ SERVICE DEBUG: Processing random_all mode');
+      
       const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
+      console.log('🚀 QUIZ SERVICE DEBUG: Available keys:', randomKey);
+      
       const availableChapters = Object.values(window.CHAPTERS).filter(chapter =>
         chapter.id !== window.QUESTION_TYPES.ACCIDENTALS_NAMES &&
         chapter.id !== window.QUESTION_TYPES.SEVENTH_SPELLING
       );
+      console.log('🚀 QUIZ SERVICE DEBUG: Available chapters:', availableChapters);
+      
       const randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
+      console.log('🚀 QUIZ SERVICE DEBUG: Selected chapter:', randomChapter);
+      
       const selectedKey = randomKey[Math.floor(Math.random() * randomKey.length)];
+      console.log('🚀 QUIZ SERVICE DEBUG: Selected key:', selectedKey);
+      
       window.learningState.currentQuestion = { key: selectedKey, chapterId: randomChapter.id };
+      console.log('🚀 QUIZ SERVICE DEBUG: currentQuestion set to:', window.learningState.currentQuestion);
+      
+      // CRITICAL: Also update AppController's currentQuestion to ensure answer validation works
+      if (this.appController && this.appController.currentQuestion !== undefined) {
+        this.appController.currentQuestion = window.learningState.currentQuestion;
+        console.log('🚀 QUIZ SERVICE DEBUG: AppController.currentQuestion synchronized');
+      }
+      
       let text = '';
       let degree;
       switch (randomChapter.id) {
         case window.QUESTION_TYPES.ACCIDENTALS_COUNT: {
           text = `How many accidentals are in ${selectedKey} major?`;
+          console.log('🚀 QUIZ SERVICE DEBUG: Generated accCount question:', text);
           break;
         }
         case window.QUESTION_TYPES.SCALE_SPELLING: {
           text = `Spell the ${selectedKey} major scale.`;
+          console.log('🚀 QUIZ SERVICE DEBUG: Generated scale question:', text);
           break;
         }
         case window.QUESTION_TYPES.TRIADS:
         case window.QUESTION_TYPES.SEVENTHS: {
           degree = [2, 3, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
           window.learningState.currentQuestion.degree = degree;
+          
+          // CRITICAL: Also update AppController's currentQuestion for chord questions
+          if (this.appController && this.appController.currentQuestion !== undefined) {
+            this.appController.currentQuestion = window.learningState.currentQuestion;
+            console.log('🚀 QUIZ SERVICE DEBUG: AppController.currentQuestion synchronized (chords)');
+          }
+          
           const chordType = randomChapter.id === window.QUESTION_TYPES.TRIADS ? 'triad' : 'seventh chord';
           const action = 'Name';
           text = `${action} the ${MusicUtils.ordinal(degree)} ${chordType} in ${selectedKey} major.`;
+          console.log('🚀 QUIZ SERVICE DEBUG: Generated chord question:', text);
           break;
         }
       }
+      
+      console.log('🚀 QUIZ SERVICE DEBUG: About to update UI with text:', text);
       this.appController.updateQuestionUI(text);
+      console.log('🚀 QUIZ SERVICE DEBUG: UI updated successfully');
+      
     } else if (mode === 'sevenths_only') {
+      console.log('🚀 QUIZ SERVICE DEBUG: Processing sevenths_only mode');
+      
       const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
       const randomChapter = window.CHAPTERS.SEVENTH_SPELLING;
       const selectedKey = randomKey[Math.floor(Math.random() * randomKey.length)];
       window.learningState.currentQuestion = { key: selectedKey, chapterId: randomChapter.id };
       const degree = [2, 3, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
       window.learningState.currentQuestion.degree = degree;
+      
+      // CRITICAL: Also update AppController's currentQuestion to ensure answer validation works
+      if (this.appController && this.appController.currentQuestion !== undefined) {
+        this.appController.currentQuestion = window.learningState.currentQuestion;
+        console.log('🚀 QUIZ SERVICE DEBUG: AppController.currentQuestion synchronized (sevenths)');
+      }
+      
       const chordType = 'seventh chord';
       const action = 'Spell';
       const text = `${action} the ${MusicUtils.ordinal(degree)} ${chordType} in ${selectedKey} major.`;
+      
+      console.log('🚀 QUIZ SERVICE DEBUG: Generated sevenths question:', text);
       this.appController.updateQuestionUI(text);
     }
+    
+    console.log('🚀 QUIZ SERVICE DEBUG: startAdvancedPractice completed');
   }
 } 

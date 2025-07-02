@@ -91,12 +91,26 @@ export class StateManager {
   }
 
   handleCorrectAnswer() {
+    console.log('🔧 STATEMANAGER DEBUG: handleCorrectAnswer called');
+    console.log('🔧 STATEMANAGER DEBUG: isAdvancedMode:', this.learningState.isAdvancedMode);
+    console.log('🔧 STATEMANAGER DEBUG: advancedModeType:', this.learningState.advancedModeType);
+    console.log('🔧 STATEMANAGER DEBUG: currentQuestion:', this.learningState.currentQuestion);
+    
+    // Check if StateManager's learningState is the same object as window.learningState
+    console.log('🔧 STATEMANAGER DEBUG: Same object?', this.learningState === window.learningState);
+    console.log('🔧 STATEMANAGER DEBUG: window.learningState.isAdvancedMode:', window.learningState.isAdvancedMode);
+    console.log('🔧 STATEMANAGER DEBUG: window.learningState.advancedModeType:', window.learningState.advancedModeType);
+    
     const group = this.getCurrentGroup();
+    console.log('🔧 STATEMANAGER DEBUG: currentGroup:', group);
 
     // Handle advanced mode separately
     if (this.learningState.isAdvancedMode) {
+      console.log('🔧 STATEMANAGER DEBUG: Calling handleAdvancedModeProgression');
       return this.handleAdvancedModeProgression();
     }
+
+    console.log('🔧 STATEMANAGER DEBUG: Not in advanced mode, proceeding with normal progression');
 
     // Single-key custom group logic
     if (this.learningState.customGroup && group.keys.length === 1) {
@@ -108,10 +122,15 @@ export class StateManager {
   }
 
   handleAdvancedModeProgression() {
+    console.log('🔧 STATEMANAGER DEBUG: handleAdvancedModeProgression called');
+    console.log('🔧 STATEMANAGER DEBUG: currentQuestion:', this.learningState.currentQuestion);
+    
     // Handle A/B pair logic for accidentals questions
     if (this.learningState.currentQuestion && 
         this.learningState.currentQuestion.chapterId === 'accCount' &&
         window.quizData[this.learningState.currentQuestion.key].accidentals > 0) {
+      
+      console.log('🔧 STATEMANAGER DEBUG: Handling A/B pair for accCount question');
       
       // Ask naming question for the same key
       const key = this.learningState.currentQuestion.key;
@@ -121,6 +140,8 @@ export class StateManager {
         text: `Name the accidentals in ${key} major.`
       };
     } else {
+      console.log('🔧 STATEMANAGER DEBUG: Not an A/B pair case, returning startAdvanced');
+      
       // Start new random question
       return { action: 'startAdvanced' };
     }

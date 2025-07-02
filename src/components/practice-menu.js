@@ -207,6 +207,8 @@ class PracticeMenu {
   }
 
   handleDifficultySelection(difficulty) {
+    console.log('🎯 FULL RANDOM DEBUG: handleDifficultySelection called with:', difficulty);
+    
     // Validate that required functions are available
     if (!window.resetLearningState || !window.getLearningState || !window.saveLearningState) {
       console.error('Required functions not available for difficulty selection');
@@ -264,6 +266,8 @@ class PracticeMenu {
       return;
     }
     
+    console.log('🎯 FULL RANDOM DEBUG: selectedMode:', selectedMode);
+    
     // Set up the custom learning path for this difficulty
     const customGroup = {
       name: selectedMode.description,
@@ -278,6 +282,8 @@ class PracticeMenu {
       requiredStreak: 3
     };
     
+    console.log('🎯 FULL RANDOM DEBUG: customGroup created:', customGroup);
+    
     // Store the custom group in the learning state
     state.customGroup = customGroup;
     state.mode = selectedMode.mode;
@@ -287,17 +293,22 @@ class PracticeMenu {
     state.correctAnswersInChapter = 0;
     state.correctAnswerStreak = 0;
     
+    console.log('🎯 FULL RANDOM DEBUG: state.customGroup after setting:', state.customGroup);
+    
     // Save the state
     window.saveLearningState();
     
     // Start the practice
     if (selectedMode.mode === 'random_all' || selectedMode.mode === 'sevenths_only') {
+      console.log('🎯 FULL RANDOM DEBUG: About to start advanced practice with mode:', selectedMode.mode);
       if (window.startAdvancedPractice) {
         // For sevenths_only mode, override the custom group chapters
         if (selectedMode.mode === 'sevenths_only') {
           state.customGroup.chapters = [{ id: 'seventhSpelling', name: 'Seventh Spelling' }];
           window.saveLearningState();
         }
+        // Note: For random_all mode, keep the customGroup intact (don't clear it)
+        console.log('🎯 FULL RANDOM DEBUG: Calling startAdvancedPractice with state:', state);
         window.startAdvancedPractice(selectedMode.mode);
       } else {
         console.error('startAdvancedPractice function not available');

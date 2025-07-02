@@ -26,11 +26,13 @@ import { MusicUtils } from './modules/business/utils/MusicUtils.js';
 
 // Import the new modular architecture
 import { AppController } from './modules/ui/controllers/AppController.js';
+import { QuizService } from './modules/business/services/QuizService.js';
 
 // Initialize practice app
 class PracticeApp {
   constructor() {
     this.controller = new AppController();
+    this.quizService = null;
   }
 
   async initialize() {
@@ -42,6 +44,9 @@ class PracticeApp {
       // Ensure global functions are available (wait for all imports to complete)
       await this.ensureGlobalFunctions();
       
+      // Initialize QuizService and set up correct startAdvancedPractice delegation
+      this.setupQuizService();
+      
       // Initialize the app controller
       await this.controller.initialize();
       import('./utils/logger.js').then(({ logger }) => {
@@ -51,6 +56,20 @@ class PracticeApp {
       console.error('Failed to initialize practice app:', error);
       this.showFallbackError();
     }
+  }
+
+  setupQuizService() {
+    // Initialize QuizService
+    this.quizService = new QuizService(this.controller);
+    
+    // Set up CORRECT startAdvancedPractice delegation to QuizService
+    // This overwrites the incorrect version from learningState.js
+    window.startAdvancedPractice = (mode) => {
+      console.log('🎯 CORRECT DELEGATION: startAdvancedPractice called with mode:', mode);
+      return this.quizService.startAdvancedPractice(mode);
+    };
+    
+    console.log('✅ QuizService delegation set up correctly');
   }
 
   async ensureGlobalFunctions() {

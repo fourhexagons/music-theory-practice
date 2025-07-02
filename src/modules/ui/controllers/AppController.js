@@ -128,6 +128,9 @@ export class AppController {
   }
 
   handleAnswerSubmit(userAnswer) {
+    console.log('🎯 APPCONTROLLER DEBUG: handleAnswerSubmit called with:', userAnswer);
+    console.log('🎯 APPCONTROLLER DEBUG: currentQuestion:', this.currentQuestion);
+    
     if (!this.currentQuestion) {
       this.showError('No current question available.');
       return;
@@ -137,8 +140,10 @@ export class AppController {
       const isCorrect = this.answerValidator.validateAnswer(userAnswer, this.currentQuestion);
       
       if (isCorrect) {
+        console.log('🎯 APPCONTROLLER DEBUG: Answer correct, calling handleCorrectAnswer');
         this.handleCorrectAnswer();
       } else {
+        console.log('🎯 APPCONTROLLER DEBUG: Answer incorrect, calling handleIncorrectAnswer');
         this.handleIncorrectAnswer();
       }
       
@@ -149,22 +154,37 @@ export class AppController {
   }
 
   handleCorrectAnswer() {
+    console.log('🎯 APPCONTROLLER DEBUG: handleCorrectAnswer called');
+    
     // Clear feedback and input
     this.answerForm.clearFeedback();
     this.answerForm.clearAnswer();
     
     // Use state manager to handle progression
     const result = this.stateManager.handleCorrectAnswer();
+    console.log('🎯 APPCONTROLLER DEBUG: StateManager returned:', result);
     
     switch (result.action) {
       case 'startAdvanced':
+        console.log('🎯 APPCONTROLLER DEBUG: Taking startAdvanced action');
         if (window.startAdvancedPractice) {
           window.startAdvancedPractice(window.learningState.advancedModeType);
         }
         break;
         
+      case 'askNaming':
+        console.log('🎯 APPCONTROLLER DEBUG: Taking askNaming action');
+        console.log('🎯 APPCONTROLLER DEBUG: askNaming text:', result.text);
+        // For A/B pairs, StateManager has already set the currentQuestion
+        // We just need to update the UI with the provided text
+        this.currentQuestion = window.learningState.currentQuestion;
+        this.questionDisplay.render(result.text);
+        this.answerForm.clearFeedback();
+        break;
+        
       case 'askQuestion':
       default:
+        console.log('🎯 APPCONTROLLER DEBUG: Taking askQuestion action');
         this.generateAndDisplayQuestion();
         break;
     }
@@ -230,14 +250,17 @@ export class AppController {
   }
 
   attachEventListeners() {
-    const form = document.getElementById('answer-form');
-    const submitBtn = document.getElementById('submit-btn');
-    if (form) {
-      form.addEventListener('submit', (e) => this.handleAnswerSubmit(e));
-    }
-    if (submitBtn) {
-      submitBtn.addEventListener('click', (e) => this.handleAnswerSubmit(e));
-    }
+    // Remove duplicate form binding - AnswerForm already handles this via setSubmitHandler
+    // const form = document.getElementById('answer-form');
+    // const submitBtn = document.getElementById('submit-btn');
+    // if (form) {
+    //   form.addEventListener('submit', (e) => this.handleAnswerSubmit(e));
+    // }
+    // if (submitBtn) {
+    //   submitBtn.addEventListener('click', (e) => this.handleAnswerSubmit(e));
+    // }
+    
+    // Only handle advanced practice buttons (not form submission)
     const advanced1Btn = document.getElementById('advanced1-btn');
     const advanced2Btn = document.getElementById('advanced2-btn');
     if (advanced1Btn) {
