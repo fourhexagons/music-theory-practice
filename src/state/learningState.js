@@ -368,6 +368,11 @@ function startAdvancedPractice(mode) {
   // Mark as advanced mode
   learningState.isAdvancedMode = true;
   learningState.advancedModeType = mode;
+  
+  // Generate and display the first question for this mode
+  if (window.askQuestion) {
+    window.askQuestion();
+  }
 }
 window.startAdvancedPractice = startAdvancedPractice;
 

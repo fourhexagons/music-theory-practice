@@ -293,6 +293,11 @@ class PracticeMenu {
     // Start the practice
     if (selectedMode.mode === 'random_all' || selectedMode.mode === 'sevenths_only') {
       if (window.startAdvancedPractice) {
+        // For sevenths_only mode, override the custom group chapters
+        if (selectedMode.mode === 'sevenths_only') {
+          state.customGroup.chapters = [{ id: 'seventhSpelling', name: 'Seventh Spelling' }];
+          window.saveLearningState();
+        }
         window.startAdvancedPractice(selectedMode.mode);
       } else {
         console.error('startAdvancedPractice function not available');
@@ -451,11 +456,11 @@ class PracticeMenu {
         let displayKey = window.accidentalToUnicode(option.dataset.key);
         
         // Wrap accidentals in a span for styling
-        displayKey = displayKey.replace(/([♯♭𝄫𝄪]+)/g, '<span class="accidental">$1</span>');
+        displayKey = displayKey.replace(/([♯♭𝄫𝄪]+)/gu, '<span class="accidental">$1</span>');
         
         // Add specific classes for sharp and flat symbols
-        displayKey = displayKey.replace(/<span class="accidental">♯<\/span>/g, '<span class="accidental sharp">♯</span>');
-        displayKey = displayKey.replace(/<span class="accidental">♭<\/span>/g, '<span class="accidental flat">♭</span>');
+        displayKey = displayKey.replace(/<span class="accidental">♯<\/span>/gu, '<span class="accidental sharp">♯</span>');
+        displayKey = displayKey.replace(/<span class="accidental">♭<\/span>/gu, '<span class="accidental flat">♭</span>');
         
         option.innerHTML = displayKey;
       }
