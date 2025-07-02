@@ -129,13 +129,13 @@ window.learningPath = [
     { name: '1. Introduction', keys: ['C'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
     { name: '2. Level 1a Sharps', keys: ['G', 'D', 'A'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
     { name: '3. Level 1b Sharps', keys: ['G', 'D', 'A'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
-    { name: '4. Level 1a Flats', keys: ['F', 'B♭', 'E♭'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '5. Level 1b Flats', keys: ['F', 'B♭', 'E♭'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
-    { name: '6. Level 2a Sharps', keys: ['E', 'B', 'F♯'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '7. Level 2b Sharps', keys: ['E', 'B', 'F♯'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
-    { name: '8. Level 2a Flats', keys: ['A♭', 'D♭', 'G♭'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
-    { name: '9. Level 2b Flats', keys: ['A♭', 'D♭', 'G♭'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
-    { name: '10. Level 3 Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F♯'], mode: window.MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
-    { name: '11. Level 3 Flats', keys: ['C', 'F', 'B♭', 'E♭', 'A♭', 'D♭', 'G♭'], mode: window.MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
-    { name: 'Complete!', keys: [], mode: window.MODES.COMPLETE, chapters: [], requiredStreak: Infinity }
+    { name: '4. Level 1a Flats', keys: ['F', 'Bb', 'Eb'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+    { name: '5. Level 1b Flats', keys: ['F', 'Bb', 'Eb'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
+    { name: '6. Level 2a Sharps', keys: ['E', 'B', 'F#'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+    { name: '7. Level 2b Sharps', keys: ['E', 'B', 'F#'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
+    { name: '8. Level 2a Flats', keys: ['Ab', 'Db', 'Gb'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
+    { name: '9. Level 2b Flats', keys: ['Ab', 'Db', 'Gb'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
+    { name: '10. Level 3 Sharps', keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#'], mode: window.MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
+    { name: '11. Level 3 Flats', keys: ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'], mode: window.MODES.RANDOM_ALL, chapters: ALL_CHAPTERS, requiredStreak: 5 },
+    { name: '12. Level 12: Infinite Sevenths', keys: Object.keys(window.quizData), mode: 'sevenths_only', chapters: [window.CHAPTERS.SEVENTH_SPELLING], requiredStreak: Infinity }
 ];

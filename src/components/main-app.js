@@ -221,6 +221,9 @@ function askQuestion() {
         chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
       );
       chapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
+  } else if (group.mode === 'sevenths_only') {
+      // For infinite sevenths practice, always use seventh spelling
+      chapter = window.CHAPTERS.SEVENTH_SPELLING;
   } else { // Linear and Random_Keys_Linear_Chapters use the linear chapter progression
       chapter = group.chapters[window.learningState.currentChapterIndex];
   }
