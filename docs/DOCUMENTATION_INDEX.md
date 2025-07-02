@@ -45,7 +45,7 @@
 1. **"I have read ALL 12 documentation files completely"**
 2. **"I understand that modifying learning path logic requires explicit permission"**  
 3. **"I will use the systematic research methodology for all investigations"**
-4. **"I will update documentation with every code change"**
+4. **"I will update ALL required documentation types with every code change (research findings, code comments, user guides, and examples)"**
 
 **⚠️ WARNING**: Proceeding without this confirmation violates the protocol and risks breaking the app.
 
@@ -57,7 +57,7 @@
 1. **Modifying learning path logic** without permission → **BREAKS ENTIRE APP**
 2. **Skipping systematic research** → Fixes symptoms not root causes, creates new bugs  
 3. **Making assumptions** instead of gathering evidence → Wrong solutions, wasted time
-4. **Not updating documentation** → Knowledge loss, confusion for future work
+4. **Not updating documentation** → **CREATES DOCUMENTATION DEBT**: Future developers waste hours re-researching solutions, examples break, knowledge is lost forever
 
 ### **❌ Investigation Shortcuts That Fail:**
 - Jumping straight to code examination without reading docs
@@ -83,7 +83,7 @@
 
 ### **🛡️ Critical Protections**
 - **NEVER** modify learning path logic without [Learning Path Protection](LEARNING_PATH_PROTECTION.md) protocols
-- **ALWAYS** update documentation with [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)
+- **ALWAYS** update documentation with [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md) - **4 types required**: research findings, code comments, user guides, examples
 - **VERIFY** URLs using [URL Configuration](URL_CONFIGURATION.md) - single source of truth
 
 ### **🧪 Testing Requirements**
@@ -120,7 +120,8 @@
 - [ ] I am using systematic research methodology
 - [ ] I am gathering evidence, not making assumptions
 - [ ] I have permission if touching learning path logic
-- [ ] I will update documentation with my changes
+- [ ] I will update ALL required documentation: research findings, code comments, affected user guides, and examples
+- [ ] I understand that skipping documentation updates creates knowledge debt and confuses future developers
 - [ ] I will test thoroughly including regression testing
 
 ---
