@@ -108,21 +108,19 @@ Follow the same pattern: accCount → accNotes → scale → triads → sevenths
 
 ## Testing and Verification
 
-## 🎯 **Full Random Pedagogical Improvement**
+## 🎯 **Naming Triads Pedagogical Enhancement**
 
-**Enhancement**: Full Random mode has been pedagogically optimized to focus on core skills:
+**Enhancement**: Naming Triads mode has been pedagogically optimized to focus on core skills:
 
-### **New Full Random Behavior**
-- **Scale Spelling**: Tests complete key knowledge (subsumes accidental knowledge)
-- **Triad Identification**: Tests harmonic understanding
-- **50/50 Distribution**: Equal probability between scale and triad questions
+### **New Naming Triads Behavior**
+- **Triad Identification**: Tests core harmonic understanding
+- **100% Triad Focus**: Pure triad identification without distraction
 - **All 15 Keys**: Complete coverage across C, G, D, A, E, B, F#, F, Bb, Eb, Ab, Db, Gb, C#, Cb
 
 ### **Pedagogical Rationale**
-1. **Scale spelling inherently requires accidental knowledge** - if students can spell "E♭ F G A♭ B♭ C D", they clearly know the key has 3 flats and which notes they are
-2. **Eliminates redundancy** - no need to test both accidental counting AND scale spelling
-3. **Focuses on fundamental skills** - scale knowledge + harmonic understanding
-4. **Reduces cognitive load** - simpler, clearer learning objectives
+1. **Focused practice** provides better learning outcomes than mixed question types
+2. **Eliminates confusion** from switching between different question formats
+3. **Builds core harmonic skills** essential for music theory understanding
 
 ### **Technical Benefits**
 - **Simplified state management**: No more A/B pairing complexity

@@ -102,7 +102,7 @@
 2. Verify RANDOM_KEYS_LINEAR_CHAPTERS pairing works
 3. Verify C major special case still works  
 4. Verify other modes unaffected
-5. Verify RANDOM_ALL includes accCount only (no orphaned accNotes)
+5. Verify NAMING_TRIADS includes only triads (no accidentals)
 
 ## ✅ IMPLEMENTATION COMPLETED
 
@@ -146,7 +146,7 @@
 ### 🎯 Expected Behavior Now:
 1. **RANDOM_KEYS_LINEAR_CHAPTERS mode**: accCount and accNotes are paired with same key
 2. **C major handling**: accCount asked, accNotes skipped (no accidentals)
-3. **RANDOM_ALL mode**: Only accCount appears (accNotes filtered out)
+3. **NAMING_TRIADS mode**: Only triads appear (accidentals filtered out)
 4. **All other modes**: Unaffected
 
 ---

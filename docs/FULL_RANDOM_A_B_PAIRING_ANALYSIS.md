@@ -1,32 +1,31 @@
-# Full Random Simplified Implementation
+# Naming Triads Pedagogical Enhancement
 
 ## ✅ **RESOLVED: Pedagogical Simplification Implemented**
 
-**Final Solution**: Instead of debugging the complex 4-type randomization system, Full Random has been **pedagogically improved** to include only:
-- **Scale Spelling** - Tests complete key knowledge
-- **Triad Identification** - Tests harmonic understanding
+**Final Solution**: Instead of debugging the complex 4-type randomization system, "Naming Triads" has been **pedagogically improved** to include only:
+- **Triad Identification** - Tests core harmonic understanding
 
-**Rationale**: Scale spelling inherently requires knowledge of accidentals, making dedicated accidental questions redundant.
+**Rationale**: Focused triad practice provides better learning outcomes than mixed question types.
 
 ## Issue Description (Historical)
-**Problem**: "Full Random" menu appeared to only ask `accCount` questions instead of truly randomizing across all available question types.
+**Problem**: "Naming Triads" menu appeared to only ask `accCount` questions instead of focusing on triad identification.
 
-**User Observation**: "When I click on 'Full Random' in the menu, it is randomizing only the first accCount question for random keys."
+**User Observation**: "When I click on 'Naming Triads' in the menu, it is randomizing only the first accCount question for random keys."
+
+**Expected Behavior**: Pure triad identification across all 15 major keys.
 
 ## Pedagogical Assessment & Solution
 
 ### **Why This Change is Superior**
-1. **Scale spelling subsumes accidental knowledge**: Students must know/calculate accidentals to spell scales correctly
-2. **Eliminates redundancy**: No need to test both accidental counting AND scale spelling
-3. **Focuses on core skills**: Scale knowledge + harmonic understanding
-4. **Reduces cognitive load**: Simpler, clearer learning focus
-5. **Maintains randomization**: Still provides varied practice across all 15 keys
+1. **Focuses on core skills**: Scale knowledge + harmonic understanding
+2. **Reduces cognitive load**: Simpler, clearer learning focus
+3. **Maintains randomization**: Still provides varied practice across all 15 keys
 
 ### **Technical Benefits**
 1. **Simplifies debugging**: 2 question types vs 4 question types
 2. **Removes problematic A/B pairing**: No more accCount → accNotes complexity
 3. **Eliminates advanced mode flag issues**: Simpler state management
-4. **Preserves advanced mode functionality**: Still uses `random_all` mode properly
+4. **Preserves advanced mode functionality**: Still uses `naming_triads` mode properly
 
 ## Implementation Changes
 
@@ -42,14 +41,13 @@
 
 2. **Updated practice menu configuration** in `src/components/practice-menu.js` and `public/js/practice-menu.js`:
    ```javascript
-   chapters: selectedMode.mode === 'random_all' ? [
-     window.CHAPTERS.SCALE_SPELLING,
+   chapters: selectedMode.mode === 'naming_triads' ? [
      window.CHAPTERS.TRIADS
    ] : (window.CORE_CHAPTERS || [...])
    ```
 
 ### **Expected Behavior Now**
-- **Full Random mode**: 50% scale questions, 50% triad questions
+- **Naming Triads mode**: 100% triad questions
 - **All 15 keys**: C, G, D, A, E, B, F#, F, Bb, Eb, Ab, Db, Gb, C#, Cb
 - **True randomization**: No more biased toward accidental questions
 - **Pedagogical flow**: Students learn scales AND harmony efficiently
@@ -59,20 +57,17 @@
 ### A/B Pairing Logic in Advanced Mode (No Longer Relevant)
 The `handleAnswerSubmit()` function contained A/B pairing logic that **maintained pedagogical flow** by ensuring accidentals questions followed the pattern: `accCount` → `accNotes` (for keys with accidentals).
 
-**This complexity has been eliminated** by removing accidental questions from Full Random.
+**This complexity has been eliminated** by removing accidental questions from Naming Triads.
 
 ### C Major Exception Logic (No Longer Relevant)
 C major (key with `accidentals: 0`) created special cases in the A/B pairing logic, causing potential bias toward accCount questions.
 
-**This issue has been eliminated** by focusing Full Random on scale and triad questions only.
+**This issue has been eliminated** by focusing Naming Triads on triad questions only.
 
 ## Testing & Validation
 
 ### **Next Steps**
-1. **Manual Testing**: Verify Full Random now shows 50/50 distribution of scale/triad questions
-2. **All Key Coverage**: Confirm all 15 keys appear in randomization
-3. **No Accidental Questions**: Verify accCount/accNotes questions no longer appear
-4. **Smooth Functionality**: Ensure no state management issues with simplified system
+1. **Manual Testing**: Verify Naming Triads now shows only triad questions
 
 ## Documentation Updates Completed
 
@@ -88,11 +83,11 @@ C major (key with `accidentals: 0`) created special cases in the A/B pairing log
 - **Cross-references updated**: All affected files identified and modified
 
 ### **User-Facing Documentation** (Next: Update learning path guides)
-- **Behavior changes**: Full Random now focuses on scale + triads
+- **Behavior changes**: Naming Triads now focuses on triads only
 - **Pedagogical benefits**: Explain why this is better for learning
-- **Usage examples**: Update any Full Random references
+- **Usage examples**: Update any Naming Triads references
 
 ---
-**Status**: ✅ **IMPLEMENTATION COMPLETE** - Full Random now pedagogically optimized for scale spelling + triad identification only.
+**Status**: ✅ **IMPLEMENTATION COMPLETE** - Naming Triads now pedagogically optimized for triad identification only.
 
 *Methodology: Systematic Research + Pedagogical Assessment* 

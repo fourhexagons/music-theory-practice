@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document shows examples of question and answer pairs that a user encounters when progressing through the complete learning path from "Start Over" to completion.
+This document shows examples of question and answer pairs that a user encounters when progressing through the complete learning path from "Start Over" through all 11 levels.
 
 **🎲 RANDOMIZATION NOTICE**: This learning path uses randomization in several ways:
 - **Triad degrees**: Always randomly selected from available degrees (2-7) 
@@ -13,7 +13,7 @@ This document shows examples of question and answer pairs that a user encounters
 **Important Notes:**
 - **LINEAR mode**: One question per chapter, but triads require 3 correct answers per key before advancing
 - **RANDOM_KEYS_LINEAR_CHAPTERS mode**: Maintains linear chapter progression but randomizes keys  
-- **RANDOM_ALL mode**: Completely random questions from available chapters/keys
+- **NAMING_TRIADS mode**: Completely random questions from triads chapter only across available keys
 - **C major special handling**: accNotes (accidentals naming) is skipped because C major has 0 accidentals
 - **Triads use degrees 2-7**: Never asks for the 1st degree (tonic triad)
 
@@ -367,3 +367,11 @@ This document shows examples of question and answer pairs that a user encounters
 - Uses ordinal function: 2 → "2nd", 3 → "3rd", 4 → "4th", etc.
 - Never asks for 1st degree in chord questions
 - Randomizes unused degrees from [2,3,4,5,6,7] pool 
+
+- **NAMING_TRIADS mode**: Completely random questions from triads chapter only across available keys
+
+**Mode:** NAMING_TRIADS
+
+**Mode:** NAMING_TRIADS
+
+- NAMING_TRIADS excludes accNotes and accCount, focuses only on triads 

@@ -105,12 +105,6 @@ Run the test suite to verify all variations:
 open test_chords.html
 ```
 
-## Version History
-
-- **v1.3.0:** Added comprehensive chord variation support
-- **v1.2.0:** Basic chord normalization
-- **v1.1.0:** Initial implementation
-
 ## Maintenance
 
 When adding new chord variations:

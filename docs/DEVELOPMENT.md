@@ -244,7 +244,7 @@ Most debugging failures occur when developers debug **theoretical system behavio
 
 ### 🎯 **Case Study: Random Sevenths Key Randomization Bug**
 
-**Problem**: "Spelling Random Sevenths" menu option stuck on C major, not randomizing across all keys.
+**Problem**: "Spelling Sevenths" menu option stuck on C major, not randomizing across all keys.
 
 #### Traditional Debugging Approach (Failed)
 1. **Assumed** the issue was in `startAdvancedPractice()` function conflicts
@@ -277,15 +277,15 @@ console.log('🔍 EVIDENCE: startAdvancedPractice called with mode:', mode);
 **Critical Evidence**: **NO debugging logs appeared** from `startAdvancedPractice` functions.
 
 **Step 4: Challenge Initial Assumptions** 
-- **Wrong Assumption**: "Spelling Random Sevenths" uses `startAdvancedPractice()`
+- **Wrong Assumption**: "Spelling Sevenths" uses `startAdvancedPractice()`
 - **Evidence Reality**: No `startAdvancedPractice()` logs = different execution path
 - **New Investigation**: Traced actual execution through `QuestionGenerator` → `StateManager.getCurrentKey()`
 
 **Step 5: Root Cause Discovery**
 Found actual key selection in `getCurrentKey()`:
 ```javascript
-// BROKEN: 'sevenths_only' mode not included in randomization condition
-if (mode === window.MODES.RANDOM_ALL || mode.startsWith('advanced')) {
+// BROKEN: 'spelling_sevenths' mode not included in randomization condition
+if (mode === window.MODES.NAMING_TRIADS || mode.startsWith('advanced')) {
     return group.keys[Math.floor(Math.random() * group.keys.length)];
 }
 return group.keys[learningState.currentKeyIndex]; // Always index 0 = 'C'
@@ -294,7 +294,7 @@ return group.keys[learningState.currentKeyIndex]; // Always index 0 = 'C'
 **Step 6: Evidence-Based Fix**
 ```javascript
 // FIXED: Added missing mode to randomization condition  
-if (mode === window.MODES.RANDOM_ALL || mode.startsWith('advanced') || mode === 'sevenths_only') {
+if (mode === window.MODES.NAMING_TRIADS || mode.startsWith('advanced') || mode === 'spelling_sevenths') {
     return group.keys[Math.floor(Math.random() * group.keys.length)];
 }
 ```

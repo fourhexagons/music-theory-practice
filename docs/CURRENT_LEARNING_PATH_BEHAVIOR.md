@@ -1,6 +1,6 @@
-# Current Learning Path Behavior (v1.5.3)
+# Current Learning Path Behavior
 
-## 📋 Current Structure (12 Levels + Complete)
+## 📋 Current Structure (11 Levels)
 
 1. **Introduction**: C major only (LINEAR, streak: 3)
 2. **Level 1a Sharps**: G, D, A (LINEAR, streak: 3)  
@@ -12,10 +12,9 @@
 8. **Level 2a Flats**: A♭, D♭, G♭ (LINEAR, streak: 3)
 9. **Level 2b Flats**: A♭, D♭, G♭ (TRIADS_ONLY, streak: 10)
 10. **Level 10: Naming Triads**: All 15 keys (NAMING_TRIADS, streak: 10) - **Triads Only**
-11. **Level 11: Spelling Sevenths**: All keys (spelling_sevenths mode)
-12. **Complete!**: End of path
+11. **Level 11: Spelling Sevenths**: All keys (spelling_sevenths mode) - **Runs indefinitely**
 
-## 🎯 **Naming Triads Pedagogical Enhancement (v1.6.3)**
+## 🎯 **Naming Triads Pedagogical Enhancement**
 
 ### **Level 10 Behavior Updated**
 - **Previous**: 4 question types (accCount, scale, triads, sevenths)
@@ -35,8 +34,8 @@
 - **RANDOM_KEYS_LINEAR_CHAPTERS**: 
   - **a-levels**: Random keys, sequential chapters (CORE_CHAPTERS)
   - **b-levels**: Random keys, triads-only practice (TRIADS_ONLY_CHAPTERS)
-- **RANDOM_ALL**: Random keys and chapters
-- **COMPLETE**: End state
+- **NAMING_TRIADS**: Random keys, triads-only questions
+- **SPELLING_SEVENTHS**: Random keys, sevenths-only questions (indefinite)
 
 ## ⚠️ Safety Protocols Currently in Place
 - Protected functions in learningState.js
@@ -47,9 +46,8 @@
 ## 📊 Streak Requirements
 - **a-levels (LINEAR)**: 3 correct answers
 - **b-levels (TRIADS_ONLY)**: 10 correct triad answers
-- **Level 3 (RANDOM_ALL)**: 5 correct answers
-- **Triads/Sevenths in a-levels**: Always 3 per key regardless of mode
+- **Level 10 (NAMING_TRIADS)**: 10 correct answers
 
 ---
 
-**Baseline established for v1.5.3 - Ready for incremental improvements** 
+**Baseline established - Ready for incremental improvements** 

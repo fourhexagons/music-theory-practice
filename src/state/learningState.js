@@ -17,11 +17,7 @@
  * 
  * See docs/LEARNING_PATH_PROTECTION.md for the mandatory protocol.
  * 
- * The current progression works correctly:
- * - Key progression: C → G → D → A → E → B → F# → C#
- * - Chapter progression: accCount → accNotes → scale → triads → sevenths
- * - C major skips accNotes (intentional behavior)
- * - Triads/sevenths require 3 correct answers, others advance immediately
+
  */
 
 /**
