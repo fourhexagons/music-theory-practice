@@ -13,7 +13,7 @@ const QUESTION_TYPES = {
 const MODES = {
   LINEAR: 'linear',
   RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
-  RANDOM_ALL: 'random_all',
+  NAMING_TRIADS: 'naming_triads',
   COMPLETE: 'complete'
 };
 
@@ -169,10 +169,10 @@ function attachEventListeners() {
   const advanced2Btn = document.getElementById('advanced2-btn');
   
   if (advanced1Btn) {
-    advanced1Btn.addEventListener('click', () => startAdvancedPractice('random_all'));
+    advanced1Btn.addEventListener('click', () => startAdvancedPractice('naming_triads'));
   }
   if (advanced2Btn) {
-    advanced2Btn.addEventListener('click', () => startAdvancedPractice('sevenths_only'));
+    advanced2Btn.addEventListener('click', () => startAdvancedPractice('spelling_sevenths'));
   }
 }
 
@@ -207,8 +207,8 @@ function askQuestion() {
   }
   
   // Handle Level 12's sevenths_only mode by transitioning to advanced practice
-  if (group.mode === 'sevenths_only') {
-    startAdvancedPractice('sevenths_only');
+  if (group.mode === 'spelling_sevenths') {
+    startAdvancedPractice('spelling_sevenths');
     return;
   }
   
@@ -222,7 +222,7 @@ function askQuestion() {
   }
   
   // Determine the chapter for the question
-  if (group.mode === MODES.RANDOM_ALL) {
+  if (group.mode === MODES.NAMING_TRIADS) {
       chapter = group.chapters[Math.floor(Math.random() * group.chapters.length)];
   } else { // Linear and Random_Keys_Linear_Chapters use the linear chapter progression
       chapter = group.chapters[window.learningState.currentChapterIndex];

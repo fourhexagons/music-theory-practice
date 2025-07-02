@@ -270,7 +270,7 @@ export class StateManager {
         }
       }
     } else {
-      // All other modes (e.g., random_all)
+              // All other modes (e.g., naming_triads)
       this.learningState.correctAnswerStreak++;
       if (this.learningState.correctAnswerStreak >= group.requiredStreak) {
         if (this.learningState.customGroup) {

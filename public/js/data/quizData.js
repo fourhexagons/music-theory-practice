@@ -108,7 +108,7 @@ window.QUESTION_TYPES = {
 window.MODES = {
   LINEAR: 'linear',
     RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
-    RANDOM_ALL: 'random_all',
+    NAMING_TRIADS: 'naming_triads',
     COMPLETE: 'complete'
 };
 
@@ -135,6 +135,6 @@ window.learningPath = [
     { name: '7. Level 2b Sharps', keys: ['E', 'B', 'F#'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
     { name: '8. Level 2a Flats', keys: ['Ab', 'Db', 'Gb'], mode: window.MODES.LINEAR, chapters: CORE_CHAPTERS, requiredStreak: 3 },
     { name: '9. Level 2b Flats', keys: ['Ab', 'Db', 'Gb'], mode: window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS, chapters: TRIADS_ONLY_CHAPTERS, requiredStreak: 10 },
-    { name: '10. Level 10: Full Random Practice', keys: Object.keys(window.quizData), mode: window.MODES.RANDOM_ALL, chapters: [window.CHAPTERS.SCALE_SPELLING, window.CHAPTERS.TRIADS], requiredStreak: 10 },
-    { name: '11. Level 11: Infinite Sevenths', keys: Object.keys(window.quizData), mode: 'sevenths_only', chapters: [window.CHAPTERS.SEVENTH_SPELLING], requiredStreak: Infinity }
+    { name: '10. Level 10: Naming Triads', keys: Object.keys(window.quizData), mode: window.MODES.NAMING_TRIADS, chapters: [window.CHAPTERS.TRIADS], requiredStreak: 10 },
+    { name: '11. Level 11: Spelling Sevenths', keys: Object.keys(window.quizData), mode: 'spelling_sevenths', chapters: [window.CHAPTERS.SEVENTH_SPELLING], requiredStreak: Infinity }
 ];

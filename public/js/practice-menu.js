@@ -246,15 +246,15 @@ class PracticeMenu {
         mode: 'random_keys_linear_chapters',
         description: '4-6 Flats - Ab, Db, Gb keys'
       },
-      'full-random': {
+      'naming-triads': {
         keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
-        mode: 'random_all',
-        description: 'Full Random - All keys'
+        mode: 'naming_triads',
+        description: 'Naming Triads - All keys'
       },
-      'spelling-random-sevenths': {
+      'spelling-sevenths': {
         keys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
-        mode: 'sevenths_only',
-        description: 'Sevenths Only - All keys'
+        mode: 'spelling_sevenths',
+        description: 'Spelling Sevenths - All keys'
       }
     };
     
@@ -269,8 +269,7 @@ class PracticeMenu {
       name: selectedMode.description,
       keys: selectedMode.keys,
       mode: selectedMode.mode,
-      chapters: selectedMode.mode === 'random_all' ? [
-        window.CHAPTERS.SCALE_SPELLING,
+      chapters: selectedMode.mode === 'naming_triads' ? [
         window.CHAPTERS.TRIADS
       ] : (window.CORE_CHAPTERS || [
         window.CHAPTERS.ACCIDENTALS_COUNT,
@@ -294,15 +293,15 @@ class PracticeMenu {
     window.saveLearningState();
     
     // Start the practice
-    if (selectedMode.mode === 'random_all' || selectedMode.mode === 'sevenths_only') {
+    if (selectedMode.mode === 'naming_triads' || selectedMode.mode === 'spelling_sevenths') {
       if (window.startAdvancedPractice) {
-        // For random_all mode, clear custom group to let advanced practice handle everything
-        if (selectedMode.mode === 'random_all') {
+        // For naming_triads mode, clear custom group to let advanced practice handle everything
+        if (selectedMode.mode === 'naming_triads') {
           state.customGroup = null;
           window.saveLearningState();
         }
-        // For sevenths_only mode, override the custom group chapters
-        if (selectedMode.mode === 'sevenths_only') {
+        // For spelling_sevenths mode, override the custom group chapters
+        if (selectedMode.mode === 'spelling_sevenths') {
           state.customGroup.chapters = [{ id: 'seventhSpelling', name: 'Seventh Spelling' }];
           window.saveLearningState();
         }
@@ -440,8 +439,8 @@ class PracticeMenu {
         else if (name.includes('1-3 flats')) selectedDifficulty = '1-3-flats';
         else if (name.includes('4-6 sharps')) selectedDifficulty = '4-6-sharps';
         else if (name.includes('4-6 flats')) selectedDifficulty = '4-6-flats';
-        else if (name.includes('full random')) selectedDifficulty = 'full-random';
-        else if (name.includes('sevenths only')) selectedDifficulty = 'spelling-random-sevenths';
+        else if (name.includes('naming triads')) selectedDifficulty = 'naming-triads';
+        else if (name.includes('spelling sevenths')) selectedDifficulty = 'spelling-sevenths';
         // If it's a key-locked mode, do not select any difficulty
       }
       this.menuOptions.forEach(option => {

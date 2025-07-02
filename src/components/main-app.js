@@ -13,7 +13,7 @@ const QUESTION_TYPES = {
 const MODES = {
   LINEAR: 'linear',
   RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
-  RANDOM_ALL: 'random_all',
+      NAMING_TRIADS: 'naming_triads',
   COMPLETE: 'complete'
 };
 
@@ -169,10 +169,10 @@ function attachEventListeners() {
   const advanced2Btn = document.getElementById('advanced2-btn');
   
   if (advanced1Btn) {
-    advanced1Btn.addEventListener('click', () => startAdvancedPractice('random_all'));
+            advanced1Btn.addEventListener('click', () => startAdvancedPractice('naming_triads'));
   }
   if (advanced2Btn) {
-    advanced2Btn.addEventListener('click', () => startAdvancedPractice('sevenths_only'));
+    advanced2Btn.addEventListener('click', () => startAdvancedPractice('spelling_sevenths'));
   }
 }
 
@@ -222,7 +222,7 @@ function askQuestion() {
   }
   
   // Determine the chapter for the question
-  if (group.mode === MODES.RANDOM_ALL) {
+  if (group.mode === MODES.NAMING_TRIADS) {
       const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
         chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
         chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
@@ -485,7 +485,7 @@ function startAdvancedPractice(mode) {
   window.learningState.currentQuestion = null;
   window.learningState.lastCompletedQuestionType = null; // Reset anti-clustering tracking
   
-  if (mode === 'random_all') {
+  if (mode === 'naming_triads') {
     // Full Random Practice: Randomly select from 4 question types across all 15 keys
     // Available types: accCount, scale, triads, sevenths (excludes accNotes and seventhSpelling)
     // Note: accNotes is excluded because it's handled by A/B pairing logic after accCount
@@ -547,7 +547,7 @@ function startAdvancedPractice(mode) {
     
     updateQuestionUI(text);
     
-  } else if (mode === 'sevenths_only') {
+  } else if (mode === 'spelling_sevenths') {
     // For sevenths practice, focus ONLY on seventh chord spelling
     const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
     const randomChapter = window.CHAPTERS.SEVENTH_SPELLING; // Only spelling, not naming

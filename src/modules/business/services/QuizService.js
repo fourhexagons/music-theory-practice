@@ -17,7 +17,7 @@ export class QuizService {
     } else {
       key = group.keys[Math.floor(Math.random() * group.keys.length)];
     }
-    if (group.mode === window.MODES.RANDOM_ALL) {
+    if (group.mode === window.MODES.NAMING_TRIADS) {
       const availableChapters = Object.values(window.CHAPTERS).filter(chapter =>
         chapter.id !== window.QUESTION_TYPES.ACCIDENTALS_NAMES &&
         chapter.id !== window.QUESTION_TYPES.SEVENTH_SPELLING
@@ -218,8 +218,8 @@ export class QuizService {
     console.log('🚀 QUIZ SERVICE DEBUG: isAdvancedMode:', window.learningState.isAdvancedMode);
     console.log('🚀 QUIZ SERVICE DEBUG: advancedModeType:', window.learningState.advancedModeType);
     
-    if (mode === 'random_all') {
-      console.log('🚀 QUIZ SERVICE DEBUG: Processing random_all mode');
+        if (mode === 'naming_triads') {
+        console.log('🚀 QUIZ SERVICE DEBUG: Processing naming_triads mode');
       
       const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
       console.log('🚀 QUIZ SERVICE DEBUG: Available keys:', randomKey);
@@ -281,8 +281,8 @@ export class QuizService {
       this.appController.updateQuestionUI(text);
       console.log('🚀 QUIZ SERVICE DEBUG: UI updated successfully');
       
-    } else if (mode === 'sevenths_only') {
-      console.log('🚀 QUIZ SERVICE DEBUG: Processing sevenths_only mode');
+        } else if (mode === 'spelling_sevenths') {
+        console.log('🚀 QUIZ SERVICE DEBUG: Processing spelling_sevenths mode');
       
       const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
       const randomChapter = window.CHAPTERS.SEVENTH_SPELLING;

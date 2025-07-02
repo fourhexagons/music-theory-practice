@@ -201,7 +201,7 @@ function getCurrentKey(mode) {
   if (learningState.accidentalsPairState && learningState.accidentalsPairState.inProgress) {
     return learningState.accidentalsPairState.currentKey;
   }
-  if (mode === window.MODES.RANDOM_ALL || mode === window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS || mode.startsWith('advanced') || mode === 'sevenths_only') {
+  if (mode === window.MODES.NAMING_TRIADS || mode === window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS || mode.startsWith('advanced') || mode === 'spelling_sevenths') {
     return group.keys[Math.floor(Math.random() * group.keys.length)];
   }
   return group.keys[learningState.currentKeyIndex];
@@ -237,7 +237,7 @@ function getCurrentChapter(mode, quizData = null) {
     }
   }
    
-  if (mode === window.MODES.RANDOM_ALL) {
+  if (mode === window.MODES.NAMING_TRIADS) {
     const availableChapters = group.chapters.filter(c => c.id !== 'seventhSpelling' && c.id !== 'accNotes');
     return availableChapters[Math.floor(Math.random() * availableChapters.length)];
   }
@@ -317,10 +317,10 @@ function startAdvancedPractice(mode) {
   // Advanced practice modes don't use the standard learning path groups
   // Set up custom group for advanced practice
   learningState.customGroup = {
-    name: mode === 'random_all' ? 'Random Practice' : 'Seventh Spelling Practice',
+    name: mode === 'naming_triads' ? 'Triad Practice' : 'Seventh Spelling Practice',
     mode: mode,
     keys: Object.keys(window.quizData), // All keys for both modes
-    chapters: mode === 'sevenths_only' ? [window.CHAPTERS.SEVENTH_SPELLING] : Object.values(window.CHAPTERS),
+    chapters: mode === 'spelling_sevenths' ? [window.CHAPTERS.SEVENTH_SPELLING] : Object.values(window.CHAPTERS),
     requiredStreak: Infinity
   };
   

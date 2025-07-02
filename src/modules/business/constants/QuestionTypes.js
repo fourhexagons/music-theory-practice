@@ -14,7 +14,7 @@ export const QUESTION_TYPES = {
 export const MODES = {
   LINEAR: 'linear',
   RANDOM_KEYS_LINEAR_CHAPTERS: 'random_keys_linear_chapters',
-  RANDOM_ALL: 'random_all',
+      NAMING_TRIADS: 'naming_triads',
   COMPLETE: 'complete'
 };
 

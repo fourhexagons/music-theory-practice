@@ -264,10 +264,10 @@ export class AppController {
     const advanced1Btn = document.getElementById('advanced1-btn');
     const advanced2Btn = document.getElementById('advanced2-btn');
     if (advanced1Btn) {
-      advanced1Btn.addEventListener('click', () => window.startAdvancedPractice('random_all'));
+              advanced1Btn.addEventListener('click', () => window.startAdvancedPractice('naming_triads'));
     }
     if (advanced2Btn) {
-      advanced2Btn.addEventListener('click', () => window.startAdvancedPractice('sevenths_only'));
+              advanced2Btn.addEventListener('click', () => window.startAdvancedPractice('spelling_sevenths'));
     }
   }
 

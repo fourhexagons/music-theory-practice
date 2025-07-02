@@ -11,17 +11,17 @@
 7. **Level 2b Sharps**: E, B, F♯ (TRIADS_ONLY, streak: 10)
 8. **Level 2a Flats**: A♭, D♭, G♭ (LINEAR, streak: 3)
 9. **Level 2b Flats**: A♭, D♭, G♭ (TRIADS_ONLY, streak: 10)
-10. **Level 10: Full Random**: All 15 keys (RANDOM_ALL, streak: 10) - **Scale + Triads Only**
-11. **Level 11: Infinite Sevenths**: All keys (sevenths_only mode)
+10. **Level 10: Naming Triads**: All 15 keys (NAMING_TRIADS, streak: 10) - **Triads Only**
+11. **Level 11: Spelling Sevenths**: All keys (spelling_sevenths mode)
 12. **Complete!**: End of path
 
-## 🎯 **Full Random Pedagogical Enhancement (v1.6.3)**
+## 🎯 **Naming Triads Pedagogical Enhancement (v1.6.3)**
 
 ### **Level 10 Behavior Updated**
 - **Previous**: 4 question types (accCount, scale, triads, sevenths)
-- **Current**: 2 question types (scale, triads) - **Pedagogically optimized**
-- **Rationale**: Scale spelling subsumes accidental knowledge, eliminating redundancy
-- **Distribution**: 50% scale questions, 50% triad questions
+- **Current**: 1 question type (triads only) - **Pedagogically optimized**
+- **Rationale**: Focus on core triad identification skills without distraction
+- **Distribution**: 100% triad naming questions
 - **Key Coverage**: All 15 major keys with true randomization
 
 ## 🎯 Chapter Progression (CORE_CHAPTERS)
