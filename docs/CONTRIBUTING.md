@@ -1,6 +1,4 @@
-# Contributing Guide
-
-Thank you for your interest in contributing to the Music Theory Practice App! This guide will help you get started.
+# AI Assistant Contribution Protocol
 
 ## 🔍 **MANDATORY: Systematic Research Methodology**
 
@@ -23,49 +21,11 @@ This methodology successfully identified complex bugs that traditional approache
 
 ---
 
-## 🤝 How to Contribute
-
-### Types of Contributions
-We welcome various types of contributions:
-- **Bug fixes** - Report and fix issues
-- **New features** - Add functionality
-- **Documentation** - Improve guides and docs
-- **Testing** - Add or improve tests
-- **UI/UX improvements** - Enhance the user experience
-
-## 🚀 Getting Started
-
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally
-3. **Set up the development environment** (see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md))
-4. **Create a feature branch** for your changes
-
-```bash
-git clone https://github.com/your-username/music-theory-practice.git
-cd music-theory-practice
-git checkout -b feature/your-feature-name
-```
-
-## 📝 Development Workflow
-
-### Before You Start
-- **Check existing issues** to avoid duplicates
-- **Discuss major changes** in an issue first
-- **Read the existing code** to understand patterns
-
-### Making Changes
-1. **Follow systematic research methodology** - Use [Research Template](RESEARCH_TEMPLATE.md)
-2. **Research existing code** before making any modifications
-3. **Make targeted changes** addressing root causes (not symptoms)
-4. **Add tests** for new functionality
-5. **Run the test suite** to ensure everything works
-6. **🚨 MANDATORY: Update documentation** - Follow [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)
-
-### **📝 Documentation Requirements (MANDATORY)**
+## 📝 **MANDATORY: Documentation Requirements**
 
 **Every contribution MUST include documentation updates. Following the [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md):**
 
-#### **Pre-Commit Documentation Checklist**
+### Pre-Contribution Documentation Checklist
 - [ ] **Research findings documented** - Key insights captured for future developers
 - [ ] **Decision rationale recorded** - Why this approach was chosen over alternatives
 - [ ] **Code documentation updated** - Comments, README, function docs as needed
@@ -73,7 +33,7 @@ git checkout -b feature/your-feature-name
 - [ ] **Examples verified** - All documentation examples still work correctly
 - [ ] **Cross-references checked** - Links and references are still accurate
 
-#### **Documentation Quality Standards**
+### Documentation Quality Standards
 - ✅ **Accurate** - Reflects actual current behavior
 - ✅ **Complete** - No missing steps or information
 - ✅ **Clear** - Understandable by intended audience  
@@ -81,36 +41,39 @@ git checkout -b feature/your-feature-name
 
 **Remember: Documentation updates are NOT optional. They're as required as tests passing.**
 
-### Testing Your Changes
-```bash
-# Start the development server
-python3 -m http.server 8000
+---
 
-# Open in browser and run tests
-# Press Ctrl+Shift+Q (or Cmd+Shift+Q on Mac) to run tests
-```
+## 🔧 **Development Standards**
 
-## 🎯 Coding Standards
+### Making Changes
+1. **Follow systematic research methodology** - Use [Research Template](RESEARCH_TEMPLATE.md)
+2. **Research existing code** before making any modifications
+3. **Make targeted changes** addressing root causes (not symptoms)
+4. **Add tests** for new functionality
+5. **Run the test suite** to ensure everything works
+6. **Update documentation** following maintenance protocol
 
-### JavaScript
+### JavaScript Standards
 - **Use consistent naming** (camelCase for variables/functions)
 - **Add comments** for complex logic
 - **Follow existing patterns** in the codebase
 - **Validate inputs** thoroughly
 
-### CSS
+### CSS Standards
 - **Use meaningful class names**
 - **Keep styles modular**
 - **Follow the existing design system**
 
-### HTML
+### HTML Standards
 - **Use semantic elements**
 - **Ensure accessibility**
 - **Validate markup**
 
-## 🧪 Testing Requirements
+---
 
-### Before Submitting
+## 🧪 **Testing Requirements**
+
+### Before Submitting Changes
 - **All tests must pass**
 - **Add tests for new features**
 - **Test on multiple browsers**
@@ -121,162 +84,60 @@ python3 -m http.server 8000
 - **Manual**: Use `Ctrl+Shift+Q` keyboard shortcut
 - **Console**: Use `runAllTests()` function
 
-## 📋 Pull Request Process
+---
 
-### Creating a PR
-1. **Push your changes** to your fork
-2. **Create a pull request** with a clear description
-3. **Link related issues** if applicable
-4. **Wait for review** from maintainers
+## 📋 **Change Documentation Template**
 
-### PR Requirements
-- **Clear title** describing the change
-- **Detailed description** of what was changed and why
-- **Screenshots** for UI changes
-- **Test results** showing all tests pass
+### Research Documentation Required
+**Include key findings from your systematic research:**
 
-### PR Template
-```markdown
-## Description
-Brief description of the changes
+#### Problem Analysis
+- **Root cause identified:** [Evidence-based analysis]
+- **Code locations examined:** [Specific files and functions]
+- **Alternative solutions considered:** [Other approaches evaluated]
 
-## Systematic Research Applied
+#### Solution Implementation
+- **Approach chosen:** [Why this solution was selected]
+- **Changes made:** [Specific modifications]
+- **Evidence supporting solution:** [How you verified it works]
+
+#### Documentation Updates
+- **Research findings:** [Key insights for future reference]
+- **Behavior changes:** [What users will notice]
+- **Code documentation:** [Comments and explanations added]
+- **Cross-references:** [Links and related docs updated]
+
+### Systematic Research Applied
 - [ ] Used [Research Template](RESEARCH_TEMPLATE.md) for investigation
 - [ ] Researched existing code before making changes
 - [ ] Identified root cause (not just symptoms)
 - [ ] Documented findings and rationale
 
-## 🚨 MANDATORY: Documentation Updates
-Following [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md):
-
-### Research Documentation
-- [ ] Key findings documented for future reference
-- [ ] Decision rationale captured with evidence
-- [ ] Alternative solutions considered and documented
-- [ ] Architectural insights noted in appropriate guides
-
-### Code Documentation  
-- [ ] Function/method comments updated for changed behavior
-- [ ] Inline comments added for complex logic
-- [ ] README updated if interface or setup changed
-- [ ] Architecture documentation updated for structural changes
-
-### User Documentation
-- [ ] User guides updated for behavior changes
-- [ ] Examples updated and verified to work
-- [ ] Testing procedures updated if needed
-- [ ] Cross-references checked and updated
-
-### Documentation Quality
-- [ ] Examples work when followed exactly
-- [ ] Information is consistent across documents
-- [ ] New team member could understand updates
-- [ ] Links and references are accurate
-
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature  
-- [ ] Documentation update
-- [ ] Test improvement
-
-## Testing
+### Testing Verification
 - [ ] All tests pass
-- [ ] Tested on multiple browsers
 - [ ] Added tests for new functionality
 - [ ] Verified no regressions in related functionality
+- [ ] Tested edge cases and different modes
 
-## Research Documentation
-*Include key findings from your systematic research:*
-- **Root cause identified:** 
-- **Code locations examined:** 
-- **Alternative solutions considered:**
-
-## Screenshots (if applicable)
-Add screenshots for UI changes
-```
-
-## 🐛 Reporting Issues
-
-### Before Reporting
-- **Check existing issues** for duplicates
-- **Try to reproduce** the issue
-- **Check browser console** for errors
-
-### Issue Template
-```markdown
-## Description
-Clear description of the issue
-
-## Steps to Reproduce
-1. Go to '...'
-2. Click on '...'
-3. See error
-
-## Expected Behavior
-What should happen
-
-## Actual Behavior
-What actually happens
-
-## Environment
-- Browser: [e.g. Chrome, Firefox]
-- OS: [e.g. Windows, macOS]
-- Version: [e.g. 1.0.0]
-
-## Additional Information
-Any other context, screenshots, etc.
-```
-
-## 🏷️ Commit Guidelines
-
-### Commit Message Format
-```
-type(scope): description
-
-[optional body]
-
-[optional footer]
-```
-
-### Types
-- **feat**: New feature
-- **fix**: Bug fix
-- **docs**: Documentation changes
-- **style**: Code style changes
-- **refactor**: Code refactoring
-- **test**: Adding or updating tests
-- **chore**: Maintenance tasks
-
-### Examples
-```
-feat(chords): add support for diminished chords
-fix(normalization): resolve case sensitivity issues
-docs(readme): update installation instructions
-test(chords): add comprehensive chord tests
-```
-
-## 📚 Resources
-
-- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** - Development setup guide
-- **[docs/TESTING.md](docs/TESTING.md)** - Testing and debugging information
-- **GitHub Issues** - Report bugs and request features
-- **Discussions** - Ask questions and share ideas
-
-## 🎉 Recognition
-
-Contributors will be recognized in:
-- **README.md** contributors section
-- **GitHub contributors** page
-- **Release notes** for significant contributions
-
-## 📞 Getting Help
-
-- **GitHub Issues** - For bugs and feature requests
-- **GitHub Discussions** - For questions and general discussion
-- **Pull Request comments** - For specific code feedback
+### Documentation Quality Verification
+- [ ] Examples work when followed exactly
+- [ ] Information is consistent across documents
+- [ ] New developers could understand updates
+- [ ] Links and references are accurate
 
 ---
 
-**Thank you for contributing to making music theory learning more accessible! 🎼**
+## 🛡️ **Critical Protections**
 
-*This contributing guide is maintained by the development team. For user support, see the main [README.md](../README.md).* 
+### Learning Path Logic
+**NEVER modify learning path logic without explicit permission.** See [Learning Path Protection](LEARNING_PATH_PROTECTION.md) for full protocol.
+
+### URL Configuration
+**ALWAYS use [URL Configuration](URL_CONFIGURATION.md)** as single source of truth for app URLs.
+
+### Documentation Maintenance
+**ALWAYS follow [Documentation Maintenance Protocol](DOCUMENTATION_MAINTENANCE_PROTOCOL.md)** with every change.
+
+---
+
+*All contributions must follow the systematic research methodology. Evidence-based approach required.*
