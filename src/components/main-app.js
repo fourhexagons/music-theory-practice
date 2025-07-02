@@ -294,17 +294,31 @@ function handleAnswerSubmit(e) {
     }
     
     if (window.learningState.isAdvancedMode) {
-      // Handle A/B pair logic for accidentals questions
+      // Handle A/B pair logic for accidentals questions (maintains pedagogical flow)
+      // IMPORTANT: This preserves the educational sequence accCount → accNotes for keys with accidentals
+      // C major exception: Since C has no accidentals (count=0), we skip accNotes and go to new random question
+      // See docs/FULL_RANDOM_A_B_PAIRING_ANALYSIS.md for detailed analysis
       if (window.learningState.currentQuestion && 
           window.learningState.currentQuestion.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT &&
           window.quizData[window.learningState.currentQuestion.key].accidentals > 0) {
-        // We just answered accidentals count correctly, now ask naming for the same key
+        // We just answered accidentals count correctly for a key WITH accidentals
+        // Now ask naming question for the same key (pedagogical A/B pairing)
         const key = window.learningState.currentQuestion.key;
         window.learningState.currentQuestion = { key: key, chapterId: QUESTION_TYPES.ACCIDENTALS_NAMES };
         const text = `Name the accidentals in ${key} major.`;
         updateQuestionUI(text, false); // Don't clear input since we already cleared it above
       } else {
-        // Normal case - start a new random question
+        // Track completed question type for anti-clustering logic
+        // This determines what question types to exclude from next random selection
+        if (window.learningState.currentQuestion) {
+          const completedType = window.learningState.currentQuestion.chapterId;
+          // Mark the question type as completed (used for anti-clustering in Full Random)
+          window.learningState.lastCompletedQuestionType = completedType;
+        }
+        
+        // Normal case: start a new random question
+        // This includes: (1) after accNotes completion, (2) after accCount for C major (no accidentals), 
+        // (3) after scale/triads/sevenths completion
         startAdvancedPractice(window.learningState.advancedModeType);
       }
       return;
@@ -469,16 +483,40 @@ function startAdvancedPractice(mode) {
   window.learningState.correctAnswerStreak = 0;
   window.learningState.usedDegrees = [];
   window.learningState.currentQuestion = null;
+  window.learningState.lastCompletedQuestionType = null; // Reset anti-clustering tracking
   
   if (mode === 'random_all') {
-    // For random practice, we'll use a simple approach
-    // Pick a random key and random chapter
+    // Full Random Practice: Randomly select from 4 question types across all 15 keys
+    // Available types: accCount, scale, triads, sevenths (excludes accNotes and seventhSpelling)
+    // Note: accNotes is excluded because it's handled by A/B pairing logic after accCount
+    // Note: seventhSpelling is excluded because it's used by dedicated sevenths_only mode
     const randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
-    const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
-      chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
-      chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
+    
+    // Anti-clustering logic: Prevent consecutive questions of same type (except triads)
+    // Rules: Only triads can repeat consecutively; accCount, scale, sevenths must alternate
+    let availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
+      chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&     // Excluded: handled by A/B pairing
+      chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING          // Excluded: dedicated to sevenths_only mode
     );
+    
+    // Apply anti-clustering filter based on last completed question type
+    const lastCompleted = window.learningState.lastCompletedQuestionType;
+    if (lastCompleted) {
+      if (lastCompleted === QUESTION_TYPES.ACCIDENTALS_COUNT || lastCompleted === QUESTION_TYPES.ACCIDENTALS_NAMES) {
+        // After accCount or accNotes completion, exclude accCount from next selection
+        availableChapters = availableChapters.filter(chapter => chapter.id !== QUESTION_TYPES.ACCIDENTALS_COUNT);
+      } else if (lastCompleted === QUESTION_TYPES.SCALE_SPELLING) {
+        // After scale completion, exclude scale from next selection
+        availableChapters = availableChapters.filter(chapter => chapter.id !== QUESTION_TYPES.SCALE_SPELLING);
+      } else if (lastCompleted === QUESTION_TYPES.SEVENTHS) {
+        // After sevenths completion, exclude sevenths from next selection
+        availableChapters = availableChapters.filter(chapter => chapter.id !== QUESTION_TYPES.SEVENTHS);
+      }
+      // Note: triads can repeat consecutively (no filtering for QUESTION_TYPES.TRIADS)
+    }
+    
     const randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
+    // Result: Anti-clustered selection with triads-only repetition allowed
     
     // Select key once and reuse it
     const selectedKey = randomKey[Math.floor(Math.random() * randomKey.length)];

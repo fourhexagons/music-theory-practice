@@ -32,7 +32,13 @@
     "test:performance": "npm run build && npm run verify:phase2 && npm run analyze:performance",
     "test:headless": "node test_headless_learning_path.js",
     "validate:urls": "node scripts/validate-urls.cjs",
-    "phase2:complete": "npm run verify:phase2 && npm run analyze:performance && echo '🎉 Phase 2 Complete!'"
+    "verify-dev-env": "node scripts/verify-dev-env.cjs",
+    "check-compliance": "npm run verify-dev-env",
+    "phase2:complete": "npm run verify:phase2 && npm run analyze:performance && echo '🎉 Phase 2 Complete!'",
+    "git:cleanup": "node scripts/git-branch-cleanup.cjs",
+    "git:status": "git branch -v && echo \"\n🧹 Run: npm run git:cleanup\"",
+    "git:verify": "node scripts/git-assistant-protocol.cjs",
+    "git:workflow": "npm run git:verify"
   },
   "keywords": [
     "music",
@@ -50,6 +56,7 @@
     "autoprefixer": "^10.4.16",
     "cssnano": "^7.0.7",
     "eslint": "^8.55.0",
+    "jsdom": "^26.1.0",
     "postcss": "^8.4.32",
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^13.0.2",

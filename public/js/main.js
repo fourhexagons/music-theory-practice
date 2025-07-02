@@ -289,17 +289,31 @@ function handleAnswerSubmit(e) {
     }
     
     if (window.learningState.isAdvancedMode) {
-      // Handle A/B pair logic for accidentals questions
+      // Handle A/B pair logic for accidentals questions (maintains pedagogical flow)
+      // IMPORTANT: This preserves the educational sequence accCount → accNotes for keys with accidentals
+      // C major exception: Since C has no accidentals (count=0), we skip accNotes and go to new random question
+      // See docs/FULL_RANDOM_A_B_PAIRING_ANALYSIS.md for detailed analysis
       if (window.learningState.currentQuestion && 
           window.learningState.currentQuestion.chapterId === QUESTION_TYPES.ACCIDENTALS_COUNT &&
           window.quizData[window.learningState.currentQuestion.key].accidentals > 0) {
-        // We just answered accidentals count correctly, now ask naming for the same key
+        // We just answered accidentals count correctly for a key WITH accidentals
+        // Now ask naming question for the same key (pedagogical A/B pairing)
         const key = window.learningState.currentQuestion.key;
         window.learningState.currentQuestion = { key: key, chapterId: QUESTION_TYPES.ACCIDENTALS_NAMES };
         const text = `Name the accidentals in ${key} major.`;
         updateQuestionUI(text, false); // Don't clear input since we already cleared it above
       } else {
-        // Normal case - start a new random question
+        // Track completed question type for anti-clustering logic
+        // This determines what question types to exclude from next random selection
+        if (window.learningState.currentQuestion) {
+          const completedType = window.learningState.currentQuestion.chapterId;
+          // Mark the question type as completed (used for anti-clustering in Full Random)
+          window.learningState.lastCompletedQuestionType = completedType;
+        }
+        
+        // Normal case: start a new random question
+        // This includes: (1) after accNotes completion, (2) after accCount for C major (no accidentals), 
+        // (3) after scale/triads/sevenths completion
         startAdvancedPractice(window.learningState.advancedModeType);
       }
       return;
@@ -465,17 +479,20 @@ function startAdvancedPractice(mode) {
   window.learningState.currentQuestion = null;
   
   if (mode === 'random_all') {
-    // For random practice, we'll use a simple approach
-    // Pick a random key and random chapter
+    // Full Random Practice: Randomly select from 4 question types across all 15 keys
+    // Available types: accCount, scale, triads, sevenths (excludes accNotes and seventhSpelling)
+    // Note: accNotes is excluded because it's handled by A/B pairing logic after accCount
+    // Note: seventhSpelling is excluded because it's used by dedicated sevenths_only mode
     let randomKey = Object.keys(window.quizData).filter(k => k !== window.learningState.lastAccidentalsKey);
     let randomChapter;
     
     // Pick a random chapter, but exclude accidentals naming and seventh spelling
     const availableChapters = Object.values(window.CHAPTERS).filter(chapter => 
-      chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&
-      chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING
+      chapter.id !== QUESTION_TYPES.ACCIDENTALS_NAMES &&     // Excluded: handled by A/B pairing
+      chapter.id !== QUESTION_TYPES.SEVENTH_SPELLING          // Excluded: dedicated to sevenths_only mode
     );
     randomChapter = availableChapters[Math.floor(Math.random() * availableChapters.length)];
+    // Result: Equal 25% chance for each of [accCount, scale, triads, sevenths]
     
     // Select key once and reuse it
     const selectedKey = randomKey[Math.floor(Math.random() * randomKey.length)];

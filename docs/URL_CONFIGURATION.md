@@ -86,6 +86,13 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/practice
 # Expected: Both should return 200
 ```
 
+### Automated Environment Verification:
+```bash
+npm run verify-dev-env
+# Verifies server compliance, port status, and URL accessibility
+# Used by the cognitive interrupt protocol for assistants
+```
+
 ### Automated Test:
 ```bash
 npm run test:headless

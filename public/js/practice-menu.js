@@ -293,6 +293,11 @@ class PracticeMenu {
     // Start the practice
     if (selectedMode.mode === 'random_all' || selectedMode.mode === 'sevenths_only') {
       if (window.startAdvancedPractice) {
+        // For random_all mode, clear custom group to let advanced practice handle everything
+        if (selectedMode.mode === 'random_all') {
+          state.customGroup = null;
+          window.saveLearningState();
+        }
         // For sevenths_only mode, override the custom group chapters
         if (selectedMode.mode === 'sevenths_only') {
           state.customGroup.chapters = [{ id: 'seventhSpelling', name: 'Seventh Spelling' }];

@@ -121,14 +121,14 @@ const LEVEL_EXPECTATIONS = {
         expectedStreak: 5,
         keyGroup: 'All Sharps'
     },
-    '3_flats': { // Level 3 Flats - All flat keys  
-        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads', 'sevenths'],
-        allowedKeys: ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
+    '10': { // Level 10 - Full Random Practice (All keys)
+        allowedQuestionTypes: ['accCount', 'scale', 'triads', 'sevenths'],
+        allowedKeys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'C#', 'Cb'],
         isB_Level: false,
-        expectedStreak: 5,
-        keyGroup: 'All Flats'
+        expectedStreak: 10,
+        keyGroup: 'All Keys'
     },
-    '12': { // Level 12 - Infinite Sevenths Practice
+    '11': { // Level 11 - Infinite Sevenths Practice
         allowedQuestionTypes: ['seventhSpelling'],
         allowedKeys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'C#', 'Cb'],
         isB_Level: false,
@@ -286,9 +286,8 @@ async function getCurrentLevel() {
                     '7. Level 2b Sharps': '2b_sharps',
                     '8. Level 2a Flats': '2a_flats',
                     '9. Level 2b Flats': '2b_flats',
-                    '10. Level 3 Sharps': '3_sharps',
-                    '11. Level 3 Flats': '3_flats',
-                    '12. Level 12: Infinite Sevenths': '12'
+                    '10. Level 10: Full Random Practice': '10',
+                    '11. Level 11: Infinite Sevenths': '11'
                 };
                 
                 if (levelMap[groupObj.name]) {

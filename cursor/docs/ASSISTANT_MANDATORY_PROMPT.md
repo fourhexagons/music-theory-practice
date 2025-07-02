@@ -8,7 +8,8 @@ Use this prompt when working with assistants to ensure they read documentation b
 
 Before you investigate ANY code or suggest ANY solutions:
 
-1. **READ EVERY FILE in docs/ COMPLETELY** 
+1. **COMPLETE DOCUMENTATION REVIEW**
+   READ EVERY FILE in docs/ COMPLETELY:
    - docs/SYSTEMATIC_RESEARCH_METHODOLOGY.md
    - docs/DOCUMENTATION_MAINTENANCE_PROTOCOL.md  
    - docs/RESEARCH_TEMPLATE.md
@@ -17,11 +18,29 @@ Before you investigate ANY code or suggest ANY solutions:
    - docs/LEARNING_PATH_PROTECTION.md
    - ALL other docs/ files
 
-2. **CONFIRM YOUR READING** by responding: "I have read all documentation in docs/ completely and understand the methodology."
+2. **CONFIRM UNDERSTANDING** 
+   Respond: "I have read all documentation in docs/ completely and understand the methodology."
 
-3. **ONLY THEN** may you begin investigation.
+3. **ENVIRONMENT SETUP PHASE**
+   Respond: "I am now setting up my development environment according to documented protocols."
 
-⚠️ **WARNING**: Any investigation, code examination, or solution suggestions made WITHOUT first reading all docs completely will be rejected and you'll be asked to restart from step 1.
+4. **COMPLIANCE VERIFICATION**
+   You MUST run and report results:
+   - Command: `npm run verify-dev-env`
+   - Paste the complete output (success or failure)
+   - State: "Environment verification complete" (only if verification passes)
+
+5. **GIT WORKFLOW VERIFICATION**
+   You MUST run and report results:
+   - Command: `npm run git:verify`
+   - Paste the complete output showing git state analysis
+   - Follow any automated workflow recommendations
+   - State: "Git workflow verified" (only after reviewing output)
+
+6. **INVESTIGATION PERMISSION**
+   Only after steps 1-5, respond: "All protocols verified. I am ready to begin systematic investigation."
+
+⚠️ **CRITICAL**: Steps 2-6 must be separate responses. No investigation may begin until step 6 is completed.
 
 🎯 **WHY**: Previous assistants who skipped doc reading wasted hours on wrong assumptions, broke working code, and violated critical protocols. Reading docs first prevents this and leads to faster, correct solutions.
 
