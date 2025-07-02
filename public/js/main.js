@@ -531,6 +531,7 @@ function initializeApp() {
 // Expose functions globally for menu system access
 window.askQuestion = askQuestion;
 window.startAdvancedPractice = startAdvancedPractice;
+window.updateQuestionUI = updateQuestionUI;
 window.resetQuiz = function() {
     if (window.resetLearningState) {
         window.resetLearningState();

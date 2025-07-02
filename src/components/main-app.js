@@ -518,7 +518,25 @@ function startAdvancedPractice(mode) {
     const action = 'Spell';
     const text = `${action} the ${ordinal(degree)} ${chordType} in ${selectedKey} major.`;
     
-    updateQuestionUI(text);
+    // Update question display directly since updateQuestionUI might not be available
+    const questionDisplay = document.getElementById('question-display');
+    if (questionDisplay) {
+      questionDisplay.textContent = text;
+    }
+    
+    // Clear answer input
+    const answerInput = document.getElementById('answer-input');
+    if (answerInput) {
+      answerInput.value = '';
+      answerInput.focus();
+    }
+    
+    // Clear feedback
+    const feedback = document.getElementById('feedback');
+    if (feedback) {
+      feedback.textContent = '';
+      feedback.className = 'feedback';
+    }
   }
 }
 
@@ -536,6 +554,7 @@ function initializeApp() {
 // Expose functions globally for menu system access
 window.askQuestion = askQuestion;
 window.startAdvancedPractice = startAdvancedPractice;
+window.updateQuestionUI = updateQuestionUI;
 window.resetQuiz = function() {
     if (window.resetLearningState) {
         window.resetLearningState();
