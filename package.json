@@ -26,7 +26,7 @@
     "test:perf": "node tests/performance/index.js",
     "css:analyze": "node scripts/analyze-css.js",
     "profile": "node --inspect scripts/profile-build.js",
-    "verify:phase2": "node scripts/verify-phase2.js",
+    "verify:phase2": "node scripts/verify-phase2.cjs",
     "analyze:performance": "node scripts/analyze-performance.js",
     "analyze:bundle": "ANALYZE=true npm run build",
     "test:performance": "npm run build && npm run verify:phase2 && npm run analyze:performance",
