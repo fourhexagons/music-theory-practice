@@ -184,12 +184,6 @@ export class AppController {
   exposeGlobalFunctions() {
     window.askQuestion = () => this.generateAndDisplayQuestion();
     
-    window.startAdvancedPractice = (mode) => {
-      window.learningState.isAdvancedMode = true;
-      window.learningState.advancedModeType = mode;
-      this.generateAndDisplayQuestion();
-    };
-    
     window.resetQuiz = () => {
       this.stateManager.resetState();
       this.answerForm.clearFeedback();

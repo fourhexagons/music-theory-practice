@@ -197,8 +197,9 @@ function getCurrentKey(mode) {
   if (learningState.accidentalsPairState && learningState.accidentalsPairState.inProgress) {
     return learningState.accidentalsPairState.currentKey;
   }
-  if (mode === window.MODES.RANDOM_ALL || mode.startsWith('advanced')) {
-    return group.keys[Math.floor(Math.random() * group.keys.length)];
+  if (mode === window.MODES.RANDOM_ALL || mode.startsWith('advanced') || mode === 'sevenths_only') {
+    const selectedKey = group.keys[Math.floor(Math.random() * group.keys.length)];
+    return selectedKey;
   }
   return group.keys[learningState.currentKeyIndex];
 }
