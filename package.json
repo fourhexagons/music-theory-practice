@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp dist/src/index.html dist/index.html && cp dist/src/practice.html dist/practice.html",
+    "build": "vite build && test -f dist/src/index.html && test -f dist/src/practice.html && cp dist/src/index.html dist/index.html && cp dist/src/practice.html dist/practice.html",
     "preview": "vite preview",
     "test": "node tests/runner.js",
     "test:unit": "node tests/unit/index.js",
