@@ -85,7 +85,8 @@ function advanceQuestionPointer() {
         if (window.learningState.currentChapterIndex >= group.chapters.length) {
             window.learningState.currentChapterIndex = 0;
             window.learningState.currentKeyIndex = 0;
-            window.learningState.correctAnswerStreak = 0;
+            // Don't reset correctAnswerStreak here - it should only reset on level advance or incorrect answer
+            // This allows b-levels with TRIADS_ONLY_CHAPTERS to accumulate streaks properly
         }
     }
 }
@@ -202,6 +203,12 @@ function askQuestion() {
   const group = window.getCurrentGroup();
   if (!group || group.mode === MODES.COMPLETE) {
       updateQuestionUI('');
+    return;
+  }
+  
+  // Handle Level 12's sevenths_only mode by transitioning to advanced practice
+  if (group.mode === 'sevenths_only') {
+    startAdvancedPractice('sevenths_only');
     return;
   }
   

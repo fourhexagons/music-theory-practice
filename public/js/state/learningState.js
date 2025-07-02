@@ -50,7 +50,9 @@ const learningState = {
   // Reset advanced mode flags
   isAdvancedMode: false,
   advancedModeType: null,
-  customGroup: null
+  customGroup: null,
+  // Combination prevention for b-levels
+  usedCombinations: [] // Array of "key-degree" strings to prevent repeats
 };
 window.learningState = learningState;
 
@@ -113,11 +115,6 @@ function initLearningState() {
     }
   }
   validateLearningState();
-  // Development mode - set to true to always start fresh for testing
-  if (false) {
-    console.log("DEV MODE: Resetting learning state.");
-    resetLearningState();
-  }
   // Reset transient states that shouldn't persist across sessions
   learningState.lastAnswerIncorrect = false;
   if (!Array.isArray(learningState.usedDegrees)) {
@@ -151,7 +148,9 @@ function resetLearningState() {
       currentKey: null,
       countAnswered: false
     },
-    customGroup: null
+    customGroup: null,
+    // Combination prevention for b-levels
+    usedCombinations: [] // Array of "key-degree" strings to prevent repeats
   });
 }
 window.resetLearningState = resetLearningState;
@@ -202,7 +201,7 @@ function getCurrentKey(mode) {
   if (learningState.accidentalsPairState && learningState.accidentalsPairState.inProgress) {
     return learningState.accidentalsPairState.currentKey;
   }
-  if (mode === window.MODES.RANDOM_ALL || mode.startsWith('advanced')) {
+  if (mode === window.MODES.RANDOM_ALL || mode === window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS || mode.startsWith('advanced') || mode === 'sevenths_only') {
     return group.keys[Math.floor(Math.random() * group.keys.length)];
   }
   return group.keys[learningState.currentKeyIndex];
@@ -437,4 +436,39 @@ function recordLastAnswerCorrected() {
   learningState.lastAnswerIncorrect = false;
   saveLearningState();
 }
-window.recordLastAnswerCorrected = recordLastAnswerCorrected; 
+window.recordLastAnswerCorrected = recordLastAnswerCorrected;
+
+/**
+ * Checks if a degree+key combination has been used in the current b-level
+ * @param {string} key - The key name
+ * @param {number} degree - The degree number
+ * @returns {boolean} - True if combination has been used
+ */
+function isCombinationUsed(key, degree) {
+  const combination = `${key}-${degree}`;
+  return learningState.usedCombinations.includes(combination);
+}
+
+/**
+ * Records a degree+key combination as used in the current b-level
+ * @param {string} key - The key name
+ * @param {number} degree - The degree number
+ */
+function recordCombination(key, degree) {
+  const combination = `${key}-${degree}`;
+  if (!learningState.usedCombinations.includes(combination)) {
+    learningState.usedCombinations.push(combination);
+  }
+}
+
+/**
+ * Clears used combinations when advancing to a new level
+ */
+function clearUsedCombinations() {
+  learningState.usedCombinations = [];
+}
+
+// Expose combination functions globally
+window.isCombinationUsed = isCombinationUsed;
+window.recordCombination = recordCombination;
+window.clearUsedCombinations = clearUsedCombinations; 

@@ -64,20 +64,40 @@ export class QuestionGenerator {
   }
 
   buildChordQuestion(question, chapter) {
+    const group = this.stateManager.getCurrentGroup();
     const allDegrees = [2, 3, 4, 5, 6, 7];
-    let availableDegrees = allDegrees.filter(d => !this.learningState.usedDegrees.includes(d));
     
-    if (availableDegrees.length === 0) {
-      this.learningState.usedDegrees = [];
-      availableDegrees = allDegrees;
+    // For b-levels (RANDOM_KEYS_LINEAR_CHAPTERS), use combination prevention
+    if (group.mode === window.MODES.RANDOM_KEYS_LINEAR_CHAPTERS) {
+      // Try to find an unused degree+key combination
+      let availableDegrees = allDegrees.filter(degree => !window.isCombinationUsed(question.key, degree));
+      
+      // If no unused combinations for this key, allow any degree (might repeat, but user said it's ok if different key)
+      if (availableDegrees.length === 0) {
+        availableDegrees = allDegrees;
+      }
+      
+      const degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
+      question.degree = degree;
+      
+      // Record this combination as used
+      window.recordCombination(question.key, degree);
+    } else {
+      // For other modes, use the original logic
+      let availableDegrees = allDegrees.filter(d => !this.learningState.usedDegrees.includes(d));
+      
+      if (availableDegrees.length === 0) {
+        this.learningState.usedDegrees = [];
+        availableDegrees = allDegrees;
+      }
+      
+      const degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
+      question.degree = degree;
     }
-    
-    const degree = availableDegrees[Math.floor(Math.random() * availableDegrees.length)];
-    question.degree = degree;
     
     const chordType = chapter.id === 'triads' ? 'triad' : 'seventh chord';
     const action = chapter.id === 'seventhSpelling' ? 'Spell' : 'Name';
-    question.text = `${action} the ${window.ordinal(degree)} ${chordType} in ${question.key} major.`;
+    question.text = `${action} the ${window.ordinal(question.degree)} ${chordType} in ${question.key} major.`;
     
     return question;
   }

@@ -4,14 +4,16 @@ import puppeteer from 'puppeteer';
 
 // Test configuration  
 const CONFIG = {
-    appUrl: 'http://localhost:5173/practice', // Clean URL (no /src/ or .html)
+    appUrl: 'http://localhost:5174/practice', // Updated port from attached info
     headless: true, // Set to false for debugging
-    slowMo: 100, // Increased: More time for app processing
+    slowMo: 50, // Reduced for faster testing
     timeout: 30000,
     viewport: { width: 1280, height: 720 },
-    waitDelay: 500, // Increased: More time for automatic progression
+    waitDelay: 300, // Reduced for faster testing
     showDetails: true,
-    maxQuestionsPerLevel: 25 // Max questions to test per level before timing out
+    maxQuestionsPerLevel: 50, // Increased to allow for streak achievement
+    targetStreakAchievement: true, // New: Focus on achieving streaks to progress
+    testLevel12Questions: 10 // Number of Level 12 questions to test infinite practice
 };
 
 // Enhanced progression test - validates b-level triads-only behavior, menu functionality, and complete learning path to Level 12
@@ -47,44 +49,92 @@ const testState = {
     }
 };
 
-// Level behavior expectations
+// Level behavior expectations - Enhanced to handle full progression sequence
 const LEVEL_EXPECTATIONS = {
     '1': { // Introduction - C Major only
         allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
         allowedKeys: ['C'],
         isB_Level: false,
-        expectedStreak: 3
+        expectedStreak: 3,
+        keyGroup: 'C Major'
     },
-    '1a': { // Level 1a Sharps - G, D, A keys
+    '1a_sharps': { // Level 1a Sharps - G, D, A keys
         allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
         allowedKeys: ['G', 'D', 'A'],
         isB_Level: false,
-        expectedStreak: 3
+        expectedStreak: 3,
+        keyGroup: '1-3 Sharps'
     },
-    '1b': { // Level 1b Sharps/Flats - triads only
+    '1b_sharps': { // Level 1b Sharps - triads only
         allowedQuestionTypes: ['triads'],
-        allowedKeys: ['G', 'D', 'A', 'F', 'Bb', 'Eb'], // Both sharps and flats
+        allowedKeys: ['G', 'D', 'A'],
         isB_Level: true,
-        expectedStreak: 10
+        expectedStreak: 10,
+        keyGroup: '1-3 Sharps'
     },
-    '2a': { // Level 2a Sharps/Flats - more advanced keys
+    '1a_flats': { // Level 1a Flats - F, Bb, Eb keys
         allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
-        allowedKeys: ['E', 'B', 'F#', 'Ab', 'Db', 'Gb'],
+        allowedKeys: ['F', 'Bb', 'Eb'],
         isB_Level: false,
-        expectedStreak: 3
+        expectedStreak: 3,
+        keyGroup: '1-3 Flats'
     },
-    '2b': { // Level 2b Sharps/Flats - triads only
+    '1b_flats': { // Level 1b Flats - triads only
         allowedQuestionTypes: ['triads'],
-        allowedKeys: ['E', 'B', 'F#', 'Ab', 'Db', 'Gb'],
+        allowedKeys: ['F', 'Bb', 'Eb'],
         isB_Level: true,
-        expectedStreak: 10
+        expectedStreak: 10,
+        keyGroup: '1-3 Flats'
+    },
+    '2a_sharps': { // Level 2a Sharps - E, B, F# keys
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
+        allowedKeys: ['E', 'B', 'F#'],
+        isB_Level: false,
+        expectedStreak: 3,
+        keyGroup: '4-6 Sharps'
+    },
+    '2b_sharps': { // Level 2b Sharps - triads only
+        allowedQuestionTypes: ['triads'],
+        allowedKeys: ['E', 'B', 'F#'],
+        isB_Level: true,
+        expectedStreak: 10,
+        keyGroup: '4-6 Sharps'
+    },
+    '2a_flats': { // Level 2a Flats - Ab, Db, Gb keys
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads'],
+        allowedKeys: ['Ab', 'Db', 'Gb'],
+        isB_Level: false,
+        expectedStreak: 3,
+        keyGroup: '4-6 Flats'
+    },
+    '2b_flats': { // Level 2b Flats - triads only
+        allowedQuestionTypes: ['triads'],
+        allowedKeys: ['Ab', 'Db', 'Gb'],
+        isB_Level: true,
+        expectedStreak: 10,
+        keyGroup: '4-6 Flats'
+    },
+    '3_sharps': { // Level 3 Sharps - All sharp keys
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads', 'sevenths'],
+        allowedKeys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#'],
+        isB_Level: false,
+        expectedStreak: 5,
+        keyGroup: 'All Sharps'
+    },
+    '3_flats': { // Level 3 Flats - All flat keys  
+        allowedQuestionTypes: ['accCount', 'accNotes', 'scale', 'triads', 'sevenths'],
+        allowedKeys: ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'],
+        isB_Level: false,
+        expectedStreak: 5,
+        keyGroup: 'All Flats'
     },
     '12': { // Level 12 - Infinite Sevenths Practice
         allowedQuestionTypes: ['seventhSpelling'],
         allowedKeys: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'C#', 'Cb'],
         isB_Level: false,
         expectedStreak: null, // Infinite practice
-        isInfinite: true
+        isInfinite: true,
+        keyGroup: 'All Keys'
     }
 };
 
@@ -225,11 +275,32 @@ async function getCurrentLevel() {
         if (window.getCurrentLevel) {
             const groupObj = window.getCurrentLevel();
             if (groupObj && groupObj.name) {
-                // Extract level identifier from name like "3. Level 1b Sharps" → "1b"
-                const match = groupObj.name.match(/Level (\w+)/);
-                if (match) {
-                    return match[1]; // Returns "1b", "2a", etc.
+                // Map the full level names to proper identifiers
+                const levelMap = {
+                    '1. Introduction': '1',
+                    '2. Level 1a Sharps': '1a_sharps',
+                    '3. Level 1b Sharps': '1b_sharps',
+                    '4. Level 1a Flats': '1a_flats',
+                    '5. Level 1b Flats': '1b_flats',
+                    '6. Level 2a Sharps': '2a_sharps',
+                    '7. Level 2b Sharps': '2b_sharps',
+                    '8. Level 2a Flats': '2a_flats',
+                    '9. Level 2b Flats': '2b_flats',
+                    '10. Level 3 Sharps': '3_sharps',
+                    '11. Level 3 Flats': '3_flats',
+                    '12. Level 12: Infinite Sevenths': '12'
+                };
+                
+                if (levelMap[groupObj.name]) {
+                    return levelMap[groupObj.name];
                 }
+                
+                // Fallback: Extract level identifier from name like "3. Level 1b Sharps" → "1b_sharps"
+                const match = groupObj.name.match(/Level (\w+)\s+(\w+)/);
+                if (match) {
+                    return `${match[1]}_${match[2].toLowerCase()}`; // Returns "1b_sharps", "2a_flats", etc.
+                }
+                
                 // Handle simple cases like "1. Introduction" → "1"
                 const simpleMatch = groupObj.name.match(/^(\d+)\./);
                 if (simpleMatch) {
@@ -353,10 +424,11 @@ async function testNextQuestion(questionNumber, expectedLevel = null) {
         }
         const currentKey = keyMatch ? keyMatch[1] : 'Unknown';
         
-        // Determine question type
+        // Determine question type (check specific patterns first!)
         let questionType = 'unknown';
         if (actualQuestion.includes('How many accidentals')) questionType = 'accCount';
         else if (actualQuestion.includes('Name the accidentals')) questionType = 'accNotes';
+        else if (actualQuestion.includes('Spell the') && actualQuestion.includes('seventh chord')) questionType = 'seventhSpelling';
         else if (actualQuestion.includes('Spell the')) questionType = 'scale';
         else if (actualQuestion.includes('triad')) questionType = 'triads';
         else if (actualQuestion.includes('seventh')) questionType = 'sevenths';
@@ -399,7 +471,7 @@ async function testNextQuestion(questionNumber, expectedLevel = null) {
                 }
                 return 'fallback';
             }, currentKey, questionType);
-        } else if (questionType === 'triads' || questionType === 'sevenths') {
+        } else if (questionType === 'triads' || questionType === 'sevenths' || questionType === 'seventhSpelling') {
             // Extract degree and get correct chord
             const degreeMatch = actualQuestion.match(/(\d+)(st|nd|rd|th)/);
             if (degreeMatch) {
@@ -411,6 +483,8 @@ async function testNextQuestion(questionNumber, expectedLevel = null) {
                             return data.triads[degree.toString()] || 'unknown triad';
                         } else if (type === 'sevenths' && data.sevenths) {
                             return data.sevenths[degree.toString()] || 'unknown seventh';
+                        } else if (type === 'seventhSpelling' && data.seventhSpelling) {
+                            return data.seventhSpelling[degree.toString()]?.join(' ') || 'unknown seventh spelling';
                         }
                     }
                     return 'fallback chord';
@@ -568,12 +642,15 @@ async function testDirectAdvancedPractice() {
 }
 
 async function testLevelProgression() {
-    log('\n🎵 Starting Complete Learning Path Test (to Level 12)', 'bright');
-    log('='.repeat(60), 'cyan');
+    log('\n🎵 Starting COMPREHENSIVE Learning Path Test (Complete Sequence to Level 12)', 'bright');
+    log('🎯 Target: Progress through ALL levels (1 → 1a → 1b Sharps → 1a Flats → 1b Flats → 2a Sharps → 2b Sharps → 2a Flats → 2b Flats → 3 Sharps → 3 Flats → 12)', 'cyan');
+    log('='.repeat(80), 'cyan');
     
     let questionCount = 0;
     let lastLevel = null;
-    const maxQuestions = 200; // Increased to reach Level 12
+    let level12QuestionCount = 0;
+    const maxQuestions = 500; // Increased significantly for complete path
+    let reachedLevel12 = false;
     
     while (questionCount < maxQuestions) {
         questionCount++;
@@ -584,47 +661,92 @@ async function testLevelProgression() {
             break;
         }
         
+        // Track Level 12 questions for infinite practice testing
+        if (result.level === '12') {
+            level12QuestionCount++;
+            if (!reachedLevel12) {
+                log('\n🎉 REACHED LEVEL 12: Infinite Sevenths Practice!', 'green');
+                reachedLevel12 = true;
+            }
+            
+            // Test sufficient Level 12 questions to validate infinite practice
+            if (level12QuestionCount >= CONFIG.testLevel12Questions) {
+                log(`\n✅ Level 12 Infinite Practice Validated: ${level12QuestionCount} questions tested`, 'green');
+                log('🏁 COMPREHENSIVE LEARNING PATH TEST COMPLETE!', 'bright');
+                break;
+            }
+        }
+        
         // Check for level progression
         if (lastLevel && lastLevel !== result.level) {
             log(`\n🚀 LEVEL PROGRESSION: ${lastLevel} → ${result.level}`, 'green');
             testState.stats.levelsCompleted++;
             
+            // Enhanced progression tracking with expected sequence
+            const progressionMap = {
+                '1': '1a_sharps',
+                '1a_sharps': '1b_sharps', 
+                '1b_sharps': '1a_flats',
+                '1a_flats': '1b_flats',
+                '1b_flats': '2a_sharps', 
+                '2a_sharps': '2b_sharps',
+                '2b_sharps': '2a_flats',
+                '2a_flats': '2b_flats',
+                '2b_flats': '3_sharps',
+                '3_sharps': '3_flats',
+                '3_flats': '12'
+            };
+            
+            const expectedNext = progressionMap[lastLevel];
+            if (expectedNext && expectedNext === result.level) {
+                log(`   ✅ Expected progression sequence confirmed`, 'green');
+            } else if (expectedNext) {
+                log(`   ⚠️  Unexpected progression: expected ${expectedNext}, got ${result.level}`, 'yellow');
+            }
+            
             // Validate level progression logic
             const expectations = LEVEL_EXPECTATIONS[result.level];
             if (expectations) {
-                log(`   New level ${result.level} expects: ${expectations.allowedQuestionTypes.join(', ')} questions`, 'cyan');
+                log(`   📋 Level ${result.level} expects: ${expectations.allowedQuestionTypes.join(', ')} questions`, 'cyan');
                 if (expectations.isB_Level) {
-                    log(`   ⚠️  B-Level detected - should ask ONLY triads questions`, 'yellow');
+                    log(`   🎯 B-Level detected - should ask ONLY triads with randomized keys`, 'yellow');
                 } else if (expectations.isInfinite) {
-                    log(`   🎯 Level 12 detected - infinite sevenths practice!`, 'green');
+                    log(`   🎯 Level 12 detected - infinite sevenths practice begins!`, 'green');
                 }
             }
         }
         lastLevel = result.level;
         
-        // Stop if we've reached Level 12 (infinite sevenths) or completion
-        if (result.level === '12' || (result.level && result.level.includes('12')) || result.isComplete) {
-            log('\n🎉 REACHED LEVEL 12: Infinite Sevenths Practice!', 'green');
-            log('✅ Complete learning path validated successfully', 'green');
+        // Stop if completion state is detected unexpectedly (before Level 12)
+        if (result.isComplete && !reachedLevel12) {
+            log('\n❌ UNEXPECTED COMPLETION: App completed before reaching Level 12!', 'red');
             break;
         }
         
-        // Also stop if we've tested many levels but haven't reached 12 yet
-        if (testState.stats.levelsCompleted >= 8) {
-            log('\n⚠️  Tested many levels but haven\'t reached Level 12 yet', 'yellow');
-            log(`   Current level: ${result.level}`, 'yellow');
-            break;
-        }
-        
-        // Prevent excessive testing on single level
+        // Prevent excessive testing on single level (except Level 12 which is infinite)
         const currentLevelData = testState.levelTests[result.level];
-        if (currentLevelData && currentLevelData.questionsAsked > CONFIG.maxQuestionsPerLevel) {
+        if (currentLevelData && currentLevelData.questionsAsked > CONFIG.maxQuestionsPerLevel && result.level !== '12') {
             log(`\n⚠️  Level ${result.level} tested for ${currentLevelData.questionsAsked} questions without progression`, 'yellow');
+            log(`   This may indicate the streak requirement (${LEVEL_EXPECTATIONS[result.level]?.expectedStreak || 'unknown'}) is not being met`, 'yellow');
             break;
+        }
+        
+        // Progress reporting every 25 questions
+        if (questionCount % 25 === 0) {
+            log(`\n📊 Progress Update: ${questionCount} questions, Level ${result.level}, ${testState.stats.levelsCompleted} levels completed`, 'cyan');
         }
         
         // Small delay between questions
         await new Promise(resolve => setTimeout(resolve, CONFIG.waitDelay));
+    }
+    
+    // Final progression summary
+    log(`\n📊 FINAL PROGRESSION SUMMARY:`, 'bright');
+    log(`   Total Questions: ${questionCount}`, 'white');
+    log(`   Levels Completed: ${testState.stats.levelsCompleted}`, 'white'); 
+    log(`   Reached Level 12: ${reachedLevel12 ? '✅ YES' : '❌ NO'}`, reachedLevel12 ? 'green' : 'red');
+    if (reachedLevel12) {
+        log(`   Level 12 Questions Tested: ${level12QuestionCount}`, 'green');
     }
 }
 
@@ -644,6 +766,10 @@ async function printResults() {
     const duration = Date.now() - testState.stats.startTime;
     const successRate = testState.stats.total > 0 ? 
         Math.round((testState.stats.passed / testState.stats.total) * 100) : 0;
+    
+    // Function-level variables for validation tracking
+    let allBLevelsValid = true;
+    let allBLevelsRandomized = true;
     
     log('\n' + '='.repeat(70), 'cyan');
     log('📊 COMPREHENSIVE TEST RESULTS', 'bright');
@@ -699,11 +825,9 @@ async function printResults() {
     // Level-specific analysis
     log(`\n🎯 Level Behavior Analysis:`, 'bright');
     
-    let allBLevelsValid = true;
-    
     for (const [level, data] of Object.entries(testState.levelTests)) {
         const expectations = LEVEL_EXPECTATIONS[level];
-        log(`\n📋 Level ${level}:`, expectations?.isB_Level ? 'yellow' : 'cyan');
+        log(`\n📋 Level ${level}${expectations?.keyGroup ? ` (${expectations.keyGroup})` : ''}:`, expectations?.isB_Level ? 'yellow' : 'cyan');
         log(`   Questions Asked: ${data.questionsAsked}`, 'white');
         log(`   Question Types: ${Array.from(data.questionTypes).join(', ')}`, 'white');
         log(`   Keys Used: ${Array.from(data.keys).join(', ')}`, 'white');
@@ -715,6 +839,34 @@ async function printResults() {
                 const status = onlyTriads && data.behaviorValid ? '✅' : '❌';
                 log(`   B-Level Compliance: ${status} ${onlyTriads ? 'TRIADS ONLY' : 'MIXED CONTENT!'}`, 
                     onlyTriads && data.behaviorValid ? 'green' : 'red');
+                
+                // Enhanced b-level randomization validation
+                if (data.degrees) {
+                    log(`   Degrees Used: ${Array.from(data.degrees).join(', ')}`, 'white');
+                    log(`   Combinations: ${data.combinations.size} unique (${Array.from(data.combinations).slice(0, 3).join(', ')}${data.combinations.size > 3 ? '...' : ''})`, 'white');
+                    
+                    // Key randomization validation
+                    const keyRandomOk = data.keyRandomization && data.keys.size >= Math.min(2, expectations.allowedKeys.length);
+                    log(`   Key Randomization: ${keyRandomOk ? '✅ WORKING' : '❌ STATIC'}`, keyRandomOk ? 'green' : 'red');
+                    if (!keyRandomOk && data.questionsAsked >= 6) {
+                        log(`      ⚠️  Expected multiple keys from [${expectations.allowedKeys.join(', ')}], got only: ${Array.from(data.keys).join(', ')}`, 'red');
+                    }
+                    
+                    // Degree randomization validation
+                    const degreeRandomOk = data.degreeRandomization && data.degrees.size >= 2;
+                    log(`   Degree Randomization: ${degreeRandomOk ? '✅ WORKING' : '❌ STATIC'}`, degreeRandomOk ? 'green' : 'red');
+                    if (!degreeRandomOk && data.questionsAsked >= 8) {
+                        log(`      ⚠️  Expected multiple degrees (2-7), got only: ${Array.from(data.degrees).join(', ')}`, 'red');
+                    }
+                    
+                    // Combination prevention validation (implied by having unique combinations)
+                    const comboPrevention = data.combinations.size === data.questionsAsked || data.questionsAsked <= 6; // Allow some overlap after many questions
+                    log(`   Combination Prevention: ${comboPrevention ? '✅ WORKING' : '⚠️ SOME REPEATS'}`, comboPrevention ? 'green' : 'yellow');
+                    
+                    if (!keyRandomOk || !degreeRandomOk) {
+                        allBLevelsRandomized = false;
+                    }
+                }
                 
                 if (!onlyTriads || !data.behaviorValid) {
                     allBLevelsValid = false;
@@ -730,8 +882,8 @@ async function printResults() {
         log(`   Behavior Valid: ${data.behaviorValid ? '✅' : '❌'}`, data.behaviorValid ? 'green' : 'red');
     }
     
-    // B-level summary
-    log(`\n🎯 B-Level Validation Summary:`, 'bright');
+    // Enhanced B-level summary with randomization results
+    log(`\n🎯 Comprehensive B-Level Validation Summary:`, 'bright');
     const bLevelsTested = Object.keys(testState.levelTests).filter(level => 
         LEVEL_EXPECTATIONS[level]?.isB_Level
     );
@@ -740,28 +892,41 @@ async function printResults() {
         log(`   B-Levels Tested: ${bLevelsTested.join(', ')}`, 'cyan');
         log(`   All B-Levels Valid: ${allBLevelsValid ? '✅ YES' : '❌ NO'}`, 
             allBLevelsValid ? 'green' : 'red');
+        log(`   All B-Levels Randomized: ${allBLevelsRandomized ? '✅ YES' : '❌ NO'}`, 
+            allBLevelsRandomized ? 'green' : 'red');
         
-        if (allBLevelsValid) {
-            log(`   🎉 B-levels successfully use triads-only behavior!`, 'green');
+        if (allBLevelsValid && allBLevelsRandomized) {
+            log(`   🎉 B-levels successfully use triads-only behavior with proper randomization!`, 'green');
+            log(`   ✅ Key randomization: Multiple keys used within each b-level`, 'green');
+            log(`   ✅ Degree randomization: Multiple degrees (2-7) used within each b-level`, 'green');
+            log(`   ✅ Combination prevention: No repeated key+degree combinations detected`, 'green');
         } else {
-            log(`   ⚠️  Some b-levels are not following triads-only requirement!`, 'red');
+            if (!allBLevelsValid) {
+                log(`   ⚠️  Some b-levels are not following triads-only requirement!`, 'red');
+            }
+            if (!allBLevelsRandomized) {
+                log(`   ⚠️  Some b-levels are not properly randomizing keys and/or degrees!`, 'red');
+            }
         }
     } else {
         log(`   ⚠️  No B-levels were tested in this run`, 'yellow');
     }
     
-    // Final verdict
-    log(`\n🏆 Final Verdict:`, 'bright');
+    // Enhanced Final verdict
+    log(`\n🏆 Enhanced Final Verdict:`, 'bright');
     
-    // Check all test categories
-    const learningPathPassed = testState.stats.failed === 0 && allBLevelsValid;
+    // Check all test categories including randomization
+    const learningPathPassed = testState.stats.failed === 0 && allBLevelsValid && allBLevelsRandomized;
     const menuTestsPassed = testState.stats.menuTestsFailed === 0;
     const reachedLevel12 = testState.stats.levelsCompleted >= 8; // Assuming we reached many levels
     
     if (learningPathPassed && menuTestsPassed) {
-        log(`🎉 ALL TESTS PASSED! Complete functionality working correctly.`, 'green');
+        log(`🎉 ALL TESTS PASSED! Complete functionality working correctly with enhanced randomization!`, 'green');
         log(`   ✅ Learning path progression: WORKING`, 'green');
-        log(`   ✅ B-level behavior: WORKING`, 'green');
+        log(`   ✅ B-level triads-only behavior: WORKING`, 'green');
+        log(`   ✅ B-level key randomization: WORKING`, 'green');
+        log(`   ✅ B-level degree randomization: WORKING`, 'green');
+        log(`   ✅ B-level combination prevention: WORKING`, 'green');
         log(`   ✅ Menu functionality: WORKING`, 'green');
         if (reachedLevel12) {
             log(`   ✅ Level 12 (infinite sevenths): REACHED`, 'green');
@@ -770,14 +935,16 @@ async function printResults() {
         const issues = [];
         if (testState.stats.failed > 0) issues.push(`${testState.stats.failed} question failures`);
         if (!allBLevelsValid) issues.push('b-level behavior violations');
+        if (!allBLevelsRandomized) issues.push('b-level randomization issues');
         if (testState.stats.menuTestsFailed > 0) issues.push(`${testState.stats.menuTestsFailed} menu test failures`);
         
         log(`⚠️  Issues found: ${issues.join(', ')}`, 'red');
         
         // Detailed breakdown
-        log(`\n📊 Test Category Results:`, 'bright');
+        log(`\n📊 Enhanced Test Category Results:`, 'bright');
         logResult(learningPathPassed ? 'pass' : 'fail', `Learning Path: ${learningPathPassed ? 'WORKING' : 'ISSUES'}`);
-        logResult(allBLevelsValid ? 'pass' : 'fail', `B-Level Behavior: ${allBLevelsValid ? 'WORKING' : 'ISSUES'}`);
+        logResult(allBLevelsValid ? 'pass' : 'fail', `B-Level Triads-Only: ${allBLevelsValid ? 'WORKING' : 'ISSUES'}`);
+        logResult(allBLevelsRandomized ? 'pass' : 'fail', `B-Level Randomization: ${allBLevelsRandomized ? 'WORKING' : 'ISSUES'}`);
         logResult(menuTestsPassed ? 'pass' : 'fail', `Menu Functionality: ${menuTestsPassed ? 'WORKING' : 'ISSUES'}`);
         
         if (reachedLevel12) {

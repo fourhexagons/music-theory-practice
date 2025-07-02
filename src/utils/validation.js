@@ -235,7 +235,13 @@ function checkAccidentalsNames(userAnswer, key, quizData) {
   // Accept string or array
   let userNotes;
   if (typeof userAnswer === 'string') {
-    userNotes = userAnswer.trim() === '' ? [] : userAnswer.split(/\s+/);
+    const trimmed = userAnswer.trim();
+    // Handle "none" as a special case for keys with no accidentals
+    if (trimmed === '' || trimmed.toLowerCase() === 'none') {
+      userNotes = [];
+    } else {
+      userNotes = trimmed.split(/\s+/);
+    }
   } else if (Array.isArray(userAnswer)) {
     userNotes = userAnswer;
   } else {

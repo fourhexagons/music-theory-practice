@@ -72,7 +72,8 @@ export class StateManager {
       if (this.learningState.currentChapterIndex >= group.chapters.length) {
         this.learningState.currentChapterIndex = 0;
         this.learningState.currentKeyIndex = 0;
-        this.learningState.correctAnswerStreak = 0;
+        // Don't reset correctAnswerStreak here - it should only reset on level advance or incorrect answer
+        // This allows b-levels with TRIADS_ONLY_CHAPTERS to accumulate streaks properly
       }
     }
   }
@@ -82,6 +83,11 @@ export class StateManager {
     this.learningState.currentChapterIndex = 0;
     this.learningState.currentKeyIndex = 0;
     this.learningState.correctAnswerStreak = 0;
+    
+    // Clear used combinations when advancing to new level (for b-level combination prevention)
+    if (window.clearUsedCombinations) {
+      window.clearUsedCombinations();
+    }
   }
 
   handleCorrectAnswer() {
@@ -276,6 +282,11 @@ export class StateManager {
       this.learningState.mode = 'linear';
       this.learningState.currentKeyIndex = 0;
       this.learningState.currentChapterIndex = 0;
+    }
+    
+    // Clear used combinations when resetting
+    if (window.clearUsedCombinations) {
+      window.clearUsedCombinations();
     }
     
     if (window.saveLearningState) {
