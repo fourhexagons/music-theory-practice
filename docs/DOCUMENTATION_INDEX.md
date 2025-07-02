@@ -1,6 +1,6 @@
 # Documentation Index
 
-🚨 **MANDATORY**: Read docs/SYSTEMATIC_RESEARCH_METHODOLOGY.md COMPLETELY before touching any code.
+🚨 **MANDATORY**: Read ALL files in docs/ COMPLETELY before touching any code.
 
 **🔍 ALL development work MUST follow our [Systematic Research Methodology](SYSTEMATIC_RESEARCH_METHODOLOGY.md)**
 
