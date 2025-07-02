@@ -8,7 +8,7 @@
 1. **Use the [Research Template](RESEARCH_TEMPLATE.md)** for investigation
 2. **Research systematically** - Understand the system before testing
 3. **Never assume test failures** - Investigate root causes thoroughly
-4. **Document findings** - Share insights with the team
+4. **Document findings** - Capture insights for future reference
 
 ### Testing with Research Methodology
 - **Phase 1: Problem Decomposition** - What exactly is failing and why?

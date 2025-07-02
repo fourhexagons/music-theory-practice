@@ -524,29 +524,6 @@ toggleDebugMode()
 - **Test Reports**: Detailed HTML test results
 - **PWA Documentation**: Progressive Web App features
 
-## 🔮 Future Development
-
-### Planned Features
-- Cloud deployment
-- User accounts and progress tracking
-- Advanced chord progressions
-- Mobile app versions
-
-### Architecture Considerations
-- Modular design for easy feature addition
-- Comprehensive testing for reliability
-- Performance optimization for mobile devices
-- Accessibility compliance
-
-### Testing Your Changes
-```bash
-# Start the development server
-python3 -m http.server 8000
-
-# Open in browser and run tests
-# Press Ctrl+Shift+Q (or Cmd+Shift+Q on Mac) to run tests
-```
-
 ---
 
-*This development guide is maintained by the development team. For user support, see the main [README.md](../README.md).* 
+*All development work must follow the systematic research methodology.*

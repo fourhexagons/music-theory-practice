@@ -174,18 +174,6 @@ read_file: "file:start-end"
 
 ---
 
-## Research Documentation
-
-### Code Changes
-- [ ] Implementation documented with comments
-- [ ] Function/class documentation updated
-- [ ] README updated (if applicable)
-
-### Research Documentation
-- [ ] Key findings documented for future reference
-- [ ] Architectural insights captured
-- [ ] Common pitfalls noted
-
 ## Lessons Learned
 
 ### Insights About Codebase
