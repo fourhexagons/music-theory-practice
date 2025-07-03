@@ -29,12 +29,13 @@
 
 **🟢 ESSENTIAL (Development Knowledge):**
 6. **[DEVELOPMENT.md](DEVELOPMENT.md)** - Setup and architecture
-7. **[TESTING.md](TESTING.md)** - Testing and debugging procedures
-8. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution requirements
-9. **[LEARNING_PATH_COMPLETE.md](LEARNING_PATH_COMPLETE.md)** - Learning path behavior
-10. **[CURRENT_LEARNING_PATH_BEHAVIOR.md](CURRENT_LEARNING_PATH_BEHAVIOR.md)** - Current implementation
-11. **[HEADLESS_TEST_RESEARCH_FINDINGS.md](HEADLESS_TEST_RESEARCH_FINDINGS.md)** - Methodology case study
-12. **[RELEASE_FORMAT.md](RELEASE_FORMAT.md)** - Release procedures
+7. **[DEPLOYMENT.md](DEPLOYMENT.md)** - Complete deployment guide and troubleshooting
+8. **[TESTING.md](TESTING.md)** - Testing and debugging procedures
+9. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution requirements
+10. **[LEARNING_PATH_COMPLETE.md](LEARNING_PATH_COMPLETE.md)** - Learning path behavior
+11. **[CURRENT_LEARNING_PATH_BEHAVIOR.md](CURRENT_LEARNING_PATH_BEHAVIOR.md)** - Current implementation
+12. **[HEADLESS_TEST_RESEARCH_FINDINGS.md](HEADLESS_TEST_RESEARCH_FINDINGS.md)** - Methodology case study
+13. **[RELEASE_FORMAT.md](RELEASE_FORMAT.md)** - Release procedures
 
 ---
 
@@ -42,7 +43,7 @@
 
 **Before proceeding with ANY task, you MUST confirm:**
 
-1. **"I have read ALL 12 documentation files completely"**
+1. **"I have read ALL 13 documentation files completely"**
 2. **"I understand that modifying learning path logic requires explicit permission"**  
 3. **"I will use the systematic research methodology for all investigations"**
 4. **"I will update ALL required documentation types with every code change (research findings, code comments, user guides, and examples)"**
@@ -115,7 +116,7 @@
 ## **🎯 Self-Validation Checklist**
 
 **Before making ANY changes, verify:**
-- [ ] I have read all 12 docs completely
+- [ ] I have read all 13 docs completely
 - [ ] I understand which files are protected and why  
 - [ ] I am using systematic research methodology
 - [ ] I am gathering evidence, not making assumptions
@@ -126,4 +127,4 @@
 
 ---
 
-*All work must follow the systematic research methodology. Documentation updates are mandatory with every code change.* 
+*All work must follow the systematic research methodology. Documentation updates are mandatory with every code change. Always check docs/DEPLOYMENT.md for deployment procedures.* 
