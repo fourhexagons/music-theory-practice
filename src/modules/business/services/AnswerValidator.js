@@ -13,26 +13,42 @@ export class AnswerValidator {
   }
 
   /**
-   * Pre-generate all 480 valid inputs from quiz data
-   * This creates a finite set of all possible correct answers
+   * Pre-generate all valid inputs from quiz data
+   * Supports both 7-note and 8-note (with repeated root) scale spellings
+   * Seventh spellings remain 4 notes (no repetition)
    */
   preGenerateValidInputs() {
     console.log('🔄 Pre-generating valid inputs for finite set lookup...');
     
     Object.entries(this.quizData).forEach(([key, keyData]) => {
-      // Generate all scale input variations (4 per key)
-      const scale = keyData.scale;
-      const spaced = scale.join(' ');
-      const unspaced = scale.join('');
-      const spacedLower = spaced.toLowerCase();
-      const unspacedLower = unspaced.toLowerCase();
+      // Generate scale input variations (8 per key: 7-note + 8-note × 4 case variations each)
+      const scale7Note = keyData.scale;
+      const scale8Note = [...keyData.scale, keyData.scale[0]]; // Add repeated root
       
-      this.validScaleInputs.add(spaced);
-      this.validScaleInputs.add(unspaced);
-      this.validScaleInputs.add(spacedLower);
-      this.validScaleInputs.add(unspacedLower);
+      // 7-note scale variations
+      const spaced7 = scale7Note.join(' ');
+      const unspaced7 = scale7Note.join('');
+      const spacedLower7 = spaced7.toLowerCase();
+      const unspacedLower7 = unspaced7.toLowerCase();
       
-      // Generate all chord input variations (28 per key: 7 degrees × 4 variations)
+      this.validScaleInputs.add(spaced7);
+      this.validScaleInputs.add(unspaced7);
+      this.validScaleInputs.add(spacedLower7);
+      this.validScaleInputs.add(unspacedLower7);
+      
+      // 8-note scale variations (with repeated root)
+      const spaced8 = scale8Note.join(' ');
+      const unspaced8 = scale8Note.join('');
+      const spacedLower8 = spaced8.toLowerCase();
+      const unspacedLower8 = unspaced8.toLowerCase();
+      
+      this.validScaleInputs.add(spaced8);
+      this.validScaleInputs.add(unspaced8);
+      this.validScaleInputs.add(spacedLower8);
+      this.validScaleInputs.add(unspacedLower8);
+      
+      // Generate chord input variations (28 per key: 7 degrees × 4 variations)
+      // Seventh spellings remain 4 notes (no repetition of root)
       for (let degree = 1; degree <= 7; degree++) {
         const chord = keyData.seventhSpelling[degree.toString()];
         const chordSpaced = chord.join(' ');
@@ -47,8 +63,8 @@ export class AnswerValidator {
       }
     });
     
-    console.log(`✅ Generated ${this.validScaleInputs.size} valid scale inputs`);
-    console.log(`✅ Generated ${this.validChordInputs.size} valid chord inputs`);
+    console.log(`✅ Generated ${this.validScaleInputs.size} valid scale inputs (7-note + 8-note variations)`);
+    console.log(`✅ Generated ${this.validChordInputs.size} valid chord inputs (4-note only)`);
     console.log(`✅ Total valid inputs: ${this.validScaleInputs.size + this.validChordInputs.size}`);
   }
 
