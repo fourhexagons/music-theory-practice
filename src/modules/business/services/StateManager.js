@@ -200,6 +200,9 @@ export class StateManager {
       } else {
         this.advanceQuestionPointer();
       }
+    } else if (group.mode === 'random_keys_linear_chapters' && this.learningState.customGroup) {
+      // Handle key sequence progression for island levels
+      return this.handleKeySequenceProgression(group);
     } else if (group.mode === 'random_keys_linear_chapters') {
       // Handle RANDOM_KEYS_LINEAR_CHAPTERS mode with accidentals pairing
       if (this.learningState.currentQuestion && this.learningState.currentQuestion.chapterId === 'accCount') {
@@ -291,6 +294,41 @@ export class StateManager {
   handleIncorrectAnswer() {
     this.learningState.correctAnswerStreak = 0;
     return { action: 'showIncorrect' };
+  }
+
+  /**
+   * Handles progression logic for key sequence-based island levels
+   * @param {Object} group - The current group configuration
+   * @returns {Object} - Action to take next
+   */
+  handleKeySequenceProgression(group) {
+    const currentQuestion = this.learningState.currentQuestion;
+    if (!currentQuestion) {
+      return { action: 'askQuestion' };
+    }
+
+    console.log('🔧 STATEMANAGER: Handling key sequence progression', {
+      chapterId: currentQuestion.chapterId,
+      key: currentQuestion.key,
+      sequenceState: this.learningState.keySequenceState
+    });
+
+    // Advance the key sequence
+    const isSequenceComplete = window.advanceKeySequence(currentQuestion.chapterId);
+    
+    if (isSequenceComplete) {
+      console.log('🔧 STATEMANAGER: Key sequence completed, starting new sequence');
+      // Reset chapter index to start with accCount for new key
+      this.learningState.currentChapterIndex = 0;
+    } else {
+      // Continue with current sequence - advance to next chapter
+      if (currentQuestion.chapterId !== 'triads') {
+        this.advanceQuestionPointer();
+      }
+      // For triads, we stay on the same chapter to ask more triad questions
+    }
+
+    return { action: 'askQuestion' };
   }
 
   resetState() {
