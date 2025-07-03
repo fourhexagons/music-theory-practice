@@ -5,6 +5,51 @@
 export class AnswerValidator {
   constructor(quizData) {
     this.quizData = quizData;
+    
+    // Pre-generate all valid inputs for finite set lookup
+    this.validScaleInputs = new Set();
+    this.validChordInputs = new Set();
+    this.preGenerateValidInputs();
+  }
+
+  /**
+   * Pre-generate all 480 valid inputs from quiz data
+   * This creates a finite set of all possible correct answers
+   */
+  preGenerateValidInputs() {
+    console.log('🔄 Pre-generating valid inputs for finite set lookup...');
+    
+    Object.entries(this.quizData).forEach(([key, keyData]) => {
+      // Generate all scale input variations (4 per key)
+      const scale = keyData.scale;
+      const spaced = scale.join(' ');
+      const unspaced = scale.join('');
+      const spacedLower = spaced.toLowerCase();
+      const unspacedLower = unspaced.toLowerCase();
+      
+      this.validScaleInputs.add(spaced);
+      this.validScaleInputs.add(unspaced);
+      this.validScaleInputs.add(spacedLower);
+      this.validScaleInputs.add(unspacedLower);
+      
+      // Generate all chord input variations (28 per key: 7 degrees × 4 variations)
+      for (let degree = 1; degree <= 7; degree++) {
+        const chord = keyData.seventhSpelling[degree.toString()];
+        const chordSpaced = chord.join(' ');
+        const chordUnspaced = chord.join('');
+        const chordSpacedLower = chordSpaced.toLowerCase();
+        const chordUnspacedLower = chordUnspaced.toLowerCase();
+        
+        this.validChordInputs.add(chordSpaced);
+        this.validChordInputs.add(chordUnspaced);
+        this.validChordInputs.add(chordSpacedLower);
+        this.validChordInputs.add(chordUnspacedLower);
+      }
+    });
+    
+    console.log(`✅ Generated ${this.validScaleInputs.size} valid scale inputs`);
+    console.log(`✅ Generated ${this.validChordInputs.size} valid chord inputs`);
+    console.log(`✅ Total valid inputs: ${this.validScaleInputs.size + this.validChordInputs.size}`);
   }
 
   validateAnswer(userAnswer, question) {
@@ -68,85 +113,70 @@ export class AnswerValidator {
     return window.normalizeAccList(userAnswer) === window.normalizeAccList(keyData.notes);
   }
 
-  validateScaleSpelling(userAnswer, keyData) {
-    // Apply accidentalToUnicode to BOTH correct scale and user input for consistent comparison
-    const correctScale = keyData.scale
-      .map(window.accidentalToUnicode)
-      .join('')
-      .toUpperCase();
+  /**
+   * Normalize input for consistent matching using existing chord normalization
+   * This handles case, accidentals, and spacing consistently
+   */
+  normalizeInput(input) {
+    const trimmed = input.trim();
     
-    // Handle both spaced input ("c d e f g a b") and unspaced input ("cdefgab")
-    let userNotes;
-    if (userAnswer.trim().includes(' ')) {
-      // Space-separated input
-      userNotes = userAnswer.trim().split(/\s+/);
-    } else {
-      // Continuous input - parse notes with accidentals properly
-      userNotes = this.parseUnspacedInput(userAnswer.trim());
+    // Handle spaced input: normalize each note separately
+    if (trimmed.includes(' ')) {
+      return trimmed.split(/\s+/)
+        .map(note => window.normalizeChord(note))
+        .join(' ');
     }
     
-    const userScale = userNotes
-      .map(window.accidentalToUnicode)
-      .join('')
-      .toUpperCase();
-    
-    return userScale === correctScale;
+    // Handle unspaced input: try to split and normalize each note
+    // For simple cases, just normalize the whole string
+    return window.normalizeChord(trimmed);
   }
 
   /**
-   * Parse unspaced musical input into individual notes with accidentals
-   * Conservative approach: only handles double letters and explicit symbols
+   * Validate scale spelling using finite set lookup with case normalization
+   * Simple lowercase conversion to match finite set entries
    */
-  parseUnspacedInput(input) {
-    const notes = [];
-    let i = 0;
+  validateScaleSpelling(userAnswer, keyData) {
+    const trimmedInput = userAnswer.trim();
     
-    while (i < input.length) {
-      const char = input[i];
-      
-      if (/[a-gA-G]/.test(char)) {
-        let note = char;
-        let j = i + 1;
-        
-        // Look ahead to collect accidentals
-        while (j < input.length) {
-          const nextChar = input[j];
-          
-          // Only handle double letters (bb, BB, Bb, bB) and explicit symbols
-          if ((nextChar === 'b' || nextChar === 'B') && char.toLowerCase() === nextChar.toLowerCase()) {
-            // Same letter doubled = flat
-            note += nextChar;
-            j++;
-          }
-          // Special case: E-flat (Eb, eb, EB, eB) - very common and unambiguous
-          else if ((nextChar === 'b' || nextChar === 'B') && char.toLowerCase() === 'e') {
-            note += nextChar;
-            j++;
-          }
-          // Handle explicit sharp/flat symbols  
-          else if (/[#♯♭𝄪𝄫x]/u.test(nextChar)) {
-            note += nextChar;
-            j++;
-          }
-          // Stop at next note letter
-          else if (/[a-gA-G]/.test(nextChar)) {
-            break;
-          }
-          // Skip unknown characters
-          else {
-            j++;
-          }
-        }
-        
-        notes.push(note);
-        i = j;
-      } else {
-        // Skip unknown characters
-        i++;
-      }
-    }
+    // Simple case normalization to match finite set (which contains simple lowercase)
+    const normalizedInput = trimmedInput.toLowerCase();
     
-    return notes;
+    // Check if normalized input matches any valid scale input
+    const isValid = this.validScaleInputs.has(normalizedInput);
+    
+    console.log('🎼 Scale Validation:', {
+      userAnswer: trimmedInput,
+      normalizedInput,
+      isValid,
+      matchedFromFiniteSet: isValid
+    });
+    
+    return isValid;
+  }
+
+  /**
+   * Validate chord spelling using finite set lookup with case normalization
+   * Simple lowercase conversion to match finite set entries
+   */
+  validateChordSpelling(userAnswer, keyData, degree) {
+    const trimmedInput = userAnswer.trim();
+    
+    // Simple case normalization to match finite set (which contains simple lowercase)
+    const normalizedInput = trimmedInput.toLowerCase();
+    
+    // Check if normalized input matches any valid chord input
+    const isValid = this.validChordInputs.has(normalizedInput);
+    
+    console.log('🎵 Chord Spelling Validation:', {
+      userAnswer: trimmedInput,
+      normalizedInput,
+      degree,
+      isValid,
+      matchedFromFiniteSet: isValid
+    });
+    
+    return isValid;
   }
 
   validateChordNaming(userAnswer, keyData, chordType, degree) {
@@ -163,20 +193,5 @@ export class AnswerValidator {
     
     return window.normalizeChord(userAnswer).toUpperCase() === 
            window.normalizeChord(expected).toUpperCase();
-  }
-
-  validateChordSpelling(userAnswer, keyData, degree) {
-    const correctSpelling = keyData.seventhSpelling[degree]
-      .map(window.accidentalToUnicode)
-      .map(n => n.toUpperCase())
-      .join('');
-    
-    const userSpelling = userAnswer.trim()
-      .split(/\s+/)
-      .map(window.accidentalToUnicode)
-      .join('')
-      .toUpperCase();
-    
-    return userSpelling === correctSpelling;
   }
 } 
