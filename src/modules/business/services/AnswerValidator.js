@@ -81,8 +81,8 @@ export class AnswerValidator {
       // Space-separated input
       userNotes = userAnswer.trim().split(/\s+/);
     } else {
-      // Continuous input - split into individual characters for natural notes
-      userNotes = userAnswer.trim().split('').filter(c => /[a-gA-G]/.test(c));
+      // Continuous input - parse notes with accidentals properly
+      userNotes = this.parseUnspacedInput(userAnswer.trim());
     }
     
     const userScale = userNotes
@@ -90,14 +90,63 @@ export class AnswerValidator {
       .join('')
       .toUpperCase();
     
-    console.log('🎼 Scale Validation:', {
-      correctScale,
-      userScale,
-      userAnswer,
-      userNotes
-    });
-    
     return userScale === correctScale;
+  }
+
+  /**
+   * Parse unspaced musical input into individual notes with accidentals
+   * Conservative approach: only handles double letters and explicit symbols
+   */
+  parseUnspacedInput(input) {
+    const notes = [];
+    let i = 0;
+    
+    while (i < input.length) {
+      const char = input[i];
+      
+      if (/[a-gA-G]/.test(char)) {
+        let note = char;
+        let j = i + 1;
+        
+        // Look ahead to collect accidentals
+        while (j < input.length) {
+          const nextChar = input[j];
+          
+          // Only handle double letters (bb, BB, Bb, bB) and explicit symbols
+          if ((nextChar === 'b' || nextChar === 'B') && char.toLowerCase() === nextChar.toLowerCase()) {
+            // Same letter doubled = flat
+            note += nextChar;
+            j++;
+          }
+          // Special case: E-flat (Eb, eb, EB, eB) - very common and unambiguous
+          else if ((nextChar === 'b' || nextChar === 'B') && char.toLowerCase() === 'e') {
+            note += nextChar;
+            j++;
+          }
+          // Handle explicit sharp/flat symbols  
+          else if (/[#♯♭𝄪𝄫x]/u.test(nextChar)) {
+            note += nextChar;
+            j++;
+          }
+          // Stop at next note letter
+          else if (/[a-gA-G]/.test(nextChar)) {
+            break;
+          }
+          // Skip unknown characters
+          else {
+            j++;
+          }
+        }
+        
+        notes.push(note);
+        i = j;
+      } else {
+        // Skip unknown characters
+        i++;
+      }
+    }
+    
+    return notes;
   }
 
   validateChordNaming(userAnswer, keyData, chordType, degree) {
