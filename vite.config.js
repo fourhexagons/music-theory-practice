@@ -51,6 +51,9 @@ export default defineConfig({
     }
   },
   
+  // Use clean public directory to prevent legacy files from being included
+  publicDir: 'public-clean',
+  
   // Development server settings
   server: {
     port: 5173, // Standard Vite default port
