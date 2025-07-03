@@ -1,6 +1,6 @@
 {
   "name": "music-theory-practice",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "A web-based music theory practice application",
   "type": "module",
   "scripts": {
