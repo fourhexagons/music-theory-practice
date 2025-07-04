@@ -51,7 +51,9 @@ export class AnswerForm {
   showFeedback(message, type = 'neutral') {
     if (this.feedback) {
       this.feedback.textContent = message;
-      this.feedback.className = `feedback ${type}`;
+      // Preserve existing classes and add feedback classes
+      const existingClasses = Array.from(this.feedback.classList).filter(cls => !cls.startsWith('feedback'));
+      this.feedback.className = `feedback ${type} ${existingClasses.join(' ')}`.trim();
       
       // Announce feedback to screen readers
       if (window.accessibilityManager && message) {

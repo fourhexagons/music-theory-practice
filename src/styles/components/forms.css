@@ -26,8 +26,8 @@
 
 /* Input styles */
 #answer-input {
-  background-color: var(--ds-input-bg) !important;
-  color: var(--ds-text-secondary) !important;
+  background-color: var(--ds-input-bg);
+  color: var(--ds-text-secondary);
   border: 1px solid transparent;
   border-radius: var(--border-radius-none);
   padding: var(--spacing-md) var(--spacing-lg);

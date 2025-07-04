@@ -94,14 +94,17 @@ export class AppController {
   setupUI() {
     // Render the practice layout
     this.layout.renderPracticeLayout();
-    
+
+    // Re-initialize the practice menu to restore event bindings
+    if (window.PracticeMenu) {
+      window.practiceMenu = new window.PracticeMenu();
+    }
+
     // Initialize UI components
     this.questionDisplay = new QuestionDisplay();
     this.answerForm = new AnswerForm();
-    
     // Set up answer submission handler
     this.answerForm.setSubmitHandler((answer) => this.handleAnswerSubmit(answer));
-    
     // Expose global functions for menu system compatibility
     this.exposeGlobalFunctions();
   }

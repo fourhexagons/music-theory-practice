@@ -132,12 +132,6 @@ export default defineConfig({
   
   // CSS processing
   css: {
-    postcss: {
-      plugins: [
-        autoprefixer
-      ]
-    },
-    // CSS code splitting
     devSourcemap: true
   },
   

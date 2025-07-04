@@ -141,16 +141,17 @@
   --feedback-incorrect: var(--ds-feedback-error);
 }
 
-/* FORCE BODY BACKGROUND - Multiple fallbacks to prevent white flash */
+/* Body background - removed !important to allow Tailwind overrides */
 html {
-  background-color: #555555 !important;
+  background-color: #555555;
 }
 
 body {
-  background-color: var(--ds-bg-primary, #555555) !important;
+  background-color: var(--ds-bg-primary, #555555);
 }
 
 /* COMPLETE FOCUS OUTLINE REMOVAL - No accessibility indicators */
+/*
 *:focus, 
 *:focus-visible, 
 *:focus-within, 
@@ -175,9 +176,10 @@ a:focus-visible,
   border-color: transparent !important;
   -webkit-focus-ring-color: transparent !important;
 }
+*/
 
-/* FORCE INPUT BACKGROUND ON FOCUS - Prevent white background */
+/* Input background on focus - removed !important to allow Tailwind overrides */
 #answer-input:focus,
 input:focus {
-  background-color: var(--ds-input-bg) !important;
+  background-color: var(--ds-input-bg);
 } 

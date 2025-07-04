@@ -14,20 +14,20 @@ export class AppLayout {
     }
 
     this.container.innerHTML = `
-      <header class="app-header">
+      <header class="flex justify-center items-center relative pb-12">
         <a href="/" class="logo-link" aria-label="Return to home">
           <img src="/images/lb-loop-logo-white-on-trans.png" alt="Music Theory Practice Logo" class="app-logo">
         </a>
       </header>
-      <main class="main-content">
-        <section class="quiz-section" role="main" aria-label="Practice questions">
+      <main class="flex-1 flex flex-col items-center justify-start pt-24 w-full">
+        <section class="w-full max-w-2xl text-center mb-24" role="main" aria-label="Practice questions">
           <div class="question-display" 
                id="question-display" 
                role="region" 
                aria-live="polite" 
                aria-label="Current question"></div>
-          <div class="answer-container">
-            <form id="answer-form" role="form" aria-label="Answer submission">
+          <div class="answer-container flex flex-col items-center gap-2 w-full max-w-2xl">
+            <form id="answer-form" role="form" aria-label="Answer submission" class="flex gap-2 items-center justify-center w-full max-w-2xl mb-6">
               <label for="answer-input" class="sr-only">Your answer</label>
               <input type="text" 
                      id="answer-input" 

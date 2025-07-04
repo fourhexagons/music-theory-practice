@@ -109,7 +109,7 @@ function renderAppLayout() {
         <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
       </a>
     </header>
-    <div class="main-content">
+    <div class="main-content border-8 border-blue-500 bg-blue-500"> <!-- tailwind-jit-trigger -->
       <div class="quiz-section">
         <div class="question-display" id="question-display"></div>
         <div class="answer-container">
