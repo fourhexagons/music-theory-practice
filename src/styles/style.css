@@ -94,75 +94,11 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   margin-bottom: var(--spacing-4xl);
 }
 
-/* Question display */
-.question-display {
-  font-size: clamp(var(--ds-question-font-size-min), 6vw, var(--ds-question-font-size-max));
-  margin-bottom: var(--ds-question-margin-bottom);
-  color: var(--ds-question-text);
-  font-weight: 500;
-  line-height: var(--ds-question-line-height);
-  text-align: center;
-}
+/* Question display - migrated to Tailwind classes */
 
-/* Form elements */
-.answer-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--ds-space-component-xs);
-  width: 100%;
-  max-width: 50rem;
-}
+/* Form elements - migrated to Tailwind classes */
 
-#answer-form {
-  display: flex;
-  gap: var(--ds-space-component-sm);
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 50rem;
-  margin-bottom: var(--ds-space-component-lg);
-}
-
-#answer-input {
-  background-color: var(--ds-input-bg);
-  color: var(--ds-text-secondary);
-  border: none;
-  border-radius: 0;
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: 1.125rem;
-  font-family: inherit;
-  font-weight: 400;
-  outline: none;
-  width: 25rem;
-}
-
-#answer-input::placeholder {
-  color: var(--ds-input-placeholder);
-  opacity: 1;
-}
-
-/* Buttons */
-.btn {
-  background-color: var(--ds-button-bg);
-  color: var(--ds-text-primary);
-  border: none;
-  border-radius: 0;
-  padding: var(--spacing-md) 3.5rem;
-  font-size: 1.125rem;
-  font-family: inherit;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  min-width: 14rem;
-}
-
-.btn:hover {
-  background-color: var(--ds-button-bg-hover);
-}
+/* Buttons - migrated to Tailwind classes */
 
 /* Advanced Practice Section */
 #advanced-practice-root {
@@ -199,19 +135,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   margin: 0 auto;
 }
 
-/* Feedback */
-.feedback {
-  min-height: 1.5em;
-  margin-top: 0.5em;
-  color: #d32f2f; /* error color, can be overridden for success */
-  transition: color 0.2s;
-  display: block;
-}
-
-.feedback.incorrect { 
-  color: var(--feedback-incorrect); 
-  margin-bottom: var(--spacing-xs);
-}
+/* Feedback - migrated to Tailwind classes */
 
 /* Responsive Design */
 @media (max-width: 48rem) {
@@ -290,23 +214,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   h4 { font-size: 1.125rem; }
 }
 
-/* Landing page */
-.landing-section {
-  text-align: center;
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  padding: var(--spacing-2xl) 0;
-}
-
-.landing-section h1 {
-  margin-bottom: var(--spacing-lg);
-}
-
-.landing-section p {
-  font-size: 1.25rem;
-  margin-bottom: var(--spacing-4xl);
-  opacity: 0.9;
-}
+/* Landing page - migrated to Tailwind classes */
 
 /* Practice Menu Overlay Styles */
 .practice-menu-overlay {

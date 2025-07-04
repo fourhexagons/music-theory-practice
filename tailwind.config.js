@@ -16,7 +16,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ...colors,
+        // Use modern color names to silence warnings
+        gray: colors.gray,
+        blue: colors.blue,
+        green: colors.green,
+        red: colors.red,
         // Semantic tokens and custom colors
         'ds-bg-primary': '#555555',
         'ds-bg-secondary': '#666666',

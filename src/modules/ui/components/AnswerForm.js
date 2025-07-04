@@ -51,9 +51,19 @@ export class AnswerForm {
   showFeedback(message, type = 'neutral') {
     if (this.feedback) {
       this.feedback.textContent = message;
-      // Preserve existing classes and add feedback classes
-      const existingClasses = Array.from(this.feedback.classList).filter(cls => !cls.startsWith('feedback'));
-      this.feedback.className = `feedback ${type} ${existingClasses.join(' ')}`.trim();
+      
+      // Base Tailwind classes for feedback
+      const baseClasses = 'text-xl min-h-5 mt-2 font-normal transition-colors duration-150 ease-in-out block empty:mt-0';
+      
+      // Type-specific color classes
+      let colorClass = 'text-white'; // neutral default
+      if (type === 'correct') {
+        colorClass = 'text-green-400';
+      } else if (type === 'incorrect') {
+        colorClass = 'text-red-400 mb-2';
+      }
+      
+      this.feedback.className = `${baseClasses} ${colorClass}`;
       
       // Announce feedback to screen readers
       if (window.accessibilityManager && message) {
@@ -65,7 +75,7 @@ export class AnswerForm {
   clearFeedback() {
     if (this.feedback) {
       this.feedback.textContent = '';
-      this.feedback.className = 'feedback';
+      this.feedback.className = 'text-xl min-h-5 mt-2 font-normal text-white transition-colors duration-150 ease-in-out block empty:mt-0';
     }
   }
 

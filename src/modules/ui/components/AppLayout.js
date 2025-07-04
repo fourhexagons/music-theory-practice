@@ -21,7 +21,7 @@ export class AppLayout {
       </header>
       <main class="flex-1 flex flex-col items-center justify-start pt-24 w-full">
         <section class="w-full max-w-2xl text-center mb-24" role="main" aria-label="Practice questions">
-          <div class="question-display" 
+          <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center" 
                id="question-display" 
                role="region" 
                aria-live="polite" 
@@ -34,15 +34,16 @@ export class AppLayout {
                      placeholder="Your answer..." 
                      autocomplete="off"
                      aria-describedby="feedback"
-                     aria-label="Enter your answer">
+                     aria-label="Enter your answer"
+                     class="bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none w-96 placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
               <button type="submit" 
                       id="submit-btn" 
-                      class="btn"
+                      class="bg-gray-700 hover:bg-gray-800 text-white border border-gray-700 hover:border-gray-800 rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-gray-700 disabled:hover:border-gray-700 disabled:hover:transform-none"
                       aria-describedby="answer-input">
                 Submit
               </button>
             </form>
-            <div class="feedback" 
+            <div class="text-xl min-h-5 mt-2 font-normal text-white transition-colors duration-150 ease-in-out block empty:mt-0" 
                  id="feedback" 
                  role="status" 
                  aria-live="polite"
@@ -60,14 +61,14 @@ export class AppLayout {
     }
 
     this.container.innerHTML = `
-      <header class="app-header">
-        <img src="/images/lb-loop-logo-white-on-trans.png" alt="Music Theory Practice Logo" class="app-logo">
+      <header class="flex justify-center items-center relative pb-12">
+        <img src="/images/lb-loop-logo-white-on-trans.png" alt="Music Theory Practice Logo" class="h-20 w-auto z-10">
       </header>
-      <main class="main-content">
-        <section class="landing-section" role="main">
-          <h1>Music Theory Practice</h1>
-          <p>Master key signatures, scales, triads, and seventh chords through interactive exercises.</p>
-          <a href="/practice" class="btn" role="button">Start Practice</a>
+      <main class="flex-1 flex flex-col items-center justify-start pt-24">
+        <section class="text-center max-w-2xl" role="main">
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-medium leading-tight mb-4">Music Theory Practice</h1>
+          <p class="text-lg md:text-xl mb-8 leading-relaxed">Master key signatures, scales, triads, and seventh chords through interactive exercises.</p>
+          <a href="/practice" class="bg-gray-700 hover:bg-gray-800 text-white border border-gray-700 hover:border-gray-800 rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5" role="button">Start Practice</a>
         </section>
       </main>
     `;
