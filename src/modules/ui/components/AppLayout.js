@@ -68,6 +68,7 @@ export class AppLayout {
         <section class="text-center max-w-2xl" role="main">
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-medium leading-tight mb-4">Music Theory Practice</h1>
           <p class="text-lg md:text-xl mb-8 leading-relaxed">Master key signatures, scales, triads, and seventh chords through interactive exercises.</p>
+          <!-- Ensure the Start Practice button is always present and styled -->
           <a href="/practice" class="bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5" role="button">Start Practice</a>
         </section>
       </main>
