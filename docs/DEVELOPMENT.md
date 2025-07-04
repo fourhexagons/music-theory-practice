@@ -427,7 +427,7 @@ music-theory-practice/
 ├── src/                    # Current system
 │   ├── practice.html       # Main application
 │   ├── index.html          # Landing page
-│   ├── styles/             # Styling (modern CSS architecture)
+│   ├── styles/             # Styling (Tailwind CSS + design system)
 │   ├── modules/            # Modular business logic
 │   │   ├── business/       # Core services and utilities
 │   │   └── ui/             # UI components and controllers
@@ -438,6 +438,28 @@ music-theory-practice/
 ├── archive/                # Legacy files (tests, debug scripts)
 └── README.md               # User-facing documentation
 ```
+
+## 🎨 Styling Architecture
+
+### **Tailwind CSS Integration**
+The app uses **Tailwind CSS** for utility-first styling with a custom design system:
+
+- **Primary Styling**: Tailwind utility classes for layout, spacing, colors, and typography
+- **Design System**: Custom CSS variables and semantic tokens for consistent theming
+- **Component Styling**: Tailwind classes applied directly in component templates
+- **Responsive Design**: Tailwind's responsive prefixes (`md:`, `lg:`) for mobile-first design
+
+### **Styling Approach**
+- **Utility-First**: Use Tailwind classes for most styling needs
+- **Design Tokens**: Custom CSS variables for semantic colors and spacing
+- **Component Migration**: Legacy CSS classes are being migrated to Tailwind utilities
+- **Accessibility**: Maintained focus states and screen reader support
+
+### **Key Styling Files**
+- `src/styles/style.css` - Main stylesheet with Tailwind directives
+- `src/styles/design-system.css` - Design tokens and semantic variables
+- `tailwind.config.js` - Tailwind configuration with custom theme
+- Component files - Tailwind classes applied directly in templates
 
 ## 🔧 Key Functions
 

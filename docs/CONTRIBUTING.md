@@ -60,9 +60,11 @@ This methodology successfully identified complex bugs that traditional approache
 - **Validate inputs** thoroughly
 
 ### CSS Standards
-- **Use meaningful class names**
-- **Keep styles modular**
-- **Follow the existing design system**
+- **Use Tailwind utility classes** for most styling needs
+- **Follow the design system** for semantic colors and spacing
+- **Apply classes directly in templates** rather than separate CSS files
+- **Use responsive prefixes** (`md:`, `lg:`) for mobile-first design
+- **Maintain accessibility** with proper focus states and screen reader support
 
 ### HTML Standards
 - **Use semantic elements**
