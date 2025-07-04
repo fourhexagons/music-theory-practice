@@ -38,7 +38,7 @@ export class AppLayout {
                      class="bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none w-96 placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
               <button type="submit" 
                       id="submit-btn" 
-                      class="bg-gray-700 hover:bg-gray-800 text-white border border-gray-700 hover:border-gray-800 rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-gray-700 disabled:hover:border-gray-700 disabled:hover:transform-none"
+                      class="bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-ds-interactive-primary disabled:hover:border-ds-interactive-primary disabled:hover:transform-none"
                       aria-describedby="answer-input">
                 Submit
               </button>
@@ -68,7 +68,7 @@ export class AppLayout {
         <section class="text-center max-w-2xl" role="main">
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-medium leading-tight mb-4">Music Theory Practice</h1>
           <p class="text-lg md:text-xl mb-8 leading-relaxed">Master key signatures, scales, triads, and seventh chords through interactive exercises.</p>
-          <a href="/practice" class="bg-gray-700 hover:bg-gray-800 text-white border border-gray-700 hover:border-gray-800 rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5" role="button">Start Practice</a>
+          <a href="/practice" class="bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5" role="button">Start Practice</a>
         </section>
       </main>
     `;
