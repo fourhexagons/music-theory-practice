@@ -1,7 +1,4 @@
 @import './design-system.css';
-@import './components/ds-button.css';
-@import './components/ds-input.css';
-@import './components/ds-feedback.css';
 
 @tailwind base;
 @tailwind components;
