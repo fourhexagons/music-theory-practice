@@ -17,18 +17,18 @@
     },
     {
       "target": "staging",
-      "public": "dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "/practice",
-          "destination": "/practice.html"
-        }
-      ]
-    }
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/practice",
+        "destination": "/practice.html"
+      }
+    ]
+  }
   ]
 }
