@@ -178,8 +178,4 @@ a:focus-visible,
 }
 */
 
-/* Input background on focus - removed !important to allow Tailwind overrides */
-#answer-input:focus,
-input:focus {
-  background-color: var(--ds-input-bg);
-} 
+/* Input background on focus - removed to allow Tailwind to control all input styling */ 

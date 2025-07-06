@@ -20,14 +20,14 @@ export class AppLayout {
         </a>
       </header>
       <main class="flex-1 flex flex-col items-center justify-start pt-24 w-full">
-        <section class="w-full max-w-2xl text-center mb-24" role="main" aria-label="Practice questions">
-          <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center" 
-               id="question-display" 
-               role="region" 
-               aria-live="polite" 
-               aria-label="Current question"></div>
-          <div class="answer-container flex flex-col items-center gap-2 w-full max-w-2xl">
-            <form id="answer-form" role="form" aria-label="Answer submission" class="flex gap-2 items-center justify-center w-full max-w-2xl mb-6">
+        <section class="flex items-center justify-center w-full mb-24" role="main" aria-label="Practice questions">
+          <div class="w-full max-w-2xl mx-auto">
+            <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center" 
+                 id="question-display" 
+                 role="region" 
+                 aria-live="polite" 
+                 aria-label="Current question"></div>
+            <form id="answer-form" role="form" aria-label="Answer submission" class="w-full block flex flex-col md:flex-row gap-2 mb-6">
               <label for="answer-input" class="sr-only">Your answer</label>
               <input type="text" 
                      id="answer-input" 
@@ -35,10 +35,10 @@ export class AppLayout {
                      autocomplete="off"
                      aria-describedby="feedback"
                      aria-label="Enter your answer"
-                     class="bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none w-96 placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
+                     class="flex-1 min-w-0 w-full md:w-auto bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
               <button type="submit" 
                       id="submit-btn" 
-                      class="bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-14 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-decoration-none inline-block text-center min-w-56 outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-ds-interactive-primary disabled:hover:border-ds-interactive-primary disabled:hover:transform-none"
+                      class="w-full md:w-40 shrink-0 bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-8 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-center outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
                       aria-describedby="answer-input">
                 Submit
               </button>

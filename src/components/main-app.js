@@ -180,12 +180,15 @@ function updateQuestionUI(text, clearInput = true) {
   const questionDisplay = document.getElementById('question-display');
   const answerInput = document.getElementById('answer-input');
   const feedback = document.getElementById('feedback');
+  const answerForm = document.getElementById('answer-form');
   
   if (getCurrentLevel().mode === MODES.COMPLETE) {
       questionDisplay.textContent = 'Congratulations! You have completed all levels.';
-      document.getElementById('answer-form').style.display = 'none';
+      // Use Tailwind classes instead of inline styles
+      answerForm.classList.add('hidden');
   } else {
-      document.getElementById('answer-form').style.display = 'flex';
+      // Use Tailwind classes instead of inline styles
+      answerForm.classList.remove('hidden');
       questionDisplay.textContent = text;
       if (clearInput) {
         answerInput.value = '';

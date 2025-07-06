@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Verification Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #555555;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Test the exact same structure as your app */
+        .test-container {
+            border: 2px solid #89ff89;
+            margin: 20px;
+            padding: 20px;
+        }
+        
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+        }
+        
+        .success { color: #89ff89; }
+        .error { color: #ff8989; }
+        .info { color: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2>Layout Verification Test</h2>
+        <p>This test uses the exact same structure as your app to verify the layout fix.</p>
+        
+        <!-- Your exact app structure -->
+        <header class="flex justify-center items-center relative pb-12">
+            <a href="/" class="logo-link" aria-label="Return to home">
+                <span>LOGO</span>
+            </a>
+        </header>
+        <main class="flex-1 flex flex-col items-center justify-start pt-24 w-full">
+            <section class="flex items-center justify-center w-full mb-24" role="main" aria-label="Practice questions">
+                <div class="w-full max-w-2xl mx-auto">
+                    <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center" 
+                         id="question-display" 
+                         role="region" 
+                         aria-live="polite" 
+                         aria-label="Current question">What is the root of C major?</div>
+                    <form id="answer-form" role="form" aria-label="Answer submission" class="w-full block flex flex-col md:flex-row gap-2 mb-6">
+                        <label for="answer-input" class="sr-only">Your answer</label>
+                        <input type="text" 
+                               id="answer-input" 
+                               placeholder="Your answer..." 
+                               autocomplete="off"
+                               aria-describedby="feedback"
+                               aria-label="Enter your answer"
+                               class="flex-1 min-w-0 w-full md:w-auto bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
+                        <button type="submit" 
+                                id="submit-btn" 
+                                class="w-full md:w-40 shrink-0 bg-gray-800 hover:bg-gray-700 text-white border border-gray-800 hover:border-gray-700 rounded-none px-8 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-center outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed">
+                            Submit
+                        </button>
+                    </form>
+                    <div class="text-xl min-h-5 mt-2 font-normal text-white transition-colors duration-150 ease-in-out block empty:mt-0" 
+                         id="feedback" 
+                         role="status" 
+                         aria-live="polite"
+                         aria-label="Answer feedback"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="test-result">
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function runVerificationTest() {
+            const results = [];
+            
+            // Test 1: Check if elements exist
+            const form = document.getElementById('answer-form');
+            const input = document.getElementById('answer-input');
+            const button = document.getElementById('submit-btn');
+            
+            if (!form || !input || !button) {
+                results.push({ type: 'error', message: 'Form elements not found' });
+                return results;
+            }
+            
+            results.push({ type: 'success', message: 'All form elements found' });
+            
+            // Test 2: Check computed styles
+            const formStyle = window.getComputedStyle(form);
+            const inputStyle = window.getComputedStyle(input);
+            const buttonStyle = window.getComputedStyle(button);
+            
+            // Test 3: Check if elements are full width on mobile
+            const isMobile = window.innerWidth < 768;
+            
+            if (isMobile) {
+                const formWidth = formStyle.width;
+                const inputWidth = inputStyle.width;
+                const buttonWidth = buttonStyle.width;
+                
+                results.push({ type: 'info', message: `Mobile view (${window.innerWidth}px):` });
+                results.push({ type: 'info', message: `  Form width: ${formWidth}` });
+                results.push({ type: 'info', message: `  Input width: ${inputWidth}` });
+                results.push({ type: 'info', message: `  Button width: ${buttonWidth}` });
+                
+                // Check if they're full width
+                const containerWidth = window.innerWidth - 40; // Account for padding
+                const isFormFullWidth = formWidth === `${containerWidth}px` || formWidth === '100%';
+                const isInputFullWidth = inputWidth === `${containerWidth}px` || inputWidth === '100%';
+                const isButtonFullWidth = buttonWidth === `${containerWidth}px` || buttonWidth === '100%';
+                
+                if (isFormFullWidth && isInputFullWidth && isButtonFullWidth) {
+                    results.push({ type: 'success', message: '✅ Mobile layout: All elements are full width' });
+                } else {
+                    results.push({ type: 'error', message: '❌ Mobile layout: Elements are not full width' });
+                }
+            } else {
+                // Test 4: Check desktop layout
+                results.push({ type: 'info', message: `Desktop view (${window.innerWidth}px):` });
+                results.push({ type: 'info', message: `  Form display: ${formStyle.display}` });
+                results.push({ type: 'info', message: `  Form flex-direction: ${formStyle.flexDirection}` });
+                results.push({ type: 'info', message: `  Input flex: ${inputStyle.flex}` });
+                results.push({ type: 'info', message: `  Button width: ${buttonStyle.width}` });
+                
+                // Check if input is flexible and button is fixed width
+                const isInputFlexible = inputStyle.flex !== 'none' && inputStyle.flex !== '0 0 auto';
+                const isButtonFixedWidth = buttonStyle.width === '160px' || buttonStyle.width === '10rem';
+                
+                if (isInputFlexible && isButtonFixedWidth) {
+                    results.push({ type: 'success', message: '✅ Desktop layout: Input flexible, button fixed width' });
+                } else {
+                    results.push({ type: 'error', message: '❌ Desktop layout: Layout not working correctly' });
+                }
+            }
+            
+            // Test 5: Check if elements are shrinking to content
+            const formRect = form.getBoundingClientRect();
+            const inputRect = input.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+            
+            const containerRect = form.parentElement.getBoundingClientRect();
+            
+            const formUsesFullWidth = formRect.width >= containerRect.width * 0.9; // 90% of container
+            const inputUsesAvailableSpace = inputRect.width >= containerRect.width * 0.6; // 60% of container on desktop
+            const buttonHasReasonableWidth = buttonRect.width >= 120; // At least 120px
+            
+            if (formUsesFullWidth && inputUsesAvailableSpace && buttonHasReasonableWidth) {
+                results.push({ type: 'success', message: '✅ Elements are not shrinking to content width' });
+            } else {
+                results.push({ type: 'error', message: '❌ Elements are shrinking to content width' });
+                results.push({ type: 'info', message: `  Form: ${formRect.width}px vs container: ${containerRect.width}px` });
+                results.push({ type: 'info', message: `  Input: ${inputRect.width}px` });
+                results.push({ type: 'info', message: `  Button: ${buttonRect.width}px` });
+            }
+            
+            return results;
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = results.map(result => 
+                `<div class="${result.type}">${result.message}</div>`
+            ).join('');
+        }
+        
+        // Run test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const results = runVerificationTest();
+                displayResults(results);
+            }, 100);
+        });
+        
+        // Run test on resize
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                const results = runVerificationTest();
+                displayResults(results);
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

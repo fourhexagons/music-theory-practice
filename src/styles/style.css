@@ -85,8 +85,6 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 }
 
 .quiz-section {
-  width: 100%;
-  max-width: var(--max-width-content);
   text-align: center;
   margin-bottom: var(--spacing-4xl);
 }
@@ -154,18 +152,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
     margin-bottom: var(--spacing-xl);
   }
 
-  #answer-form, .practice-controls {
-    flex-direction: column;
-    gap: var(--ds-space-component-sm);
-  }
-  
-  .ds-input,
-  .ds-button,
-  #answer-input,
-  .btn {
-    width: 100%;
-    min-width: 0;
-  }
+  /* Removed legacy form/button styles to allow Tailwind to control layout and width */
   
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
@@ -189,21 +176,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
     margin-bottom: var(--spacing-xl);
   }
 
-  #answer-form, .practice-controls {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    width: 100%;
-  }
-  
-  #answer-input, #submit-btn {
-    width: 100%;
-    min-width: 0;
-  }
-  
-  .practice-controls .btn {
-    width: 25rem;
-    min-width: 0;
-  }
+  /* Removed legacy form/button styles to allow Tailwind to control layout and width */
   
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }

@@ -19,12 +19,7 @@ body {
 }
 
 /* Main containers */
-#app-container {
-  position: relative;
-  padding: var(--spacing-2xl);
-  max-width: var(--max-width-container);
-  margin: 0 auto;
-}
+/* #app-container rule moved to style.css to avoid conflicts */
 
 .main-content {
   padding-top: 10vh;
@@ -35,8 +30,6 @@ body {
 }
 
 .quiz-section {
-  width: 100%;
-  max-width: var(--max-width-content);
   text-align: center;
 }
 
