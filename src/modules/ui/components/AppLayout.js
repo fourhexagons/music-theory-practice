@@ -38,7 +38,6 @@ export class AppLayout {
                    autocomplete="off"
                    aria-describedby="feedback"
                    aria-label="Enter your answer"
-                   style="width: 100%; flex: 1 1 0%; min-width: 0;"
                    class="bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
             <button type="submit" 
                     id="submit-btn" 
@@ -56,30 +55,11 @@ export class AppLayout {
       </main>
     `;
     
-    // Apply responsive width via JavaScript
-    const input = document.getElementById('answer-input');
-    if (input) {
-      const applyResponsiveWidth = () => {
-        if (window.innerWidth >= 768) {
-          input.style.width = '640px';
-          input.style.flex = 'none';
-        } else {
-          input.style.width = '100%';
-          input.style.flex = '1 1 0%';
-        }
-      };
-      
-      // Apply immediately
-      applyResponsiveWidth();
-      
-      // Apply on resize
-      window.addEventListener('resize', applyResponsiveWidth);
-    }
-    
     console.log('✅ AppLayout.renderPracticeLayout: innerHTML set successfully');
     
     // Verify the form was created with correct classes
     const form = document.getElementById('answer-form');
+    const input = document.getElementById('answer-input');
     const button = document.getElementById('submit-btn');
     
     if (form) {

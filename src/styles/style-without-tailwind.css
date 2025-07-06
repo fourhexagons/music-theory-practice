@@ -48,6 +48,34 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   min-height: 100vh;
 }
 
+/* Custom input width for 640px target */
+#answer-input {
+  width: 100%;
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  /* Set combined width of form elements to 640px total */
+  #answer-form {
+    width: 640px;
+    margin: 0 auto;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  /* Input takes most space, button stays fixed at 160px */
+  #answer-input {
+    width: 472px; /* 640px - 160px - 8px gap = 472px */
+    flex: none;
+  }
+  
+  #submit-btn {
+    width: 160px;
+    flex: none;
+  }
+}
+
 .app-header {
   display: flex;
   justify-content: center;
