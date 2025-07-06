@@ -102,7 +102,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         maximumFileSizeToCacheInBytes: 3000000,
         // Force cache invalidation by updating cache name
-        cacheId: 'music-theory-v2-' + Date.now(),
+        cacheId: 'music-theory-v3-' + Date.now(),
+        // Skip waiting to immediately activate new service worker
+        skipWaiting: true,
+        clientsClaim: true,
         // Add the copied root files to precache manifest
         additionalManifestEntries: [
           { url: 'index.html', revision: null },
