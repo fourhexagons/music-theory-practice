@@ -205,13 +205,14 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: var(--ds-space-component-sm);
+    width: 100% !important; /* Force full width on mobile - production fix */
   }
   
   .ds-input,
   .ds-button,
   #answer-input,
   .btn {
-    width: 100%;
+    width: 100% !important; /* Force full width on mobile - production fix */
     min-width: 0;
   }
   
@@ -240,11 +241,11 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: var(--spacing-sm);
-    width: 100%;
+    width: 100% !important; /* Force full width on mobile - production fix */
   }
   
   #answer-input, #submit-btn {
-    width: 100%;
+    width: 100% !important; /* Force full width on mobile - production fix */
     min-width: 0;
   }
   
