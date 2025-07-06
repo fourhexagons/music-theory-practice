@@ -538,9 +538,9 @@ function startAdvancedPractice(mode) {
   learningState.isAdvancedMode = true;
   learningState.advancedModeType = mode;
   
-  // Generate and display the first question for this mode
-  if (window.askQuestion) {
-    window.askQuestion();
+  // Generate and display the first question for this mode using new modular system
+  if (window.appController && window.appController.generateAndDisplayQuestion) {
+    window.appController.generateAndDisplayQuestion();
   }
 }
 window.startAdvancedPractice = startAdvancedPractice;

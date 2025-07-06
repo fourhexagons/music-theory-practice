@@ -51,8 +51,8 @@ export default defineConfig({
     }
   },
   
-  // Use clean public directory to prevent legacy files from being included
-  publicDir: 'public-clean',
+  // Use standard public directory for assets
+  publicDir: 'public',
   
   // Development server settings
   server: {

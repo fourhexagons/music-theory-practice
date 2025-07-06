@@ -8,7 +8,7 @@ export class QuizService {
   askQuestion() {
     const group = window.getCurrentGroup();
     if (!group || group.mode === window.MODES.COMPLETE) {
-      this.appController.updateQuestionUI('');
+      this.appController.layout.showCompletionMessage();
       return;
     }
     let key, chapter;
@@ -59,7 +59,7 @@ export class QuizService {
         break;
       }
     }
-    this.appController.updateQuestionUI(text);
+    this.appController.questionDisplay.render(text);
   }
 
   handleAnswerSubmit(e) {
@@ -83,7 +83,7 @@ export class QuizService {
           const key = window.learningState.currentQuestion.key;
           window.learningState.currentQuestion = { key: key, chapterId: window.QUESTION_TYPES.ACCIDENTALS_NAMES };
           const text = `Name the accidentals in ${key} major.`;
-          this.appController.updateQuestionUI(text, false);
+          this.appController.questionDisplay.render(text, false);
         } else {
           this.startAdvancedPractice(window.learningState.advancedModeType);
         }
@@ -255,7 +255,7 @@ export class QuizService {
       console.log('🚀 QUIZ SERVICE DEBUG: Generated triad question:', text);
       
       console.log('🚀 QUIZ SERVICE DEBUG: About to update UI with text:', text);
-      this.appController.updateQuestionUI(text);
+      this.appController.questionDisplay.render(text);
       console.log('🚀 QUIZ SERVICE DEBUG: UI updated successfully');
       
         } else if (mode === 'spelling_sevenths') {
@@ -279,7 +279,7 @@ export class QuizService {
       const text = `${action} the ${MusicUtils.ordinal(degree)} ${chordType} in ${selectedKey} major.`;
       
       console.log('🚀 QUIZ SERVICE DEBUG: Generated sevenths question:', text);
-      this.appController.updateQuestionUI(text);
+      this.appController.questionDisplay.render(text);
     }
     
     console.log('🚀 QUIZ SERVICE DEBUG: startAdvancedPractice completed');

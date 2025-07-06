@@ -93,7 +93,19 @@ export class AppController {
 
   setupUI() {
     // Render the practice layout
+    console.log('🎯 AppController.setupUI: About to call renderPracticeLayout()');
     this.layout.renderPracticeLayout();
+    console.log('🎯 AppController.setupUI: renderPracticeLayout() completed');
+    
+    // Verify the layout was rendered correctly
+    const form = document.getElementById('answer-form');
+    const input = document.getElementById('answer-input');
+    if (form && input) {
+      console.log('✅ Form rendered successfully with classes:', form.className);
+      console.log('✅ Input rendered successfully with classes:', input.className);
+    } else {
+      console.error('❌ Form or input not found after renderPracticeLayout()');
+    }
 
     // Re-initialize the practice menu to restore event bindings
     if (window.PracticeMenu) {
@@ -215,43 +227,6 @@ export class AppController {
     };
   }
 
-  renderAppLayout() {
-    const appContainer = document.getElementById('app-container');
-    appContainer.innerHTML = `
-      <header class="app-header">
-        <a href="/" class="logo-link">
-          <img src="/images/lb-loop-logo-white-on-trans.png" alt="Logo" class="app-logo">
-        </a>
-      </header>
-      <div class="main-content">
-        <div class="quiz-section">
-          <div class="question-display" id="question-display"></div>
-          <div class="answer-container">
-            <form id="answer-form">
-              <input type="text" id="answer-input" placeholder="Your answer..." autocomplete="off">
-              <button type="submit" id="submit-btn" class="btn">Submit</button>
-            </form>
-            <div class="feedback" id="feedback"></div>
-          </div>
-        </div>
-      </div>
-    `;
-    // Advanced practice section
-    const advancedRoot = document.getElementById('advanced-practice-root');
-    if (advancedRoot) {
-      advancedRoot.innerHTML = `
-        <div class="advanced-practice">
-          <h3>Advanced Practice</h3>
-          <div class="practice-controls">
-            <button id="advanced1-btn" class="btn">Randomize</button>
-            <button id="advanced2-btn" class="btn">Sevenths</button>
-          </div>
-        </div>
-      `;
-    }
-    this.attachEventListeners();
-  }
-
   attachEventListeners() {
     // Remove duplicate form binding - AnswerForm already handles this via setSubmitHandler
     // const form = document.getElementById('answer-form');
@@ -271,31 +246,6 @@ export class AppController {
     }
     if (advanced2Btn) {
               advanced2Btn.addEventListener('click', () => window.startAdvancedPractice('spelling_sevenths'));
-    }
-  }
-
-  updateQuestionUI(text, clearInput = true) {
-    const questionDisplay = document.getElementById('question-display');
-    const answerInput = document.getElementById('answer-input');
-    const feedback = document.getElementById('feedback');
-    const answerForm = document.getElementById('answer-form');
-    
-    if (window.getCurrentLevel().mode === window.MODES.COMPLETE) {
-      questionDisplay.textContent = 'Congratulations! You have completed all levels.';
-      // Use Tailwind classes instead of inline styles
-      answerForm.classList.add('hidden');
-    } else {
-      // Use Tailwind classes instead of inline styles
-      answerForm.classList.remove('hidden');
-      questionDisplay.textContent = text;
-      if (clearInput && answerInput) {
-        answerInput.value = '';
-      }
-      if (feedback) {
-        feedback.textContent = '';
-        feedback.className = 'feedback';
-      }
-      if (answerInput) answerInput.focus();
     }
   }
 } 

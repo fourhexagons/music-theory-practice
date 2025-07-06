@@ -26,10 +26,10 @@ window.checkAnswer = (answer) => quizService.checkAnswer(answer);
 
 // App initialization
 function initializeApp() {
-  appController.renderAppLayout();
-  quizService.askQuestion();
+  appController.initialize();
 }
 
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
 }); 

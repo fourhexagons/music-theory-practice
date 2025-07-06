@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Isolated Question Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Replicate the app's CSS constraints */
+        .app-container-replica {
+            position: relative;
+            padding: 2rem; /* var(--ds-space-layout-lg) */
+            max-width: 75rem; /* 1200px - same as #app-container */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #555555;
+            color: white;
+        }
+        
+        .debug-border { border: 2px solid red; }
+        .debug-bg { background: rgba(255, 255, 0, 0.2); }
+        .debug-text { color: #333; background: yellow; padding: 5px; }
+        
+        /* Test if body flex interferes */
+        body {
+            font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #555555;
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 1rem;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="app-container-replica">
+        <h1 class="text-2xl mb-8">🔍 Isolated Question Test</h1>
+        
+        <!-- Controls -->
+        <div class="mb-8 bg-black p-4 rounded">
+            <div class="mb-4">
+                <button onclick="showQuestion1Only()" class="bg-blue-500 text-white px-4 py-2 mr-2">Show Question 1 ONLY</button>
+                <button onclick="showQuestion2Only()" class="bg-green-500 text-white px-4 py-2 mr-2">Show Question 2 ONLY</button>
+                <button onclick="clearAll()" class="bg-red-500 text-white px-4 py-2">Clear All</button>
+            </div>
+            <div class="text-sm">
+                <div><strong>Current Question:</strong> <span id="current-question-display">None</span></div>
+                <div><strong>Input Width:</strong> <span id="current-input-width">-</span>px</div>
+                <div><strong>Form Width:</strong> <span id="current-form-width">-</span>px</div>
+                <div><strong>Container Width:</strong> <span id="current-container-width">-</span>px</div>
+            </div>
+        </div>
+        
+        <!-- Question 1 Container - Completely Isolated -->
+        <div id="question1-container" class="hidden">
+            <h2 class="text-xl mb-4 debug-text">Question 1: "How many accidentals are in C major?"</h2>
+            <main class="flex-1 pt-24">
+                <div class="w-full max-w-4xl mx-auto px-4 debug-border">
+                    <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center">
+                        How many accidentals are in C major?
+                    </div>
+                    <form id="form1" class="w-full flex flex-col sm:flex-row gap-2 mb-6 debug-bg">
+                        <input id="input1" type="text" 
+                               placeholder="Your answer..." 
+                               class="flex-1 min-w-0 w-full bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
+                        <button type="submit" 
+                                class="w-full sm:w-40 shrink-0 bg-gray-800 hover:bg-gray-700 text-white border border-gray-800 hover:border-gray-700 rounded-none px-8 py-4 text-lg font-medium cursor-pointer transition-all duration-150 ease-in-out text-center outline-none">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Question 2 Container - Completely Isolated -->
+        <div id="question2-container" class="hidden">
+            <h2 class="text-xl mb-4 debug-text">Question 2: "Spell the C major scale."</h2>
+            <main class="flex-1 pt-24">
+                <div class="w-full max-w-4xl mx-auto px-4 debug-border">
+                    <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center">
+                        Spell the C major scale.
+                    </div>
+                    <form id="form2" class="w-full flex flex-col sm:flex-row gap-2 mb-6 debug-bg">
+                        <input id="input2" type="text" 
+                               placeholder="Your answer..." 
+                               class="flex-1 min-w-0 w-full bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
+                        <button type="submit" 
+                                class="w-full sm:w-40 shrink-0 bg-gray-800 hover:bg-gray-700 text-white border border-gray-800 hover:border-gray-700 rounded-none px-8 py-4 text-lg font-medium cursor-pointer transition-all duration-150 ease-in-out text-center outline-none">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Measurements for currently visible question -->
+        <div class="mt-8 bg-black p-4 rounded">
+            <h3 class="text-lg mb-4">Live Measurements (Current Question Only)</h3>
+            <div class="text-sm space-y-2">
+                <div><strong>Viewport Width:</strong> <span id="viewport-width">-</span>px</div>
+                <div><strong>App Container Width:</strong> <span id="app-container-width">-</span>px</div>
+                <div><strong>Max-w-4xl Container Width:</strong> <span id="max-w-container-width">-</span>px</div>
+                <div><strong>Form Width:</strong> <span id="form-width">-</span>px</div>
+                <div><strong>Input Width:</strong> <span id="input-width">-</span>px</div>
+                <div><strong>Button Width:</strong> <span id="button-width">-</span>px</div>
+            </div>
+            <div class="mt-4">
+                <h4 class="text-md mb-2">Input Computed Styles:</h4>
+                <pre id="computed-styles" class="text-xs bg-gray-800 p-2 rounded overflow-auto max-h-40">No question selected</pre>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showQuestion1Only() {
+            // Hide everything
+            document.getElementById('question1-container').classList.add('hidden');
+            document.getElementById('question2-container').classList.add('hidden');
+            
+            // Force layout recalculation
+            document.body.offsetHeight;
+            
+            // Show question 1
+            document.getElementById('question1-container').classList.remove('hidden');
+            document.getElementById('current-question-display').textContent = 'Question 1: How many accidentals are in C major?';
+            
+            setTimeout(() => {
+                updateMeasurements('input1', 'form1');
+            }, 100);
+        }
+        
+        function showQuestion2Only() {
+            // Hide everything
+            document.getElementById('question1-container').classList.add('hidden');
+            document.getElementById('question2-container').classList.add('hidden');
+            
+            // Force layout recalculation
+            document.body.offsetHeight;
+            
+            // Show question 2
+            document.getElementById('question2-container').classList.remove('hidden');
+            document.getElementById('current-question-display').textContent = 'Question 2: Spell the C major scale.';
+            
+            setTimeout(() => {
+                updateMeasurements('input2', 'form2');
+            }, 100);
+        }
+        
+        function clearAll() {
+            document.getElementById('question1-container').classList.add('hidden');
+            document.getElementById('question2-container').classList.add('hidden');
+            document.getElementById('current-question-display').textContent = 'None';
+            
+            // Clear measurements
+            document.getElementById('current-input-width').textContent = '-';
+            document.getElementById('current-form-width').textContent = '-';
+            document.getElementById('current-container-width').textContent = '-';
+            document.getElementById('computed-styles').textContent = 'No question selected';
+        }
+        
+        function updateMeasurements(inputId, formId) {
+            const viewport = window.innerWidth;
+            const appContainer = document.querySelector('.app-container-replica');
+            const maxWContainer = document.querySelector('.w-full.max-w-4xl');
+            const form = document.getElementById(formId);
+            const input = document.getElementById(inputId);
+            const button = form?.querySelector('button');
+            
+            // Update basic measurements
+            document.getElementById('viewport-width').textContent = viewport;
+            document.getElementById('app-container-width').textContent = appContainer ? appContainer.offsetWidth : '-';
+            document.getElementById('max-w-container-width').textContent = maxWContainer ? maxWContainer.offsetWidth : '-';
+            document.getElementById('form-width').textContent = form ? form.offsetWidth : '-';
+            document.getElementById('input-width').textContent = input ? input.offsetWidth : '-';
+            document.getElementById('button-width').textContent = button ? button.offsetWidth : '-';
+            
+            // Update control panel measurements
+            document.getElementById('current-input-width').textContent = input ? input.offsetWidth : '-';
+            document.getElementById('current-form-width').textContent = form ? form.offsetWidth : '-';
+            document.getElementById('current-container-width').textContent = maxWContainer ? maxWContainer.offsetWidth : '-';
+            
+            // Update computed styles
+            if (input) {
+                const computed = window.getComputedStyle(input);
+                const styles = {
+                    width: computed.width,
+                    minWidth: computed.minWidth,
+                    maxWidth: computed.maxWidth,
+                    flex: computed.flex,
+                    flexGrow: computed.flexGrow,
+                    flexShrink: computed.flexShrink,
+                    flexBasis: computed.flexBasis,
+                    display: computed.display,
+                    boxSizing: computed.boxSizing
+                };
+                
+                document.getElementById('computed-styles').textContent = JSON.stringify(styles, null, 2);
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            console.log('🔍 Isolated Question Test Loaded');
+            console.log('Click buttons to show questions one at a time');
+        });
+        
+        window.addEventListener('resize', () => {
+            // Update measurements for currently visible question
+            if (!document.getElementById('question1-container').classList.contains('hidden')) {
+                updateMeasurements('input1', 'form1');
+            } else if (!document.getElementById('question2-container').classList.contains('hidden')) {
+                updateMeasurements('input2', 'form2');
+            }
+        });
+        
+        // Debug logging
+        setTimeout(() => {
+            console.log('🎨 Tailwind classes available:', {
+                'flex-1': getComputedStyle(document.createElement('div')).getPropertyValue('--tw-content') !== '',
+                'min-w-0': true,
+                'w-full': true
+            });
+        }, 100);
+    </script>
+</body>
+</html> 

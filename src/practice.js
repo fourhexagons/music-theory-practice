@@ -1,6 +1,10 @@
 // Import all dependencies in correct order
 import './styles/variables.css';
-import './styles/style.css';
+import './styles/design-system.css';
+// Use pre-built Tailwind CSS instead of Vite processing
+import '../debug-tailwind-output.css';
+// Import the clean version without @tailwind directives
+import './styles/style-without-tailwind.css';
 import './styles/components/menu.css';
 
 // Import utilities first

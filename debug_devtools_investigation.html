@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTools Investigation - Form Layout Debug</title>
+    <style>
+        body { 
+            font-family: monospace; 
+            background: #1a1a1a; 
+            color: #fff; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        .debug-section { 
+            background: #2a2a2a; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .debug-title { 
+            color: #4CAF50; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+        }
+        .error { color: #f44336; }
+        .success { color: #4CAF50; }
+        .warning { color: #ff9800; }
+        pre { 
+            background: #333; 
+            padding: 10px; 
+            border-radius: 3px; 
+            overflow-x: auto; 
+            white-space: pre-wrap;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>🔍 DevTools Investigation - Form Layout Debug</h1>
+    
+    <div class="debug-section">
+        <div class="debug-title">📋 Investigation Checklist</div>
+        <button onclick="runFullInvestigation()">🚀 Run Full Investigation</button>
+        <button onclick="inspectCurrentForm()">🔍 Inspect Current Form</button>
+        <button onclick="testTailwindClasses()">🎨 Test Tailwind Classes</button>
+        <button onclick="checkCSSLoading()">📄 Check CSS Loading</button>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">📊 Investigation Results</div>
+        <div id="results"></div>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">🎯 Manual DevTools Instructions</div>
+        <pre>
+1. Open DevTools (F12 or Cmd+Option+I)
+2. Go to Elements tab
+3. Find the form with id="answer-form"
+4. Right-click on the form → Copy → Copy outerHTML
+5. Check the Computed styles for the input element
+6. Look for any CSS rules overriding the Tailwind classes
+7. Check the Network tab for CSS files loading
+8. Run the investigation script below in Console tab
+        </pre>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">💻 Console Script for DevTools</div>
+        <pre id="console-script">
+// Copy and paste this into DevTools Console:
+console.log('🔍 FORM LAYOUT INVESTIGATION');
+console.log('============================');
+
+// 1. Check if form exists and its HTML
+const form = document.getElementById('answer-form');
+console.log('1. Form exists:', !!form);
+if (form) {
+    console.log('   Form HTML:', form.outerHTML);
+    console.log('   Form classes:', form.className);
+}
+
+// 2. Check input element
+const input = document.getElementById('answer-input');
+console.log('2. Input exists:', !!input);
+if (input) {
+    console.log('   Input HTML:', input.outerHTML);
+    console.log('   Input classes:', input.className);
+    const computedStyles = window.getComputedStyle(input);
+    console.log('   Computed flex:', computedStyles.flex);
+    console.log('   Computed width:', computedStyles.width);
+    console.log('   Computed min-width:', computedStyles.minWidth);
+}
+
+// 3. Check button element
+const button = document.getElementById('submit-btn');
+console.log('3. Button exists:', !!button);
+if (button) {
+    console.log('   Button HTML:', button.outerHTML);
+    console.log('   Button classes:', button.className);
+    const computedStyles = window.getComputedStyle(button);
+    console.log('   Computed width:', computedStyles.width);
+    console.log('   Computed flex-shrink:', computedStyles.flexShrink);
+}
+
+// 4. Check CSS loading
+const stylesheets = Array.from(document.styleSheets);
+console.log('4. Loaded stylesheets:', stylesheets.length);
+stylesheets.forEach((sheet, i) => {
+    try {
+        console.log(`   Sheet ${i}:`, sheet.href || 'inline', 'Rules:', sheet.cssRules?.length || 0);
+    } catch(e) {
+        console.log(`   Sheet ${i}:`, sheet.href || 'inline', 'CORS blocked');
+    }
+});
+
+// 5. Test Tailwind classes
+const testDiv = document.createElement('div');
+testDiv.className = 'flex-1 min-w-0 w-full md:w-auto';
+document.body.appendChild(testDiv);
+const testStyles = window.getComputedStyle(testDiv);
+console.log('5. Tailwind test element:');
+console.log('   flex:', testStyles.flex);
+console.log('   min-width:', testStyles.minWidth);
+console.log('   width:', testStyles.width);
+document.body.removeChild(testDiv);
+
+// 6. Check for conflicting CSS rules
+if (input) {
+    const allRules = [];
+    for (let sheet of stylesheets) {
+        try {
+            for (let rule of sheet.cssRules) {
+                if (rule.selectorText && rule.selectorText.includes('input')) {
+                    allRules.push(rule.cssText);
+                }
+            }
+        } catch(e) {}
+    }
+    console.log('6. CSS rules affecting input:', allRules);
+}
+
+console.log('============================');
+console.log('✅ Investigation complete!');
+        </pre>
+    </div>
+
+    <script>
+        function runFullInvestigation() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="warning">Opening practice page for investigation...</div>';
+            
+            // Open the practice page in a new tab for investigation
+            const practiceWindow = window.open('http://localhost:5173/practice', '_blank');
+            
+            setTimeout(() => {
+                results.innerHTML += `
+                    <div class="debug-section">
+                        <div class="success">✅ Practice page opened in new tab</div>
+                        <div>1. Switch to the new tab</div>
+                        <div>2. Open DevTools (F12)</div>
+                        <div>3. Copy the console script above and paste it in Console tab</div>
+                        <div>4. Look for any error messages or unexpected values</div>
+                        <div>5. Check Elements tab for the actual form HTML</div>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        function inspectCurrentForm() {
+            // This will work if we're on the practice page
+            const form = document.getElementById('answer-form');
+            const input = document.getElementById('answer-input');
+            const results = document.getElementById('results');
+            
+            if (!form) {
+                results.innerHTML = '<div class="error">❌ No form found on this page. Run this on the practice page.</div>';
+                return;
+            }
+            
+            results.innerHTML = `
+                <div class="debug-section">
+                    <div class="debug-title">🔍 Form Inspection Results</div>
+                    <div><strong>Form HTML:</strong></div>
+                    <pre>${form.outerHTML}</pre>
+                    <div><strong>Input Classes:</strong> ${input?.className || 'N/A'}</div>
+                    <div><strong>Form Classes:</strong> ${form.className}</div>
+                </div>
+            `;
+        }
+
+        function testTailwindClasses() {
+            const results = document.getElementById('results');
+            
+            // Create test elements with Tailwind classes
+            const testContainer = document.createElement('div');
+            testContainer.innerHTML = `
+                <div class="flex flex-col md:flex-row gap-2 mb-6" style="background: red; padding: 10px;">
+                    <input type="text" class="flex-1 min-w-0 w-full md:w-auto bg-gray-300" placeholder="Test input" style="border: 2px solid blue;">
+                    <button class="w-full md:w-40 shrink-0 bg-green-500" style="border: 2px solid green;">Test Button</button>
+                </div>
+            `;
+            
+            document.body.appendChild(testContainer);
+            
+            const testInput = testContainer.querySelector('input');
+            const testButton = testContainer.querySelector('button');
+            const computedInput = window.getComputedStyle(testInput);
+            const computedButton = window.getComputedStyle(testButton);
+            
+            results.innerHTML = `
+                <div class="debug-section">
+                    <div class="debug-title">🎨 Tailwind Classes Test</div>
+                    <div class="success">✅ Test elements added to page (look for red/blue/green borders)</div>
+                    <div><strong>Test Input Computed Styles:</strong></div>
+                    <pre>flex: ${computedInput.flex}
+width: ${computedInput.width}
+min-width: ${computedInput.minWidth}
+background: ${computedInput.backgroundColor}</pre>
+                    <div><strong>Test Button Computed Styles:</strong></div>
+                    <pre>width: ${computedButton.width}
+flex-shrink: ${computedButton.flexShrink}
+background: ${computedButton.backgroundColor}</pre>
+                </div>
+            `;
+            
+            // Remove test elements after 10 seconds
+            setTimeout(() => {
+                document.body.removeChild(testContainer);
+                results.innerHTML += '<div class="warning">Test elements removed</div>';
+            }, 10000);
+        }
+
+        function checkCSSLoading() {
+            const results = document.getElementById('results');
+            const stylesheets = Array.from(document.styleSheets);
+            
+            let cssInfo = '<div class="debug-section"><div class="debug-title">📄 CSS Loading Analysis</div>';
+            
+            cssInfo += `<div><strong>Total stylesheets:</strong> ${stylesheets.length}</div>`;
+            
+            stylesheets.forEach((sheet, i) => {
+                try {
+                    const ruleCount = sheet.cssRules?.length || 0;
+                    cssInfo += `<div>Sheet ${i}: ${sheet.href || 'inline'} (${ruleCount} rules)</div>`;
+                } catch(e) {
+                    cssInfo += `<div>Sheet ${i}: ${sheet.href || 'inline'} (CORS blocked)</div>`;
+                }
+            });
+            
+            cssInfo += '</div>';
+            results.innerHTML = cssInfo;
+        }
+
+        // Auto-generate the console script with current timestamp
+        document.addEventListener('DOMContentLoaded', () => {
+            const script = document.getElementById('console-script');
+            const timestamp = new Date().toLocaleTimeString();
+            script.textContent = script.textContent.replace('🔍 FORM LAYOUT INVESTIGATION', `🔍 FORM LAYOUT INVESTIGATION - ${timestamp}`);
+        });
+    </script>
+</body>
+</html> 
