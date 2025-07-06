@@ -15,8 +15,10 @@
 - **Features**: Bundled/optimized code, simulates production
 
 ### Staging Environment - **FOR SAFE DEPLOYMENT TESTING**
-- **Practice App**: `https://staging.learning.lightbath.com/practice`
+- **Primary URL**: `https://staging.learning.lightbath.com/practice` *(custom domain)*
+- **Firebase URL**: `https://music-theory-practice-staging.web.app/practice` *(Firebase default)*
 - **Use for**: Testing changes before production deployment
+- **Note**: Both URLs serve the **same staging environment** - the custom domain is preferred for team use
 - **See**: [STAGING_SETUP.md](STAGING_SETUP.md) for complete setup and workflow
 
 ### Production Environment - **LIVE SITE**
@@ -57,6 +59,21 @@
 - `/src/practice.html` - Actual practice app source
 
 **Key Principle**: Root files include the src files to provide clean URLs while maintaining the modular src/ architecture.
+
+### Staging Environment Details
+**Important**: The staging environment has **two URLs that serve identical content**:
+
+1. **Custom Domain** (Preferred): `staging.learning.lightbath.com`
+   - Professional URL for team use
+   - Easier to remember and share
+   - Matches production domain pattern
+
+2. **Firebase Default**: `music-theory-practice-staging.web.app`
+   - Automatically provided by Firebase
+   - Backup access method
+   - Used in deployment logs
+
+**Deployment**: Both URLs are updated simultaneously when running `npm run deploy:staging`
 
 ## 🔧 Maintenance Protocol
 

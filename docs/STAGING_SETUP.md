@@ -6,7 +6,13 @@ This guide walks you through setting up a complete staging environment for safe 
 
 **Target URLs:**
 - **Production**: `https://learning.lightbath.com/practice`
-- **Staging**: `https://staging.learning.lightbath.com/practice`
+- **Staging**: `https://staging.learning.lightbath.com/practice` *(preferred custom domain)*
+
+**Important**: The staging environment is accessible via **two URLs**:
+1. **Custom Domain** (Primary): `https://staging.learning.lightbath.com/practice`
+2. **Firebase Default** (Backup): `https://music-theory-practice-staging.web.app/practice`
+
+Both URLs serve **identical content** from the same Firebase hosting target. The custom domain is preferred for team use, while the Firebase URL appears in deployment logs and serves as a backup.
 
 **Status**: ✅ **Fully Operational** - Staging environment is live and ready for testing
 
@@ -51,11 +57,13 @@ firebase target:apply hosting staging music-theory-practice-staging
 4. Enter: `staging.learning.lightbath.com`
 5. Follow verification steps (may take 24-48 hours)
 
+**Result**: After setup, both `staging.learning.lightbath.com` and `music-theory-practice-staging.web.app` will serve the same staging content.
+
 ## Phase 3: Deployment Commands
 
 ### Manual Deployments
 ```bash
-# Deploy to staging
+# Deploy to staging (updates both URLs simultaneously)
 npm run deploy:staging
 
 # Deploy to production
@@ -70,7 +78,7 @@ npm run deploy:production
 
 ### Before Production Deployment:
 1. **Deploy to staging**: `npm run deploy:staging`
-2. **Test staging site**: `https://staging.learning.lightbath.com/practice`
+2. **Test staging site**: `https://staging.learning.lightbath.com/practice` *(use custom domain)*
 3. **Verify all functionality**:
    - Form layout on desktop/mobile
    - Service Worker behavior
