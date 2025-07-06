@@ -44,6 +44,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 #app-container {
   position: relative;
   padding: var(--ds-space-layout-lg);
+  width: 100%;
   max-width: 75rem;
   margin: 0 auto;
   display: flex;

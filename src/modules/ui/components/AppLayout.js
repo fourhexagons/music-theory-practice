@@ -24,13 +24,13 @@ export class AppLayout {
         </a>
       </header>
       <main class="flex-1 pt-24">
-        <div class="w-full max-w-4xl mx-auto px-4">
+        <div class="w-full max-w-4xl mx-auto px-4 block">
           <div class="text-2xl md:text-3xl lg:text-4xl mb-12 text-white font-medium leading-tight text-center" 
                id="question-display" 
                role="region" 
                aria-live="polite" 
                aria-label="Current question"></div>
-          <form id="answer-form" role="form" aria-label="Answer submission" class="w-full flex flex-col sm:flex-row gap-2 mb-6">
+          <form id="answer-form" role="form" aria-label="Answer submission" class="w-full block flex flex-col sm:flex-row gap-2 mb-6">
             <label for="answer-input" class="sr-only">Your answer</label>
             <input type="text" 
                    id="answer-input" 
