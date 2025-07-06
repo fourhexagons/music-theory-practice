@@ -183,7 +183,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 /* Feedback - migrated to Tailwind classes */
 
 /* Responsive Design */
-@media (max-width: 48rem) {
+@media (max-width: 767px) {
   #app-container { 
     padding: var(--ds-space-layout-md); 
   }
@@ -205,14 +205,14 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: var(--ds-space-component-sm);
-    width: 100% !important; /* Force full width on mobile - production fix */
+    width: 100%;
   }
   
   .ds-input,
   .ds-button,
   #answer-input,
   .btn {
-    width: 100% !important; /* Force full width on mobile - production fix */
+    width: 100%;
     min-width: 0;
   }
   
@@ -241,11 +241,11 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   #answer-form, .practice-controls {
     flex-direction: column;
     gap: var(--spacing-sm);
-    width: 100% !important; /* Force full width on mobile - production fix */
+    width: 100%;
   }
   
   #answer-input, #submit-btn {
-    width: 100% !important; /* Force full width on mobile - production fix */
+    width: 100%;
     min-width: 0;
   }
   
