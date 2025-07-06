@@ -14,6 +14,8 @@ module.exports = {
     'text-blue-500',
     // Critical layout classes that must always be included
     'flex-1',
+    'flex-none',
+    'md:flex-none',
     'min-w-0',
     'shrink-0',
     'w-full',

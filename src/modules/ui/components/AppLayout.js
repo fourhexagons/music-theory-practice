@@ -38,7 +38,8 @@ export class AppLayout {
                    autocomplete="off"
                    aria-describedby="feedback"
                    aria-label="Enter your answer"
-                   class="w-full md:w-160 flex-1 min-w-0 bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
+                   style="width: 100%; flex: 1 1 0%; min-width: 0;"
+                   class="bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
             <button type="submit" 
                     id="submit-btn" 
                     class="w-full sm:w-40 shrink-0 bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-8 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-center outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -55,11 +56,30 @@ export class AppLayout {
       </main>
     `;
     
+    // Apply responsive width via JavaScript
+    const input = document.getElementById('answer-input');
+    if (input) {
+      const applyResponsiveWidth = () => {
+        if (window.innerWidth >= 768) {
+          input.style.width = '640px';
+          input.style.flex = 'none';
+        } else {
+          input.style.width = '100%';
+          input.style.flex = '1 1 0%';
+        }
+      };
+      
+      // Apply immediately
+      applyResponsiveWidth();
+      
+      // Apply on resize
+      window.addEventListener('resize', applyResponsiveWidth);
+    }
+    
     console.log('✅ AppLayout.renderPracticeLayout: innerHTML set successfully');
     
     // Verify the form was created with correct classes
     const form = document.getElementById('answer-form');
-    const input = document.getElementById('answer-input');
     const button = document.getElementById('submit-btn');
     
     if (form) {
