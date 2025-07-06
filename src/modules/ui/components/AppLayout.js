@@ -38,7 +38,7 @@ export class AppLayout {
                    autocomplete="off"
                    aria-describedby="feedback"
                    aria-label="Enter your answer"
-                   class="w-full sm:max-w-xs md:max-w-sm lg:max-w-md flex-1 min-w-0 bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
+                   class="w-full sm:w-80 md:w-96 lg:w-96 flex-1 min-w-0 bg-gray-300 text-gray-900 border border-transparent rounded-none px-5 py-4 text-lg font-normal font-inherit outline-none placeholder-gray-600 focus:bg-gray-300 focus:border-gray-400">
             <button type="submit" 
                     id="submit-btn" 
                     class="w-full sm:w-40 shrink-0 bg-ds-interactive-primary hover:bg-ds-interactive-primary-hover text-white border border-ds-interactive-primary hover:border-ds-interactive-primary-hover rounded-none px-8 py-4 text-lg font-medium leading-relaxed cursor-pointer transition-all duration-150 ease-in-out text-center outline-none hover:translate-y-px active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
