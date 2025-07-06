@@ -7,6 +7,16 @@ A web-based music theory practice application for chord and accidental normaliza
 - **Site**: [learning.lightbath.com](https://learning.lightbath.com)
 - **App**: [learning.lightbath.com/practice](https://learning.lightbath.com/practice)
 
+## Staging Environment
+
+- **App**: [staging.learning.lightbath.com/practice](https://staging.learning.lightbath.com/practice)
+
+Safe testing ground for all changes before production deployment.
+
+**⚠️ Always test changes on staging before deploying to production.**
+
+See [docs/STAGING_SETUP.md](docs/STAGING_SETUP.md) for complete staging workflow.
+
 ## Beta Testing
 
 Currently in beta testing with students.

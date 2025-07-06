@@ -33,7 +33,9 @@
     "git:cleanup": "node scripts/git-branch-cleanup.cjs",
     "git:status": "git branch -v && echo \"\n🧹 Run: npm run git:cleanup\"",
     "git:verify": "node scripts/git-assistant-protocol.cjs",
-    "git:workflow": "npm run git:verify"
+    "git:workflow": "npm run git:verify",
+    "deploy:staging": "npm run build && firebase deploy --only hosting:staging",
+    "deploy:production": "npm run build && firebase deploy --only hosting:production"
   },
   "keywords": [
     "music",

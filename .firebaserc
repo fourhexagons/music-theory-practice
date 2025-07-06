@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "music-theory-practice-01"
-  }
+  },
+  "targets": {
+    "music-theory-practice-01": {
+      "hosting": {
+        "staging": [
+          "music-theory-practice-staging"
+        ],
+        "production": [
+          "music-theory-practice-01"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

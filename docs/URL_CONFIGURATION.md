@@ -14,6 +14,15 @@
 - **Use for**: Testing production builds, deployment verification
 - **Features**: Bundled/optimized code, simulates production
 
+### Staging Environment - **FOR SAFE DEPLOYMENT TESTING**
+- **Practice App**: `https://staging.learning.lightbath.com/practice`
+- **Use for**: Testing changes before production deployment
+- **See**: [STAGING_SETUP.md](STAGING_SETUP.md) for complete setup and workflow
+
+### Production Environment - **LIVE SITE**
+- **Practice App**: `https://learning.lightbath.com/practice`
+- **Use for**: Live student access
+
 ### Legacy Firebase Server (`npm run serve:old`) - **FOR REFERENCE ONLY**
 - **Practice App**: `http://localhost:5002/practice`
 - **Use for**: Comparing with legacy system (rarely needed)

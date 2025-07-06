@@ -1,16 +1,34 @@
 {
-  "hosting": {
-    "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/practice",
-        "destination": "/practice.html"
-      }
-    ]
-  }
+  "hosting": [
+    {
+      "target": "production",
+      "public": "dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/practice",
+          "destination": "/practice.html"
+        }
+      ]
+    },
+    {
+      "target": "staging",
+      "public": "dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/practice",
+          "destination": "/practice.html"
+        }
+      ]
+    }
+  ]
 }

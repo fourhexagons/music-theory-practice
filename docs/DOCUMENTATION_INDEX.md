@@ -98,6 +98,7 @@
 
 | File | Contains | Use When |
 |------|----------|----------|
+| **STAGING_SETUP.md** | Staging environment setup and configuration | Setting up or troubleshooting staging deployments |
 | **chord-variations.md** | Chord input reference | Working with chord recognition |
 | **ACCIDENTALS_PAIRING_ANALYSIS.md** | Accidentals logic analysis | Investigating accidentals behavior |
 

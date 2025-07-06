@@ -8,13 +8,24 @@ This guide follows the [Systematic Research Methodology](SYSTEMATIC_RESEARCH_MET
 
 ## 🚨 **CRITICAL: Deployment Protection Protocol**
 
-### **MANDATORY CHECKLIST Before ANY Deployment:**
-1. **Present the fix** and explain what it does
-2. **Ask "Should I deploy this fix?"** and wait for explicit permission
-3. **If user says "test first"** or similar, provide testing instructions
-4. **Only deploy after receiving clear permission** like "proceed", "deploy", or "yes"
+### **🛑 MANDATORY STAGING-FIRST DEPLOYMENT PROTOCOL**
 
-**⚠️ The user has been burned multiple times by hasty deployments that broke the live site. I must treat the live site with extreme care and always respect their testing-first process. ANY deployment without permission is a critical failure.**
+**ASSISTANTS MUST FOLLOW THIS EXACT SEQUENCE - NO EXCEPTIONS:**
+
+1. **Deploy to staging FIRST**: `npm run deploy:staging`
+2. **Inform user**: "I've deployed to staging: https://staging.learning.lightbath.com/practice"
+3. **Wait for manual testing**: User will test the staging site themselves
+4. **Ask for explicit permission**: "Should I deploy this to production?"
+5. **Only deploy to production after receiving explicit approval**: "yes", "deploy", or "proceed"
+
+### **🚨 ABSOLUTE PROHIBITIONS:**
+- **NEVER deploy directly to production** without staging first
+- **NEVER deploy to production** without explicit user approval after staging test
+- **NEVER assume** staging test was successful - wait for user confirmation
+- **NEVER proceed** with production deployment if user says "let me test" or "wait"
+
+### **⚠️ CRITICAL FAILURE WARNING:**
+**ANY deployment to production without following this exact protocol is a CRITICAL FAILURE. The user has been burned multiple times by hasty deployments that broke the live site.**
 
 ---
 
@@ -221,11 +232,15 @@ export default defineConfig({
 
 ---
 
-## 🎯 **Development vs. Production URLs**
+## 🎯 **Development vs. Production vs. Staging URLs**
 
 ### **Development (Local)**
 - **Primary**: `http://localhost:5173/practice`
 - **Preview**: `http://localhost:4173/practice` (after `npm run preview`)
+
+### **Staging (Pre-Production Testing)**
+- **Primary**: `https://staging.learning.lightbath.com/practice`
+- **Firebase**: `https://music-theory-practice-staging.web.app/practice`
 
 ### **Production (Live)**
 - **Primary**: `https://learning.lightbath.com/practice`
@@ -238,6 +253,7 @@ export default defineConfig({
 ## 📚 **Related Documentation**
 
 - **[URL Configuration](URL_CONFIGURATION.md)** - Official app URLs
+- **[Staging Setup](STAGING_SETUP.md)** - Complete staging environment setup and configuration
 - **[Development Guide](DEVELOPMENT.md)** - Local development setup
 - **[Git Workflow](GIT_WORKFLOW.md)** - Deploy-from-main safety protocols
 - **[Release Format](RELEASE_FORMAT.md)** - Release documentation standards
@@ -268,15 +284,48 @@ export default defineConfig({
 ## ✅ **Quick Reference Commands**
 
 ### **Standard Deployment Workflow**
+
+#### **MANDATORY: Staging-First Deployment**
 ```bash
 # 1. Build for production
 npm run build
 
-# 2. Deploy to Firebase (with permission)
-firebase deploy --only hosting
+# 2. Deploy to staging FIRST (mandatory)
+npm run deploy:staging
 
-# 3. Verify deployment
-# Visit https://learning.lightbath.com/practice
+# 3. Inform user and wait for manual testing
+# "I've deployed to staging: https://staging.learning.lightbath.com/practice"
+
+# 4. Ask for explicit permission after user tests
+# "Should I deploy this to production?"
+
+# 5. Deploy to production ONLY after explicit approval
+npm run deploy:production
+```
+
+#### **Emergency Revert (Production Issues)**
+```bash
+# 1. Immediately revert code
+git revert HEAD
+
+# 2. Deploy revert to production
+npm run deploy:production
+
+# 3. Fix issue on staging first
+npm run deploy:staging
+# Test thoroughly, get approval, then deploy to production
+```
+
+#### **For Staging-Only Testing**
+```bash
+# 1. Build for production
+npm run build
+
+# 2. Deploy to staging
+npm run deploy:staging
+
+# 3. Test on staging
+# Visit https://staging.learning.lightbath.com/practice
 ```
 
 ### **Troubleshooting Commands**
@@ -294,4 +343,4 @@ npm run dev
 
 ---
 
-**Remember: This deployment process is working reliably. Always ask for permission before deploying, and follow the systematic research methodology for any deployment issues.** 
+**Remember: Follow the mandatory staging-first deployment protocol. Always deploy to staging first, wait for user testing and explicit approval before deploying to production.**
