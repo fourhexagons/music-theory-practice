@@ -49,6 +49,7 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%; /* Fix for consistent container width */
 }
 
 .app-header {
@@ -93,7 +94,54 @@ h4 { font-size: clamp(1.125rem, 3vw, 1.25rem); line-height: 1.4; margin-bottom: 
 
 /* Question display - migrated to Tailwind classes */
 
-/* Form elements - migrated to Tailwind classes */
+/* Form elements - Form layout fix for consistent width */
+#answer-form {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: var(--max-width-content);
+  margin-bottom: var(--spacing-lg);
+}
+
+#answer-input {
+  background-color: var(--ds-input-bg);
+  color: var(--ds-text-secondary);
+  border: none;
+  border-radius: 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1.125rem;
+  font-family: inherit;
+  font-weight: 400;
+  outline: none;
+  width: 25rem;
+}
+
+/* Form layout fix for 640px combined width on desktop */
+@media (min-width: 768px) {
+  #answer-form {
+    width: 640px;
+    margin: 0 auto var(--spacing-lg) auto;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  #answer-input {
+    width: 472px; /* 640px - 160px button - 8px gap = 472px */
+    flex: none;
+  }
+  
+  #submit-btn {
+    width: 160px;
+    flex: none;
+  }
+}
+
+#answer-input::placeholder {
+  color: var(--ds-input-placeholder);
+  opacity: 1;
+}
 
 /* Buttons - migrated to Tailwind classes */
 
