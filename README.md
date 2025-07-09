@@ -17,34 +17,19 @@ Safe testing ground for all changes before production deployment.
 
 See [docs/STAGING_SETUP.md](docs/STAGING_SETUP.md) for complete staging workflow.
 
-## Beta Testing
-
-Currently in beta testing with students.
-
-- NEW chord normalization with case-sensitive pattern matching
-- NEW accidental normalization for double accidentals and mixed notation
-- NEW comprehensive test framework with keyboard shortcuts (Ctrl+Shift+Q)
-- FIX chord quality detection conflicts between m7 and M7
-- TEST 100% pass rate for all normalization functions
 
 ## 🚨 CRITICAL: Learning Path Protection
 
 **Before making any changes to the app, read the [Learning Path Protection Protocol](docs/LEARNING_PATH_PROTECTION.md).**
 
-The learning path logic is working correctly and follows a predictable pattern:
-- **Key progression**: C → G → D → A → E → B → F# → C#
-- **Chapter progression**: accCount → accNotes → scale → triads → sevenths
+The learning path logic is working correctly and follows a pattern of no accidentals to groups of 1-3 accidentals (first in sharps, then in flats) to 4-6 accidentals (first sharps, then flats):  
+- **Key progression**: C → [G → D → A] → [F → Bb → Eb] → [E → B → F#] → [Ab → Db → Gb]   
+- **Chapter progression**: accCount → accNotes → scale → triads → sevenths  
 - **Special cases**: C major skips accNotes (intentional behavior)
 
 **Any modifications to learning path logic require explicit permission and must follow the mandatory protocol.**
 
-## Usage
-
-- **Test Mode**: Press Ctrl+Shift+Q (Mac: Cmd+Shift+Q)
-- **Version**: Displayed in top-right corner of app
-- **Feedback**: Include version number when reporting issues
-
-## Development Commands (Phase 1+)
+## Development Commands
 
 ### Development
 - `npm run dev` - Start Vite development server (current system)
@@ -145,5 +130,3 @@ This will:
 ### Why this split?
 - **Node-compatible tests** are fast, reliable, and run automatically in CI/CD.
 - **Browser-only tests** cover UI, accessibility, and integration scenarios that require a real DOM.
-
-See comments in the test files and scripts for more details.
